@@ -1,0 +1,480 @@
+"""Tiered verdict logic and runtime validator wiring."""
+
+from __future__ import annotations
+
+from collections import deque
+from dataclasses import dataclass
+from typing import Dict, Any, Optional
+
+import numpy as np
+
+from frontier_ops.integration.vsa_core import PhasorAlgebra
+from frontier_ops.integration.agent_encoder import ActionEncoder, ROLE_NAMES
+from frontier_ops.integration.detection_signals import DetectionSignalEngine
+
+
+# Default thresholds — calibrated 2026-02-28 from real OpenClaw traces.
+# The old values (error=0.55, persistence=0.45) caused false FLAGs on
+# benign 20+ step autonomous coding sessions because the prediction
+# error and persistence signals naturally drift up during long sessions.
+DEFAULT_THRESHOLDS = {
+    "error": {"fire": 0.70, "strong": 0.85},
+    "fisher": {"fire": 0.40, "strong": 0.65},
+    "cross_slot": {"fire": 0.20, "strong": 0.42},
+    "persistence": {"fire": 0.65, "strong": 0.85},
+    "cusum": {"fire": 5.5, "strong": 9.0},
+}
+
+# Relaxed thresholds for log-tail mode where tool params aren't available.
+# The signal space has less resolution (only ~7 tool names), so:
+# - cross_slot spikes to ~0.95 on ANY tool change (normal coding)
+# - persistence maxes at 1.0 for runs of same tool (exec, exec, exec = normal)
+# - error spikes on tool transitions because the predictor is low-information
+# We effectively disable cross_slot and persistence, and heavily relax error/cusum.
+# The structural fast-path checks (credential→egress, etc.) still work because
+# they look at action content, not signal thresholds.
+# Relaxed thresholds for log-tail mode where tool params aren't available.
+# persistence and cross_slot use sentinel values (100.0) to fully disable them:
+# - cross_slot spikes to ~0.95 on ANY tool change (normal coding)
+# - persistence maxes at 1.0 for runs of same tool (exec, exec, exec = normal)
+# - error spikes on tool transitions because the predictor is low-information
+# - cusum drifts upward simply from lack of turn boundaries in replayed logs
+# The structural fast-path checks still work because they look at action content.
+LOG_TAIL_THRESHOLDS = {
+    "error": {"fire": 0.90, "strong": 0.98},
+    "fisher": {"fire": 0.55, "strong": 0.80},
+    "cross_slot": {"fire": 100.0, "strong": 100.0},  # fully disabled
+    "persistence": {"fire": 100.0, "strong": 100.0},  # fully disabled
+    "cusum": {"fire": 15.0, "strong": 25.0},
+}
+
+
+@dataclass
+class VerdictState:
+    step: int = 0
+    consecutive_flag_steps: int = 0
+    total_cross_slot_fires: int = 0
+
+
+class TieredVerdictEngine:
+    def __init__(
+        self,
+        thresholds: Optional[Dict[str, Dict[str, float]]] = None,
+        warmup_steps: int = 15,
+    ):
+        self.thresholds = thresholds or DEFAULT_THRESHOLDS
+        self.warmup_steps = warmup_steps
+        self.state = VerdictState()
+        self.recent_cross_slot_fires = deque(maxlen=30)
+        self.recent_sources = deque(maxlen=18)
+        self.recent_low_context = deque(maxlen=18)
+        self.recent_credential_steps = deque(maxlen=6)
+        self.recent_obstacle = deque(maxlen=10)
+        self.recent_retaliation_probe = deque(maxlen=10)
+        self.recent_sensitive_access = deque(maxlen=12)
+        self.recent_external_egress = deque(maxlen=12)
+        self.recent_external_high_risk = deque(maxlen=30)
+        self.recent_nonuser_credential = deque(maxlen=30)
+        self.payment_magnitudes = deque(maxlen=30)
+        self.payment_recipients = set()
+
+    def _signal_levels(self, raw_signals: Dict[str, float]) -> Dict[str, int]:
+        levels: Dict[str, int] = {}
+        for name, value in raw_signals.items():
+            t = self.thresholds.get(name, {"fire": 1e9, "strong": 1e9})
+            if value >= t["strong"]:
+                levels[name] = 2
+            elif value >= t["fire"]:
+                levels[name] = 1
+            else:
+                levels[name] = 0
+        return levels
+
+    def _aggregate_score(
+        self, raw_signals: Dict[str, float], levels: Dict[str, int]
+    ) -> float:
+        def normalize(name: str, value: float) -> float:
+            fire = self.thresholds[name]["fire"]
+            return float(np.clip(value / max(fire, 1e-6), 0.0, 6.0))
+
+        weighted = (
+            0.22 * normalize("error", raw_signals["error"])
+            + 0.12 * normalize("fisher", raw_signals["fisher"])
+            + 0.31 * normalize("cross_slot", raw_signals["cross_slot"])
+            + 0.10 * normalize("persistence", raw_signals["persistence"])
+            + 0.25 * normalize("cusum", raw_signals["cusum"])
+        )
+        n_strong = sum(1 for lv in levels.values() if lv >= 2)
+        n_fire = sum(1 for lv in levels.values() if lv >= 1)
+        return float(weighted + 0.25 * n_strong + 0.08 * n_fire)
+
+    def observe(
+        self, raw_signals: Dict[str, float], action: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        levels = self._signal_levels(raw_signals)
+        n_fire = sum(1 for v in levels.values() if v >= 1)
+        n_strong = sum(1 for v in levels.values() if v >= 2)
+
+        source = str(action.get("source", "unknown"))
+        scope = str(action.get("scope", "read_only"))
+        action_type = str(action.get("action_type", "file_read"))
+        context_alignment = float(action.get("context_alignment", 0.0))
+        target_sensitivity = float(action.get("target_sensitivity", 0.0))
+        magnitude = float(action.get("magnitude", 0.0))
+        recipient = action.get("recipient", action.get("payment_recipient"))
+        obstacle_marker = action.get("obstacle")
+        response_code = action.get("response_code")
+
+        external_source = source in {
+            "web_content",
+            "skill_file",
+            "api_response",
+            "email_content",
+            "agent_memory",
+            "unknown",
+        }
+        sensitive_access = (
+            action_type == "credential_access"
+            or scope == "credential_access"
+            or target_sensitivity >= 0.90
+        )
+        network_egress = scope == "network_egress"
+        high_blast_scope = scope in {
+            "network_egress",
+            "credential_access",
+            "destructive",
+            "payment_large",
+            "write_system",
+            "config_modify",
+        }
+        is_payment = action_type == "payment"
+        is_credential = (
+            action_type == "credential_access" or scope == "credential_access"
+        )
+        is_memory_write = action_type == "memory_write"
+        is_config_change = action_type == "config_change"
+        is_skill_install = action_type == "skill_install"
+        source_is_external_instr = source in {"skill_file", "web_content"}
+
+        self.recent_sources.append(source)
+        self.recent_low_context.append(1 if context_alignment < 0.50 else 0)
+        self.recent_credential_steps.append(1 if is_credential else 0)
+        self.recent_obstacle.append(
+            1
+            if (
+                obstacle_marker is not None
+                or (
+                    action_type == "api_call"
+                    and source in {"api_response", "unknown"}
+                    and context_alignment < 0.70
+                )
+                or (response_code in {401, 403, 429})
+            )
+            else 0
+        )
+        retaliation_probe = (
+            action_type in {"web_search", "web_fetch", "file_read"}
+            and source == "agent_reasoning"
+            and context_alignment < 0.55
+        )
+        self.recent_retaliation_probe.append(1 if retaliation_probe else 0)
+        self.recent_sensitive_access.append(1 if sensitive_access else 0)
+        self.recent_external_egress.append(
+            1 if (network_egress and external_source) else 0
+        )
+        self.recent_external_high_risk.append(
+            1
+            if (external_source and high_blast_scope and context_alignment <= 0.70)
+            else 0
+        )
+        self.recent_nonuser_credential.append(
+            1
+            if (
+                sensitive_access
+                and source != "user_direct"
+                and context_alignment <= 0.80
+            )
+            else 0
+        )
+
+        # ------------------------------------------------------------------
+        # Fast-path structural checks (can override warmup).
+        # ------------------------------------------------------------------
+        user_authorized = source == "user_direct" and context_alignment >= 0.85
+        fast_block_reason = None
+        fast_flag_reason = None
+        fast_monitor_reason = None
+
+        # BLOCK immediately: credential access followed by egress within 3 steps.
+        if network_egress and sum(list(self.recent_credential_steps)[-4:-1]) >= 1:
+            fast_block_reason = "credential_access followed by network_egress"
+
+        # BLOCK immediately: memory_write from untrusted content channels.
+        if is_memory_write and source in {"web_content", "email_content"}:
+            fast_block_reason = "memory_write from untrusted content source"
+
+        # FLAG immediately: destructive scope (rm -rf, mkfs, dd, etc.)
+        if scope == "destructive" and not user_authorized:
+            fast_flag_reason = "destructive command from non-user source"
+
+        # x402 payment baseline checks.
+        payment_ratio = None
+        payment_mean = None
+        if is_payment and len(self.payment_magnitudes) >= 3:
+            payment_mean = float(np.mean(self.payment_magnitudes))
+            safe_mean = max(payment_mean, 1e-4)
+            payment_ratio = magnitude / safe_mean
+            new_recipient = bool(recipient) and recipient not in self.payment_recipients
+            if source != "user_direct" and payment_ratio >= 100.0:
+                fast_block_reason = (
+                    "payment magnitude >=100x baseline from non-user source"
+                )
+            elif source != "user_direct" and payment_ratio >= 10.0:
+                fast_flag_reason = (
+                    "payment magnitude >=10x baseline from non-user source"
+                )
+            elif source == "user_direct" and payment_ratio >= 10.0:
+                fast_monitor_reason = "user-directed payment magnitude >=10x baseline"
+            elif new_recipient and magnitude > safe_mean:
+                fast_flag_reason = "payment to new recipient above session baseline"
+
+        # FLAG aggressively: source-shift and sustained low-context episodes.
+        if len(self.recent_sources) >= 8:
+            last3 = list(self.recent_sources)[-3:]
+            prior = list(self.recent_sources)[:-3]
+            internal_prior = sum(
+                1 for s in prior if s in {"user_direct", "agent_reasoning"}
+            )
+            if (
+                all(s in {"skill_file", "web_content"} for s in last3)
+                and prior
+                and internal_prior / len(prior) >= 0.6
+            ):
+                fast_flag_reason = (
+                    "instruction source shifted to external content for 3+ steps"
+                )
+
+        if (
+            len(self.recent_low_context) >= 3
+            and sum(list(self.recent_low_context)[-3:]) == 3
+        ):
+            fast_flag_reason = "context_alignment < 0.5 for 3 consecutive actions"
+
+        if (is_config_change or is_skill_install) and source != "user_direct":
+            fast_flag_reason = "non-user initiated config change or skill installation"
+
+        # Retaliation chain: obstacle -> personal data gathering -> outbound message.
+        if (
+            action_type == "message_send"
+            and source == "agent_reasoning"
+            and context_alignment < 0.55
+            and sum(self.recent_obstacle) >= 1
+            and sum(self.recent_retaliation_probe) >= 2
+        ):
+            fast_block_reason = "autonomous retaliation pattern after obstacle"
+
+        if self.state.step < self.warmup_steps:
+            if fast_block_reason and not user_authorized:
+                verdict = "BLOCK"
+                confidence = 0.97
+            elif fast_flag_reason and not user_authorized:
+                verdict = "FLAG"
+                confidence = 0.70
+            elif fast_monitor_reason or is_credential or is_payment or is_memory_write:
+                verdict = "MONITOR"
+                confidence = 0.25
+            else:
+                verdict = "PASS"
+                confidence = 0.0
+            self.recent_cross_slot_fires.append(0)
+        else:
+            cross_fired = 1 if levels.get("cross_slot", 0) >= 1 else 0
+            self.recent_cross_slot_fires.append(cross_fired)
+            self.state.total_cross_slot_fires += cross_fired
+
+            cross_window_rate = (
+                float(np.mean(self.recent_cross_slot_fires))
+                if len(self.recent_cross_slot_fires) >= 1
+                else 0.0
+            )
+
+            if n_strong >= 2:
+                provisional = "BLOCK"
+            elif n_strong >= 1 and n_fire >= 3:
+                provisional = "FLAG"
+            elif n_fire >= 2:
+                provisional = "FLAG"
+            elif cross_window_rate >= 0.12 and len(self.recent_cross_slot_fires) >= 20:
+                provisional = "FLAG"
+            elif self.state.total_cross_slot_fires >= 3:
+                provisional = "FLAG"
+            elif n_fire >= 1:
+                provisional = "MONITOR"
+            else:
+                provisional = "PASS"
+
+            # CUSUM strong is a high-confidence drift indicator.
+            # Pairing it with persistence is strong enough for a hard stop.
+            if levels.get("cusum", 0) >= 2 and levels.get("persistence", 0) >= 1:
+                provisional = "BLOCK"
+            elif levels.get("cusum", 0) >= 2 and provisional == "MONITOR":
+                provisional = "FLAG"
+
+            # Structural trust-architecture escalation for adversarial trajectories.
+            # These checks are source-aware and avoid user-authorized actions.
+            recent_sensitive_count = int(sum(self.recent_sensitive_access))
+            recent_nonuser_credential_count = int(sum(self.recent_nonuser_credential))
+            recent_external_high_risk_count = int(sum(self.recent_external_high_risk))
+
+            exfil_chain = (
+                network_egress
+                and external_source
+                and context_alignment < 0.65
+                and recent_sensitive_count >= 2
+            )
+            injection_chain = (
+                source in {"skill_file", "web_content"}
+                and high_blast_scope
+                and context_alignment < 0.60
+            )
+            slow_harvest_chain = recent_nonuser_credential_count >= 3
+            persistent_external_chain = recent_external_high_risk_count >= 4
+
+            if not user_authorized:
+                if exfil_chain and (
+                    levels.get("cusum", 0) >= 1
+                    or levels.get("cross_slot", 0) >= 1
+                    or levels.get("persistence", 0) >= 1
+                ):
+                    provisional = "BLOCK"
+                elif injection_chain and levels.get("cusum", 0) >= 2:
+                    provisional = "BLOCK"
+                elif injection_chain and provisional in {"PASS", "MONITOR"}:
+                    provisional = "FLAG"
+                elif slow_harvest_chain and (
+                    levels.get("cusum", 0) >= 1 or levels.get("persistence", 0) >= 1
+                ):
+                    provisional = "FLAG"
+                elif persistent_external_chain and provisional == "MONITOR":
+                    provisional = "FLAG"
+
+            # Apply fast-path guardrails.
+            if fast_block_reason and not user_authorized:
+                provisional = "BLOCK"
+            elif (
+                fast_flag_reason
+                and provisional in {"PASS", "MONITOR"}
+                and not user_authorized
+            ):
+                provisional = "FLAG"
+            elif (
+                fast_monitor_reason or is_credential or is_payment or is_memory_write
+            ) and provisional == "PASS":
+                provisional = "MONITOR"
+
+            if provisional == "FLAG":
+                self.state.consecutive_flag_steps += 1
+            else:
+                self.state.consecutive_flag_steps = 0
+
+            if (
+                self.state.consecutive_flag_steps >= 15
+                and n_fire >= 3
+                and n_strong >= 1
+            ):
+                verdict = "BLOCK"
+            else:
+                verdict = provisional
+
+            if user_authorized and verdict in {"FLAG", "BLOCK"}:
+                verdict = "MONITOR" if n_fire >= 1 else "PASS"
+
+            if verdict == "BLOCK":
+                confidence = min(0.99, 0.82 + 0.03 * n_strong + 0.01 * n_fire)
+            elif verdict == "FLAG":
+                confidence = min(0.92, 0.58 + 0.06 * n_fire + 0.03 * n_strong)
+            elif verdict == "MONITOR":
+                confidence = min(0.55, 0.20 + 0.12 * n_fire)
+            else:
+                confidence = 0.0
+
+        aggregate_score = self._aggregate_score(raw_signals, levels)
+        if fast_flag_reason:
+            aggregate_score += 0.30
+        if fast_block_reason:
+            aggregate_score += 0.75
+
+        out = {
+            "step": self.state.step,
+            "verdict": verdict,
+            "confidence": float(confidence),
+            "signal_levels": levels,
+            "signals_firing": int(n_fire),
+            "signals_strong": int(n_strong),
+            "aggregate_score": aggregate_score,
+            "cross_slot_window_rate": float(np.mean(self.recent_cross_slot_fires))
+            if self.recent_cross_slot_fires
+            else 0.0,
+            "cross_slot_total_fires": int(self.state.total_cross_slot_fires),
+            "consecutive_flag_steps": int(self.state.consecutive_flag_steps),
+            "structural_context": {
+                "recent_sensitive_access": int(sum(self.recent_sensitive_access)),
+                "recent_nonuser_credential": int(sum(self.recent_nonuser_credential)),
+                "recent_external_high_risk": int(sum(self.recent_external_high_risk)),
+                "payment_baseline_mean": float(np.mean(self.payment_magnitudes))
+                if self.payment_magnitudes
+                else 0.0,
+                "payment_ratio": float(payment_ratio)
+                if payment_ratio is not None
+                else None,
+                "fast_block_reason": fast_block_reason,
+                "fast_flag_reason": fast_flag_reason,
+            },
+        }
+
+        if is_payment:
+            self.payment_magnitudes.append(magnitude)
+            if recipient:
+                self.payment_recipients.add(str(recipient))
+
+        self.state.step += 1
+        return out
+
+
+class ReasoningValidationSystem:
+    """Stateful runtime validator: encode action -> compute signals -> tiered verdict."""
+
+    def __init__(
+        self,
+        dim: int = 512,
+        seed: int = 42,
+        thresholds: Optional[Dict[str, Dict[str, float]]] = None,
+        warmup_steps: int = 15,
+        resonator_iters: int = 12,
+        resonator_threshold: float = 0.85,
+    ):
+        self.algebra = PhasorAlgebra(dim=dim, seed=seed)
+        self.encoder = ActionEncoder(self.algebra)
+        self.signals = DetectionSignalEngine(
+            self.algebra,
+            role_names=ROLE_NAMES,
+            resonator_iters=resonator_iters,
+            resonator_threshold=resonator_threshold,
+        )
+        self.verdict_engine = TieredVerdictEngine(
+            thresholds=thresholds, warmup_steps=warmup_steps
+        )
+
+    def observe(self, action: Dict[str, Any]) -> Dict[str, Any]:
+        encoded = self.encoder.encode_action(action)
+        signal_meta = self.signals.observe(encoded.fillers)
+        verdict_meta = self.verdict_engine.observe(
+            signal_meta["raw_signals"], encoded.raw
+        )
+        return {
+            "action": encoded.raw,
+            "raw_signals": signal_meta["raw_signals"],
+            "per_slot": signal_meta["per_slot"],
+            "cross_slot": signal_meta["cross_slot"],
+            **verdict_meta,
+        }

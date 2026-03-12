@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "frontier-ops"
+version = "0.1.0"
+description = "Middleware for AI agent governance. Define boundaries. Monitor agents. Prove they stayed within bounds."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Joseph Hopkins" },
+]
+keywords = ["ai", "agents", "governance", "monitoring", "safety"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+kalman = ["scipy>=1.10"]
+ica = ["scikit-learn>=1.2"]
+governance = ["cryptography>=41.0"]
+semantic = ["sentence-transformers>=2.2"]
+all = [
+    "scipy>=1.10",
+    "scikit-learn>=1.2",
+    "cryptography>=41.0",
+    "sentence-transformers>=2.2",
+]
+dev = [
+    "pytest>=7.0",
+    "scipy>=1.10",
+    "scikit-learn>=1.2",
+    "cryptography>=41.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/openclaw/frontier-ops"
+Documentation = "https://github.com/openclaw/frontier-ops#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["frontier_ops"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

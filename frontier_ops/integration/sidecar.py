@@ -58,6 +58,17 @@ class ProprioceptiveSidecar:
         )
         self._last_user_check = time.time()
 
+        # Market architecture hook (non-invasive, advisory-only)
+        try:
+            from frontier_ops.integration.market_hook import MarketHook
+            self.market = MarketHook.from_telemetry(verbose=verbose)
+            if verbose:
+                print("[sidecar] Market hook initialized", file=sys.stderr)
+        except Exception as e:
+            self.market = None
+            if verbose:
+                print(f"[sidecar] Market hook disabled: {e}", file=sys.stderr)
+
     async def _on_tool_event(self, event: dict):
         """Process a tool call or run_start event from the log tailer."""
         # Handle new agent turn (user message → run start)
@@ -109,6 +120,17 @@ class ProprioceptiveSidecar:
                 write_compact_state()
             except Exception:
                 pass
+
+            # Feed verdict to market hook (non-invasive)
+            if self.market is not None:
+                try:
+                    self.market.on_step(
+                        verdict=result.get("verdict", "PASS"),
+                        timestamp=time.time(),
+                    )
+                except Exception as e:
+                    if self.verbose:
+                        print(f"[sidecar] Market hook error: {e}", file=sys.stderr)
 
         if self.verbose and result:
             duration_ms = event.get("duration_ms", 0)

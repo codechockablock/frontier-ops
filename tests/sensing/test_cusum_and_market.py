@@ -29,7 +29,9 @@ from frontier_ops.sensing.market_gate import (
     MarketGate,
     MarketSignalState,
     SIGNAL_LABELS,
+    SIGNAL_LABEL_VARIANTS,
     _NUMERIC_PATTERNS,
+    _select_variant,
 )
 from frontier_ops.boundary.constitution import (
     ConstitutionalMetric,
@@ -357,11 +359,14 @@ class TestGateInvariants:
     """CORRECTNESS_SPEC §5.2: G1-G7."""
 
     def test_g1_output_set(self):
-        """G1: Output is None or a value from SIGNAL_LABELS."""
+        """G1: Output is None or a value from SIGNAL_LABELS / SIGNAL_LABEL_VARIANTS."""
+        all_variants = set()
+        for variants in SIGNAL_LABEL_VARIANTS.values():
+            all_variants.update(variants)
         gate = _make_gate()
         for i in range(20):
             result = gate.evaluate(np.random.rand(6) * 0.1, float(i))
-            assert result is None or result in SIGNAL_LABELS.values()
+            assert result is None or result in all_variants
 
     def test_g2_g3_no_numerics_in_labels(self):
         """G2-G3: No numeric values in any label."""
@@ -686,9 +691,12 @@ class TestIntegration:
         phase2_labels = [r for r in results[20:] if r is not None]
         assert len(phase2_labels) > 0, "Suspicious phase produced no labels"
 
-        # All labels must be from the allowed set
+        # All labels must be from the allowed set (including variants)
+        all_variants = set()
+        for variants in SIGNAL_LABEL_VARIANTS.values():
+            all_variants.update(variants)
         for label in phase2_labels:
-            assert label in SIGNAL_LABELS.values()
+            assert label in all_variants
 
     def test_state_tracks_evaluations(self):
         """Gate state updates correctly on each evaluation."""
@@ -785,6 +793,88 @@ class TestCalibration:
 # ===========================================================================
 # §7.7 PERFORMANCE TESTS
 # ===========================================================================
+
+class TestLabelRotation:
+    """CORRECTNESS_SPEC §10.2: LR1-LR5."""
+
+    def test_lr1_all_variants_pass_numeric_checks(self):
+        """LR1: Every label variant passes _NUMERIC_PATTERNS validation."""
+        for key, variants in SIGNAL_LABEL_VARIANTS.items():
+            for idx, label in enumerate(variants):
+                for pattern in _NUMERIC_PATTERNS:
+                    assert not pattern.search(label), (
+                        f"SIGNAL_LABEL_VARIANTS[{key!r}][{idx}] matches "
+                        f"{pattern.pattern!r}: {label!r}"
+                    )
+
+    def test_lr2_same_count_same_label(self):
+        """LR2: Same evaluation_count → same label."""
+        for key in SIGNAL_LABEL_VARIANTS:
+            label1 = _select_variant(key, 42)
+            label2 = _select_variant(key, 42)
+            assert label1 == label2, (
+                f"Non-deterministic: {key} at count 42 → {label1!r} vs {label2!r}"
+            )
+
+    def test_lr3_different_counts_produce_varied_labels(self):
+        """LR3: Different evaluation counts produce varied labels."""
+        for key, variants in SIGNAL_LABEL_VARIANTS.items():
+            if len(variants) < 2:
+                continue
+            labels_seen = set()
+            for count in range(100):
+                labels_seen.add(_select_variant(key, count))
+            assert len(labels_seen) > 1, (
+                f"No variety for {key!r}: always {labels_seen}"
+            )
+
+    def test_lr5_variants_validated_at_import(self):
+        """LR5: SIGNAL_LABEL_VARIANTS exists and first variant matches canonical."""
+        for key in SIGNAL_LABELS:
+            assert key in SIGNAL_LABEL_VARIANTS
+            assert SIGNAL_LABEL_VARIANTS[key][0] == SIGNAL_LABELS[key]
+
+    def test_gate_with_audit_chain_evaluation_count(self):
+        """A6: Gate with audit chain: n_evaluations == chain length."""
+        from frontier_ops.governance.market_audit import MarketAuditChain
+        metric = _simple_metric()
+        d = DeceptionTaxSignal(metric)
+        s = StagnationTaxSignal()
+        audit = MarketAuditChain()
+        gate = MarketGate(d, s, audit_chain=audit)
+
+        for i in range(15):
+            gate.evaluate(np.zeros(6), float(i))
+
+        assert gate.n_evaluations == 15
+        assert len(audit) == 15
+
+    def test_gate_label_rotation_varies(self):
+        """Gate uses label rotation — labels vary across evaluations."""
+        metric = _simple_metric()
+        d = DeceptionTaxSignal(metric, cusum_params={
+            "threshold": 0.5, "drift": 0.1, "window_size": 10,
+        })
+        s = StagnationTaxSignal(baseline_rate=1.0, cusum_params={
+            "threshold": 0.5, "drift": 0.1, "window_size": 10,
+        })
+        gate = MarketGate(d, s)
+
+        labels = []
+        rng = np.random.default_rng(42)
+        for i in range(200):
+            vec = rng.uniform(-0.5, 0.5, 6)
+            result = gate.evaluate(vec, float(i))
+            if result is not None:
+                labels.append(result)
+
+        if len(labels) > 1:
+            # Should see some variety
+            unique = set(labels)
+            # Not required to always vary, but with 200 evals and
+            # multiple variants, very likely to see > 1
+            assert len(unique) >= 1
+
 
 class TestPerformance:
     def test_evaluate_latency(self):

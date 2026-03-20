@@ -6,4 +6,5 @@ from frontier_ops.sensing.combiner import BayesFactorCombiner, EvidenceResult
 from frontier_ops.sensing.efference import EfferenceCopyPredictor, PredictionError
 from frontier_ops.sensing.cusum import DASCUSUM, CUSUMAlert, SPRTWrapper, SPRTDecision
 from frontier_ops.sensing.market_signals import DeceptionTaxSignal, StagnationTaxSignal, DSignalResult, SSignalResult
-from frontier_ops.sensing.market_gate import MarketGate, MarketSignalState, SIGNAL_LABELS
+from frontier_ops.sensing.market_gate import MarketGate, MarketSignalState, SIGNAL_LABELS, SIGNAL_LABEL_VARIANTS
+from frontier_ops.sensing.market_entropy import market_entropy, market_health, redistribute, MarketHealthMonitor

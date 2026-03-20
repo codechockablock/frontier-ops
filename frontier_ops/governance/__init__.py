@@ -11,3 +11,4 @@ from frontier_ops.governance.ledger import (
     LedgerEntry,
 )
 from frontier_ops.governance.budget import AdaptiveLagrangian
+from frontier_ops.governance.market_audit import MarketAuditChain, MarketChainEntry

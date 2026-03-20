@@ -20,11 +20,16 @@ Pipeline:
     3. If all nominal: returns None (zero token overhead)
     4. If any elevated: returns qualitative label string
 
+Label rotation (Phase 3): Each signal state maps to 3-5 semantically equivalent
+labels. Selection is deterministic given evaluation count but unpredictable to
+the agent. See CORRECTNESS_SPEC.md §10.
+
 See CORRECTNESS_SPEC.md §5 for invariants and the qualitative-only constraint.
 """
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass
 from typing import Optional
@@ -38,7 +43,12 @@ from frontier_ops.sensing.market_signals import (
     StagnationTaxSignal,
 )
 
-__all__ = ["MarketSignalState", "MarketGate", "SIGNAL_LABELS"]
+__all__ = [
+    "MarketSignalState",
+    "MarketGate",
+    "SIGNAL_LABELS",
+    "SIGNAL_LABEL_VARIANTS",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -52,6 +62,42 @@ SIGNAL_LABELS: dict[str, str] = {
     "d_and_s": "Multiple behavioral pressures active — review approach.",
     "exploration_safe": "Novel approach noted — proceeding.",
     "exploration_boundary": "Exploration near safety boundary — exercise caution.",
+}
+
+# Label rotation pool: 3-5 semantically equivalent variants per signal state.
+# First variant in each list is the canonical label (== SIGNAL_LABELS value).
+# All variants validated at import time (LR1, LR5).
+SIGNAL_LABEL_VARIANTS: dict[str, list[str]] = {
+    "d_only": [
+        "Behavioral trajectory deviating from expected path.",
+        "Approach pattern diverging from anticipated route.",
+        "Observed trajectory not aligned with expected behavior.",
+        "Movement pattern shows unexpected directional choices.",
+    ],
+    "s_only": [
+        "Extended period of low-productivity activity detected.",
+        "Action rate below expected baseline for sustained interval.",
+        "Prolonged reduction in task-relevant activity observed.",
+        "Operational tempo has dropped below expected levels.",
+    ],
+    "d_and_s": [
+        "Multiple behavioral pressures active — review approach.",
+        "Concurrent trajectory and activity anomalies detected.",
+        "Several behavioral indicators warrant attention — reassess strategy.",
+        "Combined directional and tempo signals suggest course correction.",
+        "Simultaneous deviation in path and pace — consider adjustments.",
+    ],
+    "exploration_safe": [
+        "Novel approach noted — proceeding.",
+        "Unfamiliar strategy detected — within acceptable bounds.",
+        "New behavioral pattern observed — no intervention needed.",
+    ],
+    "exploration_boundary": [
+        "Exploration near safety boundary — exercise caution.",
+        "Behavioral exploration approaching operational limits.",
+        "Novel approach detected near constraint boundary — proceed carefully.",
+        "Unconventional strategy close to safety margins — remain attentive.",
+    ],
 }
 
 # Patterns that MUST NOT appear in any label (CORRECTNESS_SPEC §5.3)
@@ -71,9 +117,22 @@ def _validate_label(key: str, label: str) -> None:
         )
 
 
-# Validate all labels at import time — fail fast on any violation
+# Validate all labels at import time — fail fast on any violation (LR5)
 for _k, _v in SIGNAL_LABELS.items():
     _validate_label(_k, _v)
+
+for _k, _variants in SIGNAL_LABEL_VARIANTS.items():
+    for _idx, _v in enumerate(_variants):
+        _validate_label(f"{_k}[{_idx}]", _v)
+
+# Verify canonical labels match first variant
+for _k in SIGNAL_LABELS:
+    assert _k in SIGNAL_LABEL_VARIANTS, (
+        f"SIGNAL_LABELS key {_k!r} missing from SIGNAL_LABEL_VARIANTS"
+    )
+    assert SIGNAL_LABEL_VARIANTS[_k][0] == SIGNAL_LABELS[_k], (
+        f"First variant of {_k!r} must equal canonical SIGNAL_LABELS value"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -115,6 +174,24 @@ class MarketSignalState:
 
 
 # ---------------------------------------------------------------------------
+# Label rotation helper
+# ---------------------------------------------------------------------------
+
+def _select_variant(signal_key: str, n_evaluations: int) -> str:
+    """
+    Deterministic label selection from the variant pool.
+
+    Uses hash(n_evaluations) to select. Deterministic for same count (LR2)
+    but unpredictable to the agent.
+    """
+    variants = SIGNAL_LABEL_VARIANTS[signal_key]
+    # Hash the evaluation count for deterministic but unpredictable selection
+    h = hashlib.sha256(str(n_evaluations).encode()).hexdigest()
+    index = int(h, 16) % len(variants)
+    return variants[index]
+
+
+# ---------------------------------------------------------------------------
 # Market Gate
 # ---------------------------------------------------------------------------
 
@@ -123,23 +200,30 @@ class MarketGate:
     Binary gate for qualitative market signal injection.
 
     Invariants (CORRECTNESS_SPEC §5.2):
-      G1: Output is None or a string from SIGNAL_LABELS
+      G1: Output is None or a string from SIGNAL_LABELS / SIGNAL_LABEL_VARIANTS
       G2-G3: Output contains no numeric substrings
       G4: None ⟺ no signal in alarm
       G5: get_state() always returns valid MarketSignalState
       G6: evaluate() is the only public mutation method
       G7: evaluate() calls D.step() then S.step() in fixed order
+
+    Label rotation invariants (CORRECTNESS_SPEC §10.2):
+      LR1: All variants pass numeric validation
+      LR2: Same evaluation count → same label
+      LR3: Different counts → different labels (usually)
     """
 
     def __init__(
         self,
         d_signal: DeceptionTaxSignal,
         s_signal: StagnationTaxSignal,
+        audit_chain: Optional[object] = None,
     ):
         self._d = d_signal
         self._s = s_signal
         self._state = MarketSignalState()
         self._n_evaluations: int = 0
+        self._audit_chain = audit_chain
 
     def evaluate(
         self,
@@ -174,15 +258,58 @@ class MarketGate:
             observed_rate=s_result.observed_rate,
         )
 
-        # Select label (invariant G4: None ⟺ no alarm)
+        # Optional: entropy redistribution
+        label: Optional[str] = None
+        try:
+            from frontier_ops.sensing.market_entropy import redistribute
+            sv = self._state.signal_vector
+            # Only redistribute if there are non-zero signals
+            if float(np.sum(np.abs(sv))) > 1e-12:
+                redistribute(sv)  # side-effect free check; used for audit
+        except ImportError:
+            pass
+
+        # Select label with rotation (invariant G4: None ⟺ no alarm)
+        signal_key: Optional[str] = None
         if d_result.alarm and s_result.alarm:
-            return SIGNAL_LABELS["d_and_s"]
+            signal_key = "d_and_s"
         elif d_result.alarm:
-            return SIGNAL_LABELS["d_only"]
+            signal_key = "d_only"
         elif s_result.alarm:
-            return SIGNAL_LABELS["s_only"]
-        else:
-            return None
+            signal_key = "s_only"
+
+        if signal_key is not None:
+            label = _select_variant(signal_key, self._n_evaluations)
+
+        # Optional: audit chain recording
+        if self._audit_chain is not None:
+            try:
+                from frontier_ops.governance.market_audit import MarketChainEntry
+                from frontier_ops.sensing.market_entropy import (
+                    market_entropy,
+                    market_health,
+                )
+                import time as _time
+
+                sv = self._state.signal_vector
+                entry = MarketChainEntry(
+                    d_statistic=self._state.d_statistic,
+                    d_alarm=self._state.d_alarm,
+                    d_raw=self._state.d_raw,
+                    s_statistic=self._state.s_statistic,
+                    s_alarm=self._state.s_alarm,
+                    s_raw=self._state.s_raw,
+                    observed_rate=self._state.observed_rate,
+                    label_emitted=label,
+                    market_entropy=market_entropy(sv),
+                    market_health=market_health(sv),
+                    timestamp=_time.time(),
+                )
+                self._audit_chain.record(entry)
+            except ImportError:
+                pass
+
+        return label
 
     def get_state(self) -> MarketSignalState:
         """

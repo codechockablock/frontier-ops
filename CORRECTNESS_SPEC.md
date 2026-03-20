@@ -337,6 +337,196 @@ Benchmark test verifies this with 1000 iterations at P99.
 
 ---
 
+---
+
+## 8. Market Entropy — Antitrust Mechanism
+
+### 8.1 Shannon Entropy (Redistribution)
+
+Normalized Shannon entropy over the magnitude vector of market signals.
+
+```
+magnitudes = [|s_i| for s_i in signals]
+total = sum(magnitudes)
+if total < ε: return 1.0  # no signal → no monopoly (but may trigger collapse)
+
+p_i = magnitude_i / total
+H = -Σ p_i · log(p_i)  (for p_i > 0)
+H_norm = H / log(N)     # normalized to [0, 1]
+```
+
+### 8.2 Entropy Invariants
+
+| ID | Invariant | Rationale |
+|----|-----------|-----------|
+| E1 | `market_entropy(signals) ∈ [0, 1]` for all finite non-negative inputs | Normalized by log(N) |
+| E2 | `market_entropy([k, k, k, k]) = 1.0` for any k > 0 | Uniform = maximum entropy |
+| E3 | `market_entropy([k, 0, 0, 0]) = 0.0` for any k > 0 | Single source = zero entropy |
+| E4 | All-zero signals → 1.0 | No monopoly when no signals active |
+| E5 | `market_entropy` is permutation-invariant | Order of signals doesn't matter |
+| E6 | Input validation: NaN/inf → ValueError | Bad data caught early |
+| E7 | `market_entropy` uses absolute values of signals | S_raw can be negative |
+
+### 8.3 Renyi-2 Entropy (Health Monitor)
+
+```
+p_i = |s_i| / total  (same normalization)
+H2 = -log(Σ p_i²)
+H2_norm = H2 / log(N)
+```
+
+| ID | Invariant | Rationale |
+|----|-----------|-----------|
+| R1 | `market_health(signals) ∈ [0, 1]` for all valid inputs | Normalized |
+| R2 | `market_health([k, k, k, k]) = 1.0` for any k > 0 | Uniform = healthy |
+| R3 | `market_health([k, 0, 0, 0]) = 0.0` for any k > 0 | Total monopoly |
+| R4 | All-zero signals → 0.0 | Collapsed market = unhealthy |
+| R5 | For any signal vector: `market_health ≤ market_entropy` | Renyi-2 ≤ Shannon (always) |
+
+### 8.4 Redistribution
+
+```
+redistribute(signals, floor, critical_threshold):
+  if max(|signals|) > critical_threshold:
+    return signals  # Emergency override: do not dampen critical alerts
+  
+  H = market_entropy(signals)
+  if H >= floor:
+    return signals  # Already diverse enough
+  
+  α = (floor - H) / floor  # Blending strength: 0 at floor, 1 at H=0
+  magnitudes = [|s_i| for s_i in signals]
+  uniform_mag = mean(magnitudes)
+  redistributed_i = (1 - α) · s_i + α · uniform_mag · sign(s_i)
+  return redistributed
+```
+
+| ID | Invariant | Rationale |
+|----|-----------|-----------|
+| RD1 | `redistribute(s, floor, ct)` preserves sign of each element | Direction preserved |
+| RD2 | `redistribute(s, floor, ct)` returns `s` unchanged when `H ≥ floor` | Identity above floor |
+| RD3 | `redistribute` returns `s` unchanged when `max(|s|) > ct` | Emergency override |
+| RD4 | After redistribution: `market_entropy(result) ≥ market_entropy(input)` | Entropy never decreases |
+| RD5 | `redistribute` is idempotent on uniform distributions | No change to balanced signals |
+| RD6 | `redistribute` is continuous in all inputs | No hard discontinuities |
+| RD7 | `α ∈ [0, 1]` always | Bounded blending strength |
+
+### 8.5 Market Health Monitor
+
+Sustained-alert state machine:
+
+```
+States: HEALTHY, MONOPOLY_PENDING(count), COLLAPSE_PENDING(count), MONOPOLY, COLLAPSE
+
+On each update(signals):
+  health = market_health(signals)
+  total = sum(|signals|)
+  
+  if total < ε:
+    if in COLLAPSE_PENDING: increment count
+    else: enter COLLAPSE_PENDING(1)
+    if count ≥ N: transition to COLLAPSE
+  elif health < monopoly_threshold:
+    if in MONOPOLY_PENDING: increment count
+    else: enter MONOPOLY_PENDING(1)
+    if count ≥ N: transition to MONOPOLY
+  else:
+    transition to HEALTHY (reset pending counts)
+```
+
+| ID | Invariant | Rationale |
+|----|-----------|-----------|
+| MH1 | `status ∈ {"healthy", "monopoly", "collapse"}` | Closed state set |
+| MH2 | MONOPOLY requires N consecutive unhealthy readings | Not a single spike |
+| MH3 | COLLAPSE requires N consecutive zero-total readings | Not a single dropout |
+| MH4 | Any single healthy reading resets pending count to zero | Fast recovery |
+| MH5 | Alerts are for HUMAN operator, never injected into agent context | Different audience |
+
+### 8.6 Boundary Conditions
+
+| Condition | market_entropy | market_health | redistribute |
+|-----------|---------------|---------------|--------------|
+| Empty array (N=0) | ValueError | ValueError | ValueError |
+| Single element [k] | 0.0 (N=1, log(1)=0, convention) | 0.0 | Return unchanged |
+| All zeros | 1.0 | 0.0 | Return unchanged (total < ε) |
+| Contains NaN | ValueError | ValueError | ValueError |
+| Contains inf | ValueError | ValueError | ValueError |
+| Negative values | Handled via |s_i| | Handled via |s_i| | Preserves sign |
+
+---
+
+## 9. Governance Audit Chain — Market Evaluations
+
+### 9.1 Algorithm Definition
+
+Every market evaluation is signed into the existing Ed25519 hash chain.
+
+```
+On each MarketGate.evaluate():
+  state = gate.get_state()
+  entry = {
+    "type": "market_evaluation",
+    "d_statistic": state.d_statistic,
+    "d_alarm": state.d_alarm,
+    "d_raw": state.d_raw,
+    "s_statistic": state.s_statistic,
+    "s_alarm": state.s_alarm,
+    "s_raw": state.s_raw,
+    "observed_rate": state.observed_rate,
+    "label_emitted": label_or_null,
+    "market_entropy": H,
+    "market_health": H2,
+    "timestamp": now()
+  }
+  chain.observe(entry)
+```
+
+### 9.2 Invariants
+
+| ID | Invariant | Rationale |
+|----|-----------|-----------|
+| A1 | Every evaluate() call produces exactly one chain entry | One-to-one mapping |
+| A2 | Chain entries are append-only and tamper-evident | Ed25519 + SHA-256 hash chain |
+| A3 | `chain.export()` + `auditor.verify()` succeeds for unmodified chains | Round-trip integrity |
+| A4 | Modifying any single entry causes `verify()` to fail | Tamper detection |
+| A5 | MarketGate works correctly without audit chain (optional dependency) | Backward compatibility |
+| A6 | Chain length == number of evaluate() calls | One entry per evaluation |
+
+### 9.3 Boundary Conditions
+
+| Condition | Expected behavior |
+|-----------|-------------------|
+| No governance chain provided | MarketGate operates normally, no signing |
+| Governance chain with expired/invalid key | Raise at construction time, not at evaluate() time |
+
+---
+
+## 10. Label Rotation — Anti-Meta-Learning Defense
+
+### 10.1 Algorithm Definition
+
+Each signal state maps to a pool of 3-5 semantically equivalent labels.
+Selection is deterministic given (evaluation_count, chain_position) but
+unpredictable to the agent (it doesn't know its own evaluation count or chain position).
+
+```
+label_pool = SIGNAL_LABEL_VARIANTS[signal_state]  # list of 3-5 strings
+index = hash(evaluation_count ^ chain_position) % len(label_pool)
+label = label_pool[index]
+```
+
+### 10.2 Invariants
+
+| ID | Invariant | Rationale |
+|----|-----------|-----------|
+| LR1 | Every label variant passes _NUMERIC_PATTERNS validation | Qualitative-only preserved |
+| LR2 | Same evaluation_count + chain_position → same label | Deterministic (reproducible for audit) |
+| LR3 | Different evaluation counts → different labels (usually) | Rotation provides variety |
+| LR4 | All variants for a signal state are semantically equivalent | Don't leak signal magnitude through label choice |
+| LR5 | Label variants are validated at import time | Fail fast |
+
+---
+
 ## 7. Test Categories
 
 Every module must have tests in ALL of these categories:

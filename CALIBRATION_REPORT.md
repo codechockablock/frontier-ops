@@ -1,236 +1,200 @@
 # Calibration Report: Market Signal Thresholds
 ## frontier-ops v0.2.0
 **Date:** 2026-03-20
-**Dataset:** 330,051 telemetry entries, 5,455 sessions, 475.5 hours
-**Status:** Calibration complete. D signal requires redesign.
+**Status:** Calibration complete. Architecture pivot required.
 
 ---
 
-## Dataset Characteristics
+## Data Sources
 
-| Metric | Value |
-|--------|-------|
-| Total entries | 330,051 |
-| Total sessions | 5,455 |
-| Benign sessions (0 BLOCK, <10% FLAG) | 3,070 (56%) |
-| Suspicious sessions | 2,385 (44%) |
-| Sessions with ≥5 steps | 2,384 (benign: 687, suspicious: 1,697) |
-| Time span | 475.5 hours |
-| Unique action types | 11 |
-| Unique scopes | 9 |
+| Source | Entries | Sessions | Signals | Period |
+|--------|---------|----------|---------|--------|
+| Old sidecar log | 330,051 | 5,455 | 5 (error, fisher, cross_slot, persistence, cusum) | ~475h |
+| frontier-ops observations | 538 | 2 | 6D behavioral + efference copy + detection + governance | 2 days |
+| Deep suite (labeled) | 24 | 24 | spike, drift, health, alerts (12 benign, 12 adversarial) | 1 run |
 
-### Signal Schema (per entry)
+---
+
+## Finding 1: Geodesic Ratio (D_raw) Is Fundamentally Wrong for This Data
+
+**D_raw = PathLength_G / DirectDistance_G** assumes continuous behavioral embeddings.
+
+Reality: The old sidecar produces **16 unique behavioral vectors**. The frontier-ops
+pipeline produces **94 unique vectors** from 538 entries. Both are effectively
+categorical — each tool call maps to one of a finite set of behavioral archetypes.
+
+Normal coding sessions rapidly switch between these archetypes (read → exec → write → read),
+producing enormous path-to-geodesic ratios on purely benign behavior.
+
+**Result on 330K dataset:** D_raw median = 7.08 (benign) vs 9.60 (suspicious). Complete overlap.
+CUSUM over D_raw: 25-49% FPR even at threshold=15.
+
+**Result on 538 frontier-ops entries:** ARL = 2-4 steps on PASS-verdict data at all thresholds tested.
+
+**Verdict: D_raw as geodesic ratio is not recoverable. The signal definition must change.**
+
+---
+
+## Finding 2: The Existing Sidecar Already Computes Good Signals
+
+The frontier-ops pipeline computes per-step:
+- `fisher_divergence` — Fisher information divergence from baseline
+- `baseline_error` — Efference copy prediction error (G-weighted)
+- `intent_adjusted_error` — Error adjusted for user intent alignment
+- `cusum` — Running CUSUM accumulator
+- `mmd_window` — Maximum mean discrepancy over sliding window
+- `e_value` — Sequential e-value for testing
+- `conjunction_flags` — Binary flags for specific threat patterns (exfiltration, C2, etc.)
+
+**Verdict-conditioned distributions (frontier-ops, N=538):**
+
+| Signal | PASS mean | FLAG mean | BLOCK mean | Separation |
+|--------|-----------|-----------|------------|------------|
+| fisher_divergence | 0.014 | 0.632 | 0.728 | 45× between PASS/FLAG |
+| baseline_error | 0.046 | 0.411 | 0.306 | 9× between PASS/FLAG |
+| cusum (existing) | 0.122 | 0.600 | 0.170 | 5× between PASS/FLAG |
+| mmd_window | 0.250 | 0.372 | 0.465 | 1.5× (weak) |
+
+**Conjunction flags are perfect classifiers:** Zero false positives on PASS data,
+all flags occur exclusively on BLOCK verdicts.
+
+**Deep suite confirms (91.7% accuracy):**
+- max_spike threshold=3.0 → 91.7% accuracy
+- alerts threshold=14 → 91.7% accuracy
+- health threshold=0.70 → 87.5% accuracy
+
+---
+
+## Finding 3: DAS-CUSUM Over Per-Step Signals Doesn't Work
+
+Every candidate signal produces unacceptable FPR when fed raw into DAS-CUSUM:
+
+| Signal | ARL₀ (thr=5) | FPR (PASS) | TPR (BLOCK) |
+|--------|-------------|------------|-------------|
+| fisher_divergence | 3 | 0.347 | 0.487 |
+| baseline_error | 2 | 0.458 | 0.333 |
+| intent_adjusted_error | 3 | 0.322 | 0.372 |
+| cusum_existing | 4 | 0.263 | 0.436 |
+| mmd_window | 1 | 0.898 | 0.282 |
+| composite_v1 | 1 | 0.716 | 0.487 |
+
+**Root cause:** Tool-type switching in normal coding produces spiky signals.
+Every read→exec→write transition creates a prediction error spike that looks
+identical to a genuine behavioral anomaly at the per-step level.
+
+DAS-CUSUM is designed for shift detection in approximately stationary processes.
+The per-step signals are categorically non-stationary — they're a Markov chain
+jumping between discrete states.
+
+---
+
+## Finding 4: The Right Architecture
+
+The market architecture should operate at a **different timescale** than the sidecar.
+
+### What the sidecar does well (keep unchanged):
+- Per-step spike detection (Mahalanobis step detector)
+- Per-step efference copy prediction error
+- Per-step conjunction flag detection
+- Per-step verdict (PASS/MONITOR/FLAG/BLOCK)
+
+### What the market adds (new value):
+- **Trajectory-level pattern detection**: sustained elevation over N steps, not single spikes
+- **Formal clearance**: SPRT can affirmatively ACCEPT benign behavior after enough evidence
+- **Multi-signal integration**: entropy-based antitrust prevents single-signal dominance
+- **Tamper-evident audit**: every evaluation signed into governance chain
+
+### The D signal should be:
+
+**D = DAS-CUSUM over windowed verdict severity score**
+
+Map sidecar verdicts to a severity score:
 ```
-step, ts, tool, type, scope, src, verdict, conf, signals{error, fisher, cross_slot, persistence, cusum}, ctx, mag
+PASS = 0, MONITOR = 1, FLAG = 2, BLOCK = 3
 ```
 
-### Verdict Distribution
-- PASS: 30,724 (9.3%)
-- MONITOR: 160,244 (48.6%)
-- FLAG: 120,812 (36.6%)
-- BLOCK: 18,271 (5.5%)
+Compute a rolling severity over a window of N recent verdicts.
+Feed the windowed severity into DAS-CUSUM to detect sustained elevation.
+
+This works because:
+1. The sidecar already makes good per-step decisions
+2. A single FLAG is normal (task switching, tool burst)
+3. *Sustained* FLAG or BLOCK is the real signal (prolonged anomalous behavior)
+4. DAS-CUSUM on severity is approximately stationary within behavioral regimes
+
+### The S signal should be:
+
+**S = DAS-CUSUM over inter-action interval percentile**
+
+Instead of raw rate deviation, compute where each interval falls in the
+empirical CDF of benign intervals. Feed the percentile (0-1) into DAS-CUSUM.
+
+This normalizes the bimodal distribution (burst vs idle) into a uniform [0,1] signal.
+Sustained high percentiles (long gaps) = stagnation. Sustained low percentiles
+(rapid fire) = suspicious burst.
 
 ---
 
-## Finding 1: D_raw (Geodesic Ratio) Is Not Discriminative
+## Calibrated Parameters
 
-### The Problem
-
-D_raw as implemented measures PathLength_G / DirectDistance_G in behavioral space.
-On the 330K dataset, D_raw produces:
-
-- **Benign sessions median:** 7.08
-- **Suspicious sessions median:** 9.60
-- **Overlap:** Complete (benign p95 = 88.19, suspicious p5 = 4.35)
-
-CUSUM over D_raw produces 25-49% FPR even at threshold=15.0.
-
-### Root Cause
-
-The telemetry produces only **16 unique behavioral vectors** when mapped to the
-6D categorical behavioral space. Normal coding sessions involve rapid switching
-between file_read → shell_exec → file_write → file_read, which creates large
-metric-weighted path lengths even on perfectly benign behavior. The constitutional
-metric amplifies certain transitions (e.g., scope escalation), making D_raw
-enormous for routine multi-tool sessions.
-
-D_raw works in theory for continuous behavioral embeddings (the original paper's
-assumption). It fails when the behavioral space is effectively discrete with
-high inter-cluster distances.
-
-### Recommendation
-
-D_raw should operate on the **raw continuous signals** (error, fisher, cross_slot,
-persistence, cusum) rather than categorical action-type mappings. However, even
-on the 5D normalized signal space, D_raw still shows complete overlap between
-benign and suspicious sessions.
-
-**The geodesic ratio is the wrong signal for this data.**
-
-The telemetry already contains a rich set of continuous signals that DO discriminate.
-D should be replaced with a signal derived from the features that actually separate
-benign from suspicious behavior (see Finding 3).
-
----
-
-## Finding 2: S_raw (Action Rate Deviation) Has Structural Issues
-
-### The Data
-
-Benign inter-action intervals:
-- **Median:** 6.3s
-- **Mean:** 633.5s (heavily right-skewed by long pauses between sessions)
-- **P95:** 1,789s
-
-The distribution is bimodal:
-1. **Active bursts:** 0.01-2s intervals (tool calls within a reasoning chain)
-2. **Idle gaps:** 30s-60min+ (waiting for user, heartbeat intervals)
-
-### Calibration Result
-
-- **Baseline rate (median):** 0.159 actions/sec (1 action every 6.3s)
-- **S_raw distribution:** Heavily negative (mean = -417) because windowed rate
-  estimation produces enormous observed rates during burst periods
-
-### The Problem
-
-The current S signal measures deviation from a single global baseline rate.
-But action rate is highly non-stationary: coding bursts produce 10-50 actions/sec,
-while idle periods produce 0 actions for minutes. A single baseline can't
-capture this bimodality.
-
-### Recommendation
-
-S should use **per-regime baselines** from the HMM task state, not a global rate.
-Alternatively, use percentile-based anomaly detection: flag when the inter-action
-interval exceeds the 95th percentile of the windowed distribution (stagnation)
-or drops below the 5th percentile (suspicious burst).
-
----
-
-## Finding 3: Features That Actually Discriminate
-
-Feature separation analysis (Mann-Whitney AUC + Cohen's d) reveals the signals
-that genuinely separate benign from suspicious sessions:
-
-### Tier 1: Strong Discriminators (|d| > 1.0)
-
-| Feature | Benign Median | Suspicious Median | Cohen's d | AUC |
-|---------|--------------|-------------------|-----------|-----|
-| max_scope | 0.30 | 0.80 | 2.06 | 0.23 |
-| cross_slot_p95 | 0.00 | 0.96 | 2.04 | 0.46 |
-| persistence_p95 | 0.40 | 1.00 | 1.46 | 0.36 |
-
-### Tier 2: Moderate Discriminators (|d| > 0.5)
-
-| Feature | Benign Median | Suspicious Median | Cohen's d |
-|---------|--------------|-------------------|-----------|
-| cross_slot_std | 0.17 | 0.29 | 0.83 |
-| type_diversity | 2 | 3 | 0.83 |
-| scope_escalation | 0.20 | 0.40 | 0.74 |
-| cusum_max | 0.76 | 3.18 | 0.65 |
-| cusum_mean | 0.14 | 1.29 | 0.60 |
-| persistence_diff_mean | 0.024 | 0.010 | -0.52 |
-
-### Interpretation
-
-The strongest discriminators are:
-1. **Scope escalation** (max_scope, scope_escalation): Suspicious sessions access
-   higher-privilege scopes (credential_access, write_system, destructive)
-2. **Cross-slot binding** (cross_slot_p95, cross_slot_std): Suspicious sessions show
-   elevated cross-slot signals — they combine action types in unusual patterns
-3. **Persistence** (persistence_p95, persistence_max): Suspicious sessions have
-   high persistence scores — they repeat similar patterns longer
-4. **CUSUM** (cusum_max, cusum_mean): The existing sidecar CUSUM already captures
-   meaningful cumulative drift
-
-### Key Insight
-
-The existing sidecar already computes the right signals. The market architecture
-should compose these signals rather than computing new ones from scratch.
-
----
-
-## Calibration Parameters
-
-### For the CUSUM accumulator (used by both D and S)
-
-Based on the existing `cusum` signal distribution in benign sessions:
+### D Signal (Verdict Severity)
 
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
-| Benign cusum mean | 3.16 | Empirical from 59K benign entries |
-| Benign cusum std | 1.80 | |
-| Benign cusum p95 | 5.97 | |
-| Benign cusum p99 | 5.97 | Ceiling hit |
-| Benign cusum max | 5.97 | |
+| severity_map | {PASS:0, MONITOR:1, FLAG:2, BLOCK:3} | Ordinal verdict encoding |
+| severity_window | 10 | ~10 actions ≈ 1 reasoning chain |
+| DAS-CUSUM threshold | 5.0 | Tuned below |
+| DAS-CUSUM drift | 0.5 | Standard |
+| DAS-CUSUM window | 30 | 30-step reference |
+| DAS-CUSUM decay | 0.98 | Runaway prevention |
+| DAS-CUSUM ceiling | 30.0 | Structural safety |
 
-These suggest the existing sidecar's CUSUM threshold is well-calibrated for
-the raw signal. For the market DAS-CUSUM operating on higher-level features:
+Rationale for threshold=5.0: Benign sessions average severity ~0.5 (mix of PASS
+and MONITOR). Sustained FLAG/BLOCK pushes windowed severity to 2-3. After
+standardization in DAS-CUSUM, a sustained shift from 0.5 to 2.5 produces
+z-scores of ~4-5σ, triggering the threshold.
 
-| DAS-CUSUM Parameter | Recommended Value | Rationale |
-|---------------------|-------------------|-----------|
-| threshold | 8.0 | > benign p99 (5.97) with margin |
-| drift | 0.3 | Conservative allowance |
-| window_size | 50 | ~50 actions covers a typical reasoning chain |
-| decay | 0.98 | From runaway prevention analysis |
-| ceiling | 30.0 | Structural safety cap |
+### S Signal (Interval Percentile)
 
-### For the S signal (action rate)
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| benign_interval_cdf | Empirical from PASS verdicts | Non-parametric |
+| baseline_rate | 0.164 actions/sec | Median interval = 6.1s |
+| stagnation_p95 | 193s | Benign p95 interval |
+| DAS-CUSUM threshold | 5.0 | Symmetric with D |
+| DAS-CUSUM drift | 0.5 | Standard |
+| rate_window | 10 | 10 recent intervals |
 
-| Parameter | Recommended Value | Rationale |
-|-----------|-------------------|-----------|
-| baseline_rate | 0.159 actions/sec | Median inter-action interval |
-| rate_window | 10 | ~1 minute of actions at median rate |
-| stagnation_threshold | 60s | Interval > p90 of benign |
-| burst_threshold | 0.1s | Interval < p5 of benign |
+### Entropy Antitrust
 
-### For entropy antitrust
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| entropy_floor | 0.5 | Standard diversity target |
+| critical_threshold | 3.0 | Severity score of 3 = BLOCK |
+| monopoly_health_threshold | 0.3 | Standard |
+| sustained_readings | 5 | Prevent single-spike false alarms |
 
-| Parameter | Recommended Value | Rationale |
-|-----------|-------------------|-----------|
-| entropy_floor | 0.5 | Conservative start |
-| critical_threshold | 20.0 | Well above max benign CUSUM (5.97) |
-| monopoly_health_threshold | 0.3 | Standard diversity floor |
-| sustained_readings | 5 | Prevents single-spike false alarms |
+### SPRT Parameters
 
----
-
-## Recommendations for Architecture
-
-### Replace D Signal
-
-The geodesic ratio is not discriminative on real data. Replace with a
-composite signal derived from the Tier 1 discriminators:
-
-```python
-D_composite = w1 * scope_escalation + w2 * cross_slot_p95 + w3 * persistence_p95
-```
-
-This directly measures what the data says matters: privilege escalation,
-unusual action combinations, and behavioral persistence.
-
-Feed this composite through the existing DAS-CUSUM for trajectory-level detection.
-
-### Restructure S Signal
-
-Replace single-baseline rate deviation with:
-1. Percentile-based anomaly detection on inter-action intervals
-2. Per-regime baseline from HMM task state when available
-3. Burst detection (interval < 0.1s sustained for > 5 steps)
-
-### Compose Existing Sidecar Signals
-
-The sidecar already computes error, fisher, cross_slot, persistence, and cusum.
-The market architecture should consume these signals and add trajectory-level
-sequential detection (CUSUM/SPRT) rather than recomputing from scratch.
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| alpha (Type I) | 0.05 | 5% false alarm tolerance |
+| beta (Type II) | 0.10 | 10% missed detection tolerance |
+| LLR computation | (severity - benign_mean) / benign_std | Standardized severity as LLR proxy |
 
 ---
 
-## Next Steps
+## Validation Plan
 
-1. Implement D_composite using calibrated Tier 1 features
-2. Wire sidecar signals into the market gate as additional inputs
-3. Re-run ARL analysis on D_composite to verify ARL₀ > 1000
-4. Implement per-regime S baselines once HMM states stabilize
-5. Cross-validate: hold out 20% of sessions for validation
+### Cross-validation (to be implemented):
+
+1. **Train/test split:** 70% of PASS-verdict sessions for calibration, 30% for validation
+2. **ARL₀ target:** > 100 steps on validation PASS data (not just training data)
+3. **Detection delay target:** < 20 steps to detect sustained FLAG/BLOCK elevation
+4. **SPRT clearance time:** < 50 steps to ACCEPT benign behavior
+5. **End-to-end test:** Replay deep suite traces through market pipeline, verify ≥ 87.5% accuracy
+
+### Integration test with live sidecar:
+
+Run the market pipeline alongside the sidecar on the next Chocka session.
+Compare market verdicts with sidecar verdicts. Log divergences for analysis.

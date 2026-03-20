@@ -178,9 +178,11 @@ def main():
                             write_auth_state(auth_pipeline, last_auth_verdict, action_text)
 
                         elif msg_type == "verdict":
-                            # Market: feed sidecar verdict
+                            # Market: feed sidecar verdict + cold-start signals
                             verdict = msg.get("verdict", "pass")
-                            label = hook.on_step(verdict, timestamp)
+                            hmm_state = msg.get("hmm_state", "unknown")
+                            e_value = float(msg.get("e_value", 0.0))
+                            label = hook.on_step(verdict, timestamp, hmm_state=hmm_state, e_value=e_value)
                             if label and args.verbose:
                                 print(f"[daemon] 📊 {label}", file=sys.stderr)
 

@@ -180,6 +180,8 @@ class MarketHook:
         self,
         verdict: str,
         timestamp: Optional[float] = None,
+        hmm_state: str = "unknown",
+        e_value: float = 0.0,
     ) -> Optional[str]:
         """
         Process one sidecar step. Returns qualitative label or None.
@@ -187,6 +189,8 @@ class MarketHook:
         Args:
             verdict: Sidecar verdict — "pass", "monitor", "flag", or "block".
             timestamp: Action timestamp (defaults to now).
+            hmm_state: HMM task state from sidecar (for cold-start detection).
+            e_value: Cumulative e-value from sidecar (for cold-start detection).
 
         Returns:
             None if all market signals are nominal.
@@ -198,7 +202,7 @@ class MarketHook:
         self._n_steps += 1
 
         # Feed to market gate (atomic D.step + S.step + audit)
-        label = self._gate.evaluate(verdict, timestamp)
+        label = self._gate.evaluate(verdict, timestamp, hmm_state=hmm_state, e_value=e_value)
         self._last_label = label
 
         if label is not None:

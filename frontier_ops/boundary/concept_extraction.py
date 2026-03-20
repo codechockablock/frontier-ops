@@ -358,10 +358,13 @@ class SemanticConceptExtractor:
 
 class ConceptExtractor:
     """
-    Auto-selecting concept extractor.
+    Blended concept extractor — combines Tier 1 (keywords) and Tier 2 (semantic).
 
-    Uses SemanticConceptExtractor if sentence-transformers is available,
-    falls back to KeywordConceptExtractor otherwise.
+    Strategy:
+    - Try Tier 2 (semantic_extraction.SemanticConceptExtractor) first
+    - Always run Tier 1 (keywords) as baseline
+    - Blend: final_score = max(tier1_score, tier2_score) per dimension
+    - If sentence-transformers unavailable, Tier 1 only
 
     Usage::
         extractor = ConceptExtractor()
@@ -371,32 +374,54 @@ class ConceptExtractor:
     def __init__(self, force_tier: Optional[int] = None):
         """
         Args:
-            force_tier: 1 for keyword-only, 2 for semantic-only, None for auto.
+            force_tier: 1 for keyword-only, 2 for semantic-only, None for blended.
         """
-        self.tier: int = 1
-        self._backend = None
+        self._keyword = KeywordConceptExtractor()
+        self._semantic = None
+        self.tier: int = 1  # tracks highest available tier
 
         if force_tier == 1:
-            self._backend = KeywordConceptExtractor()
-            self.tier = 1
+            pass  # keyword only
         elif force_tier == 2:
-            self._backend = SemanticConceptExtractor()
+            # Import the new Tier 2 module
+            from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor as Tier2
+            self._semantic = Tier2()
             self.tier = 2
         else:
+            # Auto: try Tier 2, fall back gracefully
             try:
-                self._backend = SemanticConceptExtractor()
-                self.tier = 2
-            except (ImportError, Exception):
-                self._backend = KeywordConceptExtractor()
-                self.tier = 1
+                from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor as Tier2
+                self._semantic = Tier2.create()
+                if self._semantic is not None:
+                    self.tier = 2
+            except Exception:
+                pass
 
     def extract(self, text: str) -> Dict[str, float]:
-        """Extract concept scores from text using best available backend."""
-        return self._backend.extract(text)
+        """Extract concept scores, blending Tier 1 + Tier 2 via per-dimension max."""
+        tier1_scores = self._keyword.extract(text)
+
+        if self._semantic is None:
+            return tier1_scores
+
+        tier2_scores = self._semantic.extract(text)
+        if tier2_scores is None:
+            return tier1_scores
+
+        # Blend: max of each tier per dimension
+        blended = {}
+        for concept in CONCEPTS:
+            t1 = tier1_scores.get(concept, 0.0)
+            t2 = tier2_scores.get(concept, 0.0)
+            blended[concept] = round(max(t1, t2), 4)
+
+        return blended
 
     @property
     def backend_name(self) -> str:
-        return "semantic" if self.tier == 2 else "keyword"
+        if self._semantic is not None:
+            return "blended"
+        return "keyword"
 
 
 # ---------------------------------------------------------------------------

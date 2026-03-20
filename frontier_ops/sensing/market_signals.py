@@ -124,7 +124,7 @@ class SeveritySignal:
         self,
         severity_window: int = 10,
         cusum_params: Optional[Dict] = None,
-    ):
+    ) -> None:
         if severity_window < 1:
             raise ValueError(f"severity_window must be ≥ 1, got {severity_window}")
 
@@ -226,7 +226,7 @@ class IntervalAnomalySignal:
     def __init__(
         self,
         cusum_params: Optional[Dict] = None,
-    ):
+    ) -> None:
         params = {**_DEFAULT_S_CUSUM, **(cusum_params or {})}
         self._cusum = DASCUSUM(**params)
         self._benign_intervals: Optional[np.ndarray] = None  # sorted, for bisect

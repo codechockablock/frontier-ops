@@ -90,7 +90,7 @@ class DASCUSUM:
         decay: float = 0.98,
         ceiling: float = 30.0,
         signal_name: str = "cusum",
-    ):
+    ) -> None:
         # --- Parameter validation (CORRECTNESS_SPEC §1.4) ---
         if threshold <= 0:
             raise ValueError(f"threshold must be > 0, got {threshold}")
@@ -292,7 +292,7 @@ class SPRTWrapper:
         beta:  Type II error rate (missed detection). Must be in (0, 0.5).
     """
 
-    def __init__(self, alpha: float = 0.05, beta: float = 0.10):
+    def __init__(self, alpha: float = 0.05, beta: float = 0.10) -> None:
         if not (0 < alpha < 0.5):
             raise ValueError(f"alpha must be in (0, 0.5), got {alpha}")
         if not (0 < beta < 0.5):

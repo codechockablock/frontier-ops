@@ -19,15 +19,49 @@ Writes:
 
 import argparse
 import json
+import logging
 import os
 import signal
+import stat
 import sys
 import time
+
+logger = logging.getLogger(__name__)
 
 from frontier_ops.integration.market_hook import MarketHook
 from frontier_ops import FullPipeline
 
 AUTH_STATE_PATH = os.path.expanduser("~/.openclaw/workspace/authorization_state.json")
+
+
+def validate_fifo_path(path: str) -> str:
+    """Validate that *path* is a FIFO (named pipe).
+
+    - If the path exists, it must be a FIFO — regular files and symlinks are
+      rejected with ``ValueError``.
+    - If the path does not exist, a new FIFO is created via ``os.mkfifo``.
+
+    Returns the validated (absolute) path.
+    """
+    path = os.path.abspath(path)
+
+    if os.path.exists(path):
+        # lstat so we don't follow symlinks
+        mode = os.lstat(path).st_mode
+        if stat.S_ISLNK(mode):
+            raise ValueError(
+                f"FIFO path is a symlink (refusing to follow): {path}"
+            )
+        if not stat.S_ISFIFO(mode):
+            raise ValueError(
+                f"FIFO path exists but is not a FIFO (mode={oct(mode)}): {path}"
+            )
+        logger.info("Using existing FIFO: %s", path)
+    else:
+        os.mkfifo(path)
+        logger.info("Created new FIFO: %s", path)
+
+    return path
 
 
 def write_auth_state(pipeline, last_auth_verdict, last_action):
@@ -52,7 +86,7 @@ def write_auth_state(pipeline, last_auth_verdict, last_action):
             json.dump(state, f, separators=(",", ":"))
         os.replace(tmp, AUTH_STATE_PATH)
     except Exception:
-        pass
+        logger.exception("Failed to write authorization state to %s", AUTH_STATE_PATH)
 
 
 def main():
@@ -60,6 +94,9 @@ def main():
     parser.add_argument("--fifo", required=True, help="Path to event FIFO")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
+
+    # Validate FIFO path before anything else
+    args.fifo = validate_fifo_path(args.fifo)
 
     # Initialize market hook (auto-calibrate)
     hook = MarketHook.from_telemetry(verbose=args.verbose)

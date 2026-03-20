@@ -26,7 +26,7 @@ import math
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 

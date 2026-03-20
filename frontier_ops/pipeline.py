@@ -17,7 +17,7 @@ Usage::
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -27,13 +27,12 @@ from frontier_ops.boundary.constitution import ConstitutionSpec, ConstitutionalM
 from frontier_ops.sensing.efference import EfferenceCopyPredictor, PredictionError
 from frontier_ops.sensing.newma import DualEWMA
 from frontier_ops.sensing.trend import ScopeCreepDetector, MetricAdaptiveEWMA
-from frontier_ops.governance.budget import AdaptiveLagrangian
 from frontier_ops.memory.activation import MemoryEventBus, MemoryEventType, AutoActivator
 from frontier_ops.memory.vsa import VSAMemory, phasor_encode
 from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 from frontier_ops.sensing.combiner import BayesFactorCombiner
-from frontier_ops.authorization.scope import AuthorizationState, ScopeOperator, AuthorizationEvent
+from frontier_ops.authorization.scope import AuthorizationState, AuthorizationEvent
 from frontier_ops.authorization.provenance import ProvenanceGraph
 from frontier_ops.authorization.budget import AuthorizationLinkedBudget
 
@@ -275,7 +274,7 @@ class FullPipeline:
             self._novelty = False
             c_phasor = phasor_encode(str(concept_vec[:3]), self.memory.dim)
             r_phasor = phasor_encode("reasoning", self.memory.dim)
-            results = self.activator.perceive(c_phasor, r_phasor, step=self._step)
+            self.activator.perceive(c_phasor, r_phasor, step=self._step)
             primed = self._primed
             novelty = self._novelty
             # Encode into memory
@@ -323,13 +322,6 @@ class FullPipeline:
 
         # 12. Governance
         if self._enable_governance:
-            from frontier_ops.governance.chain import observe_agent_step
-            record_data = {
-                "step": self._step,
-                "concept_vec": concept_vec.tolist(),
-                "angular_disp": self._angular_disp_acc,
-                "alert_level": alert_level,
-            }
             # observe_agent_step expects a StepRecord-like object
             # We'll just append to chain directly for now
             self.governance.observe({

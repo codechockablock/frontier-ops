@@ -12,7 +12,7 @@ Panic mode: if budget < 10%, hard override to prevent exhaustion.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 

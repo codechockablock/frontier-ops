@@ -33,7 +33,7 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

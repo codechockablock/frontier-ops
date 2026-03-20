@@ -105,7 +105,6 @@ class ScopeCreepDetector:
     @staticmethod
     def _fit_ols(t: np.ndarray, y: np.ndarray) -> Tuple[float, float, float]:
         """Simple OLS: y = a + b*t. Returns (slope, intercept, R²)."""
-        n = len(t)
         t_mean = t.mean()
         y_mean = y.mean()
 

@@ -200,7 +200,6 @@ class ParalysisDetector:
 
         # ── Signature 5: Low-magnitude plateau ──
         mag_list = list(self.recent_magnitudes)
-        mean_magnitude = sum(mag_list) / max(len(mag_list), 1)
         low_mag_count = sum(1 for m in mag_list if m < self.magnitude_threshold)
         magnitude_score = low_mag_count / max(len(mag_list), 1)
 

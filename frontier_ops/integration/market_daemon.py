@@ -23,7 +23,6 @@ import os
 import signal
 import sys
 import time
-from pathlib import Path
 
 from frontier_ops.integration.market_hook import MarketHook
 from frontier_ops import FullPipeline
@@ -70,7 +69,7 @@ def main():
     last_auth_verdict = "none"
 
     if args.verbose:
-        print(f"[daemon] Market + Authorization initialized", file=sys.stderr)
+        print("[daemon] Market + Authorization initialized", file=sys.stderr)
         print(f"[daemon] Listening on {args.fifo}", file=sys.stderr)
 
     running = True

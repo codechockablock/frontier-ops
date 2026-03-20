@@ -228,7 +228,7 @@ class MetricDetector:
             step_lengths.append(result.metric_weighted_length)
 
         # Calibrate from warmup
-        warmup_lengths = [l for l in step_lengths[1:warmup_end] if l > 0]
+        warmup_lengths = [length for length in step_lengths[1:warmup_end] if length > 0]
         if len(warmup_lengths) < 3:
             # Not enough warmup data
             has_violation = trace.violation_start is not None and trace.metadata.get(

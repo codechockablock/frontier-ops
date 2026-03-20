@@ -41,7 +41,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
@@ -51,8 +51,6 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 from cryptography.hazmat.primitives.serialization import (
     Encoding,
     PublicFormat,
-    PrivateFormat,
-    NoEncryption,
 )
 from cryptography.exceptions import InvalidSignature
 

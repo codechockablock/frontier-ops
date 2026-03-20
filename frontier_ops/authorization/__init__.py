@@ -26,15 +26,15 @@ References:
 """
 
 from frontier_ops.authorization.scope import (
-    AuthorizationState,
-    ScopeOperator,
-    AuthorizationEvent,
-    GoalConditionedMetric,
+    AuthorizationState as AuthorizationState,
+    ScopeOperator as ScopeOperator,
+    AuthorizationEvent as AuthorizationEvent,
+    GoalConditionedMetric as GoalConditionedMetric,
 )
 from frontier_ops.authorization.provenance import (
-    ProvenanceNode,
-    ProvenanceGraph,
+    ProvenanceNode as ProvenanceNode,
+    ProvenanceGraph as ProvenanceGraph,
 )
 from frontier_ops.authorization.budget import (
-    AuthorizationLinkedBudget,
+    AuthorizationLinkedBudget as AuthorizationLinkedBudget,
 )

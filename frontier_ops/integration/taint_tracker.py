@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -72,12 +72,12 @@ SENSITIVE_COMMANDS = {
 class TaintTracker:
     """
     Track information flow taint between tool calls.
-    
+
     Taint is produced by web/email reads and decays exponentially
     with each step. When a tainted agent writes to sensitive targets,
     an alert is raised.
     """
-    
+
     def __init__(
         self,
         decay_rate: float = 0.5,  # taint *= decay each step (faster decay)
@@ -91,15 +91,15 @@ class TaintTracker:
         self.steps_since_taint = 999
         self.history: deque = deque(maxlen=history_size)
         self.total_alerts = 0
-    
+
     def observe(self, tool: str, params: Dict[str, Any] = None) -> TaintState:
         """
         Observe a tool call and update taint state.
-        
+
         Returns TaintState with current taint level and any alerts.
         """
         params = params or {}
-        
+
         # Check if this tool PRODUCES taint (before decay, so we track fresh)
         taint_type = TAINT_PRODUCERS.get(tool)
         if taint_type:
@@ -110,12 +110,12 @@ class TaintTracker:
             # Decay and increment only for non-producer steps
             self.current_taint *= self.decay_rate
             self.steps_since_taint += 1
-        
+
         # Check if this tool accesses SENSITIVE targets while tainted.
         # Alert if taint is recent (within 2 steps of a producer).
         alert = False
         alert_reason = ""
-        
+
         if self.steps_since_taint <= 2 and self.current_taint > 0.1:
             # Check file paths
             file_path = str(params.get("file_path", params.get("path", "")))
@@ -128,7 +128,7 @@ class TaintTracker:
                             f"with taint={self.current_taint:.2f} from {self.taint_sources}"
                         )
                         break
-            
+
             # Check commands
             command = str(params.get("command", ""))
             for cmd, sensitivity in SENSITIVE_COMMANDS.items():
@@ -139,10 +139,10 @@ class TaintTracker:
                         f"with taint={self.current_taint:.2f} from {self.taint_sources}"
                     )
                     break
-        
+
         if alert:
             self.total_alerts += 1
-        
+
         state = TaintState(
             level=round(self.current_taint, 4),
             sources=list(self.taint_sources),
@@ -152,7 +152,7 @@ class TaintTracker:
         )
         self.history.append(state)
         return state
-    
+
     def reset(self):
         """Reset taint state (e.g., on new session)."""
         self.current_taint = 0.0

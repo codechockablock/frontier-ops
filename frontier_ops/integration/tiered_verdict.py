@@ -154,8 +154,6 @@ class TieredVerdictEngine:
         is_memory_write = action_type == "memory_write"
         is_config_change = action_type == "config_change"
         is_skill_install = action_type == "skill_install"
-        source_is_external_instr = source in {"skill_file", "web_content"}
-
         self.recent_sources.append(source)
         self.recent_low_context.append(1 if context_alignment < 0.50 else 0)
         self.recent_credential_steps.append(1 if is_credential else 0)

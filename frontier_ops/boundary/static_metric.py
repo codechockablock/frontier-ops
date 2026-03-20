@@ -15,8 +15,7 @@ These three detectors are empirically orthogonal — each catches violations the
 from __future__ import annotations
 
 import numpy as np
-from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 
 # --- Constitutional Metric Tensor ----------------------------------------

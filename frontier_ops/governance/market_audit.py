@@ -13,7 +13,6 @@ See CORRECTNESS_SPEC.md §9 for invariants A1-A6.
 
 from __future__ import annotations
 
-import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 

@@ -19,13 +19,12 @@ Wraps AdaptiveLagrangian to add authorization-linked replenishment.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-import numpy as np
 
 from frontier_ops.governance.budget import AdaptiveLagrangian
-from frontier_ops.authorization.provenance import ProvenanceGraph, EdgeType
+from frontier_ops.authorization.provenance import ProvenanceGraph
 
 
 @dataclass

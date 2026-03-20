@@ -22,7 +22,7 @@ See CORRECTNESS_SPEC.md §8 for invariants E1-E7, R1-R5, RD1-RD7, MH1-MH5.
 from __future__ import annotations
 
 import math
-from typing import List, Sequence, Union
+from typing import Sequence, Union
 
 import numpy as np
 

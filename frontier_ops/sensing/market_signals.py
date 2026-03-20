@@ -24,10 +24,9 @@ See CORRECTNESS_SPEC.md §3-4 for invariants and boundary conditions.
 
 from __future__ import annotations
 
-import math
 from collections import deque
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 

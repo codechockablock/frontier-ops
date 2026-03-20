@@ -147,8 +147,8 @@ def main():
     args = parser.parse_args()
 
     print(f"Serving metrics on http://127.0.0.1:{args.port}/")
-    print(f"  /health   — JSON health status")
-    print(f"  /metrics  — Prometheus text format")
+    print("  /health   — JSON health status")
+    print("  /metrics  — Prometheus text format")
 
     server = HTTPServer(("127.0.0.1", args.port), MetricsHandler)
     try:

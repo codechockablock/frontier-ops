@@ -44,7 +44,7 @@ Integration:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 import numpy as np
@@ -347,8 +347,8 @@ class EfferenceCopyPredictor:
             return
 
         self._kalman_state = x_pred + K @ y
-        I = np.eye(2 * self.n_dims)
-        self._kalman_P = (I - K @ H) @ P_pred
+        eye = np.eye(2 * self.n_dims)
+        self._kalman_P = (eye - K @ H) @ P_pred
 
     # ─── Error Decomposition ──────────────────────────────────────────
 

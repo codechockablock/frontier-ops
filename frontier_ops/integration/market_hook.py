@@ -36,19 +36,16 @@ from __future__ import annotations
 import json
 import os
 import time
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
 
 from frontier_ops.sensing.market_signals import SeveritySignal, IntervalAnomalySignal
 from frontier_ops.sensing.market_gate import MarketGate, MarketSignalState
 from frontier_ops.sensing.market_entropy import (
-    market_entropy,
-    market_health,
     MarketHealthMonitor,
 )
-from frontier_ops.governance.market_audit import MarketAuditChain, MarketChainEntry
+from frontier_ops.governance.market_audit import MarketAuditChain
 
 __all__ = ["MarketHook"]
 

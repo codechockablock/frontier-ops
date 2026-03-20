@@ -5,7 +5,7 @@ Define your boundaries. Monitor your agents. Prove they stayed within bounds.
 
 __version__ = "0.1.0"
 
-from frontier_ops.boundary.constitution import ConstitutionSpec, Boundary, CrossTerm
-from frontier_ops.boundary.concept_extraction import CONCEPTS, ConceptExtractor
-from frontier_ops.pipeline import FullPipeline, StepResult
-from frontier_ops.authorization import AuthorizationState, ProvenanceGraph, AuthorizationLinkedBudget
+from frontier_ops.boundary.constitution import ConstitutionSpec as ConstitutionSpec, Boundary as Boundary, CrossTerm as CrossTerm
+from frontier_ops.boundary.concept_extraction import CONCEPTS as CONCEPTS, ConceptExtractor as ConceptExtractor
+from frontier_ops.pipeline import FullPipeline as FullPipeline, StepResult as StepResult
+from frontier_ops.authorization import AuthorizationState as AuthorizationState, ProvenanceGraph as ProvenanceGraph, AuthorizationLinkedBudget as AuthorizationLinkedBudget

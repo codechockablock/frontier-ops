@@ -1,0 +1,20 @@
+Model: codestral:22b
+Tokens: 123
+Speed: 47.6 tok/sec
+Load: 11.4s
+Response:  def fib(n, memo={}):
+
+    # Base case
+    if n <= 1:
+        return n
+
+    # If we have cached the result for this input, return it
+    if n in memo:
+        return memo[n]
+
+    # Compute and cache the result
+    memo[n] = fib(n-1) + fib(n-2)
+
+    return memo[n]
+
+print(fib(10))  # 55 is the 10th Fibonacci number.

@@ -1,0 +1,8 @@
+Status: Ollama is running
+Model: qwen2.5:14b
+Tokens: 39
+Speed: 66.7 tok/sec
+Load: 2.1s
+Response: Here is the count to 10:
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10

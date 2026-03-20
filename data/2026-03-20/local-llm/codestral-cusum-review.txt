@@ -1,0 +1,13 @@
+=== Codestral 22B Code Review of DAS-CUSUM ===
+Tokens: 467 | Speed: 54.8 t/s | Load: 2.1s
+
+1. Mathematical correctness: The implementation appears to be mathematically correct as it correctly calculates the standardized test statistic (z-score), updates the positive and negative CUSUM cumulative sums correctly based on the z-scores, and checks for alarm conditions based on a threshold.
+
+  2. Edge cases: There are several edge cases to consider in this implementation:
+     - When the window size is less than 2, the reference mean and standard deviation cannot be calculated because there are not enough observations. In this case, the function returns immediately without updating the CUSUM cumulative sums or checking for alarm conditions. This could lead to incorrect results if new observations are added before enough data has been collected to fill the window.
+     - When the standard deviation of the reference window is zero (which can only happen when all the values in the window are identical), the z-score will be undefined because dividing by zero is not allowed. To avoid this issue, the function sets a minimum value for the standard deviation to 1e-10.
+     - When the window size is large and the decay factor is close to 1, the cumulative sums could become extremely large due to the repeated multiplication of the decay factor. This can cause numerical instability and lead to incorrect results or errors in the calculation. To avoid this issue, the function limits the maximum value of the cumulative sums to a ceiling value (30 by default).
+
+  3. Numerical stability: The implementation includes several measures to ensure numerical stability, such as limiting the minimum standard deviation to 1e-10 and limiting the maximum value of the cumulative sums to a ceiling value. However, it is still possible for numerical instability issues to arise if the window size is large and the decay factor is close to 1, as mentioned in the previous section.
+
+  4. Reference window exclusion: The implementation correctly implements reference window exclusion by calculating the reference mean and standard deviation based on all observations in the window before appending the new observation to the window. This ensures that the new observation does not contaminate the reference statistics used for the calculation of the z-score.

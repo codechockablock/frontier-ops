@@ -33,6 +33,9 @@ from frontier_ops.memory.vsa import VSAMemory, phasor_encode
 from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 from frontier_ops.sensing.combiner import BayesFactorCombiner
+from frontier_ops.authorization.scope import AuthorizationState, ScopeOperator, AuthorizationEvent
+from frontier_ops.authorization.provenance import ProvenanceGraph
+from frontier_ops.authorization.budget import AuthorizationLinkedBudget
 
 
 @dataclass
@@ -70,6 +73,14 @@ class StepResult:
     # Alert
     alert_level: float
     alert_reasons: List[str]
+    # Authorization (Layer 1-3)
+    authorized: Optional[bool] = None
+    geodesic_distance: Optional[float] = None
+    authorization_radius: Optional[float] = None
+    goal_confidence: Optional[float] = None
+    needs_escalation: bool = False
+    needs_clarification: bool = False
+    authorization_verdict: str = "no_goal"
 
 
 class FullPipeline:
@@ -134,11 +145,20 @@ class FullPipeline:
             base_threshold=0.15,
         )
 
-        # Adaptive Lagrangian
-        self.lagrangian = AdaptiveLagrangian(
+        # Authorization system (Layers 1-3)
+        self.provenance = ProvenanceGraph()
+        self.auth_state = AuthorizationState(
+            metric=self.metric,
+            default_radius=0.5,
+        )
+        self.auth_budget = AuthorizationLinkedBudget(
             total_budget=curvature_budget,
             expected_steps=expected_steps,
+            provenance=self.provenance,
         )
+
+        # Adaptive Lagrangian (now accessed via auth_budget)
+        self.lagrangian = self.auth_budget.lagrangian
 
         # Memory + Activation
         self._enable_memory = enable_memory
@@ -167,6 +187,37 @@ class FullPipeline:
         self._prev_concept: Optional[np.ndarray] = None
         self._angular_disp_acc = 0.0
         self._trajectory: List[np.ndarray] = []
+
+    def process_user_message(self, message: str) -> AuthorizationEvent:
+        """
+        Process a user message to establish/update authorization scope.
+
+        Call this BEFORE process_step() when a new user message arrives.
+        This extracts the goal, classifies the scope operator, updates
+        the authorization envelope, records provenance, and triggers
+        budget replenishment if applicable.
+        """
+        # Layer 1-3: Update authorization state
+        event = self.auth_state.process_user_message(message)
+
+        # Record in provenance graph
+        prov_node = self.provenance.add_directive(
+            user_message=message,
+            scope_operator=event.operator.value,
+            goal_confidence=event.goal_after.confidence,
+            budget_replenished=event.budget_replenished,
+        )
+
+        # Link budget replenishment to authorization event
+        if event.budget_replenished:
+            replenish_event = self.auth_budget.on_authorization_event(
+                operator=event.operator.value,
+                directive_node_id=prov_node.id,
+                goal_confidence=event.goal_after.confidence,
+            )
+            event.replenish_amount = replenish_event.amount
+
+        return event
 
     def process_step(self, text: str) -> StepResult:
         """Process one agent output through the full pipeline."""
@@ -232,13 +283,45 @@ class FullPipeline:
                                        self._step, step=self._step)
             self.activator.register_trace(trace, c_phasor, r_phasor)
 
-        # 10. Combined alert level
+        # 10. Authorization check (Layers 1-3)
+        auth_result = self.auth_state.check_action(concept_vec)
+
+        # Record action in provenance graph
+        auth_verdict = "no_goal"
+        if auth_result["needs_clarification"]:
+            auth_verdict = "needs_clarification"
+        elif auth_result["needs_escalation"]:
+            auth_verdict = "escalate"
+        elif auth_result["authorized"]:
+            auth_verdict = "pass"
+        else:
+            auth_verdict = "block"
+
+        self.provenance.add_action(
+            action_content=text[:200],
+            tool="",
+            authorized=auth_result["authorized"],
+            geodesic_distance=auth_result["geodesic_distance"],
+            verdict=auth_verdict,
+        )
+
+        # 11. Combined alert level
         alert_level, alert_reasons = self._compute_alert(
             pred_error, proximities, cross_acts, newma_alarm, newma_div,
             trend_alerts, ewma_alarm,
         )
 
-        # 11. Governance
+        # Escalate alert if action is outside authorization envelope
+        if auth_result["needs_escalation"]:
+            alert_level = max(alert_level, 0.6)
+            alert_reasons.append(
+                f"auth:outside_radius(d={auth_result['geodesic_distance']:.2f}>"
+                f"r={auth_result['radius']:.2f})"
+            )
+        if auth_result["needs_clarification"]:
+            alert_reasons.append("auth:goal_unclear")
+
+        # 12. Governance
         if self._enable_governance:
             from frontier_ops.governance.chain import observe_agent_step
             record_data = {
@@ -283,6 +366,13 @@ class FullPipeline:
             novelty=novelty,
             alert_level=alert_level,
             alert_reasons=alert_reasons,
+            authorized=auth_result["authorized"],
+            geodesic_distance=auth_result["geodesic_distance"],
+            authorization_radius=auth_result["radius"],
+            goal_confidence=auth_result["goal_confidence"],
+            needs_escalation=auth_result["needs_escalation"],
+            needs_clarification=auth_result["needs_clarification"],
+            authorization_verdict=auth_verdict,
         )
 
     def _compute_alert(self, pred_error, proximities, cross_acts,
@@ -370,6 +460,11 @@ class FullPipeline:
         self.ewma.clear()
         if self._enable_memory:
             self.memory = VSAMemory(dim=self.memory.dim)
+        # Reset authorization (provenance is preserved for audit)
+        self.auth_state = AuthorizationState(
+            metric=self.metric,
+            default_radius=0.5,
+        )
 
     @property
     def stats(self) -> Dict:
@@ -377,8 +472,11 @@ class FullPipeline:
             "step": self._step,
             "angular_disp": self._angular_disp_acc,
             "lambda": self.lagrangian.lam,
-            "budget_remaining": self.lagrangian.budget_remaining,
+            "budget_remaining": self.auth_budget.budget_remaining,
+            "budget_fraction": self.auth_budget.budget_fraction,
             "newma_divergence": self.newma.divergence,
             "trajectory_length": len(self._trajectory),
             "concept_extractor": self.extractor.backend_name,
+            "authorization": self.auth_state.export_state(),
+            "provenance": self.provenance.stats,
         }

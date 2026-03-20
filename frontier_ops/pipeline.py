@@ -272,7 +272,7 @@ class FullPipeline:
         if self._enable_memory:
             self._primed = []
             self._novelty = False
-            c_phasor = phasor_encode(str(concept_vec[:3]), self.memory.dim)
+            c_phasor = phasor_encode(concept_vec[:3].tobytes().hex(), self.memory.dim)
             r_phasor = phasor_encode("reasoning", self.memory.dim)
             self.activator.perceive(c_phasor, r_phasor, step=self._step)
             primed = self._primed

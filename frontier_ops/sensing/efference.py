@@ -257,7 +257,8 @@ class EfferenceCopyPredictor:
             self._update_kalman(actual)
 
         if len(self.history) >= 2:
-            step_error = float(np.linalg.norm(actual - self.history[-2]))
+            raw_err = actual - self.history[-2]
+            step_error = float(raw_err @ self.G @ raw_err)
             self.error_history.append(step_error)
             if len(self.error_history) > self.history_size:
                 self.error_history.pop(0)

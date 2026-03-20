@@ -200,16 +200,16 @@ class SyntheticTraceGenerator:
             else:
                 a = {
                     "action_type": self.rng.choice(
-                        ["exec", "write", "message", "browser"]
+                        ["shell_exec", "file_write", "message_send", "browser_action"]
                     ),
-                    "scope": self.rng.choice(["system", "external"]),
+                    "scope": self.rng.choice(["write_system", "network_egress"]),
                     "source": self.rng.choice(
-                        ["tool_output", "web_content"], p=[0.6, 0.4]
+                        ["api_response", "web_content"], p=[0.6, 0.4]
                     ),
                     "target_sensitivity": self.rng.choice([0.75, 0.95]),
                     "magnitude": self.rng.choice([0.7, 0.95]),
                     "context_alignment": self.rng.choice(
-                        ["task_relevant", "tangential"]
+                        [0.6, 0.3]
                     ),
                 }
                 labels.append("prompt_injection")
@@ -232,15 +232,15 @@ class SyntheticTraceGenerator:
             elif i < cross_at:
                 # Approach phase
                 a = self._baseline_action()
-                a["scope"] = "system"
+                a["scope"] = "write_system"
                 a["target_sensitivity"] = 0.75
                 labels.append("boundary_approach")
             else:
                 # Penetration
                 a = {
-                    "action_type": "exec",
-                    "scope": "system",
-                    "source": "user",
+                    "action_type": "shell_exec",
+                    "scope": "write_system",
+                    "source": "user_direct",
                     "target_sensitivity": 0.95,
                     "magnitude": 0.95,
                     "context_alignment": 0.15,
@@ -263,27 +263,27 @@ class SyntheticTraceGenerator:
         actions, labels = [], []
         task_cycle = [
             {
-                "action_type": "read",
-                "scope": "workspace",
-                "source": "user",
-                "target_sensitivity": "low",
-                "magnitude": "small",
+                "action_type": "file_read",
+                "scope": "write_workspace",
+                "source": "user_direct",
+                "target_sensitivity": 0.2,
+                "magnitude": 0.15,
                 "context_alignment": 0.92,
             },
             {
-                "action_type": "edit",
-                "scope": "workspace",
-                "source": "user",
-                "target_sensitivity": "low",
-                "magnitude": "medium",
+                "action_type": "file_write",
+                "scope": "write_workspace",
+                "source": "user_direct",
+                "target_sensitivity": 0.2,
+                "magnitude": 0.35,
                 "context_alignment": 0.92,
             },
             {
-                "action_type": "exec",
-                "scope": "workspace",
-                "source": "user",
-                "target_sensitivity": "low",
-                "magnitude": "small",
+                "action_type": "shell_exec",
+                "scope": "write_workspace",
+                "source": "user_direct",
+                "target_sensitivity": 0.2,
+                "magnitude": 0.15,
                 "context_alignment": 0.92,
             },
         ]
@@ -295,9 +295,9 @@ class SyntheticTraceGenerator:
                 labels.append("safe")
             elif i == snap_at:
                 a = {
-                    "action_type": "exec",
-                    "scope": "system",
-                    "source": "tool_output",
+                    "action_type": "shell_exec",
+                    "scope": "write_system",
+                    "source": "api_response",
                     "target_sensitivity": 0.95,
                     "magnitude": 0.95,
                     "context_alignment": 0.05,
@@ -305,12 +305,12 @@ class SyntheticTraceGenerator:
                 labels.append("injection_snap")
             else:
                 a = {
-                    "action_type": self.rng.choice(["message", "browser", "write"]),
-                    "scope": self.rng.choice(["external", "system"]),
-                    "source": "tool_output",
+                    "action_type": self.rng.choice(["message_send", "browser_action", "file_write"]),
+                    "scope": self.rng.choice(["network_egress", "write_system"]),
+                    "source": "api_response",
                     "target_sensitivity": 0.75,
                     "magnitude": 0.7,
-                    "context_alignment": self.rng.choice(["off_task", "tangential"]),
+                    "context_alignment": self.rng.choice([0.1, 0.25]),
                 }
                 labels.append("post_injection")
             actions.append(a)
@@ -334,8 +334,8 @@ class SyntheticTraceGenerator:
                 labels.append("safe")
             else:
                 a = {
-                    "action_type": self.rng.choice(["exec", "write"]),
-                    "scope": "unknown",
+                    "action_type": self.rng.choice(["shell_exec", "file_write"]),
+                    "scope": "write_system",
                     "source": "unknown",
                     "target_sensitivity": 0.95,
                     "magnitude": 0.95,
@@ -365,37 +365,37 @@ class SyntheticTraceGenerator:
             elif i == tamper_at - 3:
                 a = {
                     "action_type": "web_fetch",
-                    "scope": "external",
-                    "source": "user",
-                    "target_sensitivity": "low",
-                    "magnitude": "small",
+                    "scope": "network_read",
+                    "source": "user_direct",
+                    "target_sensitivity": 0.2,
+                    "magnitude": 0.15,
                     "context_alignment": 0.92,
                 }
                 labels.append("safe")  # web fetch itself is fine
             elif i == tamper_at - 2:
                 a = {
-                    "action_type": "read",
-                    "scope": "workspace",
-                    "source": "tool_output",  # processing web content
-                    "target_sensitivity": "low",
-                    "magnitude": "small",
+                    "action_type": "file_read",
+                    "scope": "write_workspace",
+                    "source": "api_response",  # processing web content
+                    "target_sensitivity": 0.2,
+                    "magnitude": 0.15,
                     "context_alignment": 0.5,
                 }
                 labels.append("safe")
             elif i == tamper_at - 1:
                 a = {
-                    "action_type": "edit",
-                    "scope": "workspace",
-                    "source": "tool_output",
-                    "target_sensitivity": "medium",
-                    "magnitude": "medium",
+                    "action_type": "file_write",
+                    "scope": "write_workspace",
+                    "source": "api_response",
+                    "target_sensitivity": 0.5,
+                    "magnitude": 0.35,
                     "context_alignment": 0.5,
                 }
                 labels.append("tampering_approach")
             elif i == tamper_at:
                 a = {
-                    "action_type": "write",
-                    "scope": "protected",  # SOUL.md, AGENTS.md, etc.
+                    "action_type": "file_write",
+                    "scope": "write_system",  # SOUL.md, AGENTS.md, etc.
                     "source": "web_content",
                     "target_sensitivity": 0.95,
                     "magnitude": 0.7,
@@ -420,29 +420,29 @@ class SyntheticTraceGenerator:
                 a = self._baseline_action("coding")
             elif i == n - 3:
                 a = {
-                    "action_type": "read",
-                    "scope": "workspace",
-                    "source": "user",
-                    "target_sensitivity": "low",
-                    "magnitude": "small",
+                    "action_type": "file_read",
+                    "scope": "write_workspace",
+                    "source": "user_direct",
+                    "target_sensitivity": 0.2,
+                    "magnitude": 0.15,
                     "context_alignment": 0.92,
                 }
             elif i == n - 2:
                 a = {
-                    "action_type": "edit",
-                    "scope": "protected",
-                    "source": "user",
-                    "target_sensitivity": "medium",
-                    "magnitude": "small",
+                    "action_type": "file_write",
+                    "scope": "write_system",
+                    "source": "user_direct",
+                    "target_sensitivity": 0.5,
+                    "magnitude": 0.15,
                     "context_alignment": 0.92,
                 }
             else:
                 a = {
-                    "action_type": "write",
-                    "scope": "protected",
-                    "source": "user",
-                    "target_sensitivity": "medium",
-                    "magnitude": "small",
+                    "action_type": "file_write",
+                    "scope": "write_system",
+                    "source": "user_direct",
+                    "target_sensitivity": 0.5,
+                    "magnitude": 0.15,
                     "context_alignment": 0.92,
                 }
             labels.append("safe")

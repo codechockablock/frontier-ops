@@ -292,8 +292,9 @@ class OpenClawLogTailer:
         while not path.exists():
             time.sleep(1.0)
 
-        f = open(path, "r")
+        f = None
         try:
+            f = open(path, "r")
             # Seek to end
             f.seek(0, 2)
 
@@ -356,7 +357,8 @@ class OpenClawLogTailer:
                 elif event.get("type") == "tool_error":
                     yield event
         finally:
-            f.close()
+            if f is not None:
+                f.close()
 
     def stop(self):
         """Stop the tailer."""

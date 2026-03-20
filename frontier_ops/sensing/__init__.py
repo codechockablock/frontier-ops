@@ -12,4 +12,5 @@ from frontier_ops.sensing.market_signals import (
     VERDICT_SEVERITY as VERDICT_SEVERITY,
 )
 from frontier_ops.sensing.market_gate import MarketGate as MarketGate, MarketSignalState as MarketSignalState, SIGNAL_LABELS as SIGNAL_LABELS, SIGNAL_LABEL_VARIANTS as SIGNAL_LABEL_VARIANTS
+from frontier_ops.sensing.cold_start import ColdStartDetector as ColdStartDetector, ColdStartEvent as ColdStartEvent
 from frontier_ops.sensing.market_entropy import market_entropy as market_entropy, market_health as market_health, redistribute as redistribute, MarketHealthMonitor as MarketHealthMonitor

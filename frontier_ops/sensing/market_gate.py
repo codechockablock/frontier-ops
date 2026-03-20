@@ -38,6 +38,7 @@ from frontier_ops.sensing.market_signals import (
     DSignalResult,
     SSignalResult,
 )
+from frontier_ops.sensing.cold_start import ColdStartDetector
 
 __all__ = [
     "MarketSignalState",
@@ -190,17 +191,21 @@ class MarketGate:
         d_signal: SeveritySignal,
         s_signal: IntervalAnomalySignal,
         audit_chain: Optional[object] = None,
+        cold_start_detector: Optional[ColdStartDetector] = None,
     ):
         self._d = d_signal
         self._s = s_signal
         self._state = MarketSignalState()
         self._n_evaluations: int = 0
         self._audit_chain = audit_chain
+        self._cold_start_detector = cold_start_detector or ColdStartDetector()
 
     def evaluate(
         self,
         verdict: str,
         action_timestamp: float,
+        hmm_state: str = "unknown",
+        e_value: float = 0.0,
     ) -> Optional[str]:
         """
         Evaluate all market signals and return qualitative label if any elevated.
@@ -208,12 +213,24 @@ class MarketGate:
         Args:
             verdict: Sidecar verdict — one of "pass", "monitor", "flag", "block".
             action_timestamp: Unix timestamp of the action.
+            hmm_state: Current HMM state (for cold-start detection).
+            e_value: Current e-value (for cold-start detection).
 
         Returns:
             None if all signals nominal.
             A qualitative label string if any signal is elevated.
         """
         self._n_evaluations += 1
+
+        # Cold-start suppression: feed the detector and short-circuit if suppressing
+        self._cold_start_detector.observe(
+            verdict=verdict,
+            hmm_state=hmm_state,
+            e_value=e_value,
+            timestamp=action_timestamp,
+        )
+        if self._cold_start_detector.is_suppressing:
+            return None
 
         # D signal: severity (invariant G7: D first)
         d_result: DSignalResult = self._d.step(verdict)
@@ -279,3 +296,7 @@ class MarketGate:
     @property
     def n_evaluations(self) -> int:
         return self._n_evaluations
+
+    @property
+    def cold_start_detector(self) -> ColdStartDetector:
+        return self._cold_start_detector

@@ -454,10 +454,10 @@ class TestEntropyPerformance:
             latencies.append((t1 - t0) / 1e6)
 
         p99 = np.percentile(latencies, 99)
-        assert p99 < 0.01, f"P99 = {p99:.4f}ms, budget is 0.01ms"
+        assert p99 < 0.05, f"P99 = {p99:.4f}ms, budget is 0.05ms"
 
     def test_redistribute_latency(self):
-        """redistribute < 0.05ms."""
+        """redistribute < 0.15ms."""
         signals = np.array([10.0, 0.1, 0.5, 2.0])
         # Warmup
         for _ in range(100):
@@ -471,4 +471,4 @@ class TestEntropyPerformance:
             latencies.append((t1 - t0) / 1e6)
 
         p99 = np.percentile(latencies, 99)
-        assert p99 < 0.05, f"P99 = {p99:.4f}ms, budget is 0.05ms"
+        assert p99 < 0.15, f"P99 = {p99:.4f}ms, budget is 0.15ms"

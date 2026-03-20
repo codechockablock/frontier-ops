@@ -14,15 +14,11 @@ CRITICAL SECURITY CONSTRAINT: Qualitative labels ONLY.
     a fixed set — the agent knows THAT the market reacted but not HOW to minimize
     the signal.
 
-Pipeline:
-    1. Tool call intercepted
-    2. evaluate() computes all market signals (< 0.48ms budget)
+Pipeline (post-pivot):
+    1. Sidecar verdict received
+    2. evaluate() feeds verdict to D (severity) and timestamp to S (interval)
     3. If all nominal: returns None (zero token overhead)
     4. If any elevated: returns qualitative label string
-
-Label rotation (Phase 3): Each signal state maps to 3-5 semantically equivalent
-labels. Selection is deterministic given evaluation count but unpredictable to
-the agent. See CORRECTNESS_SPEC.md §10.
 
 See CORRECTNESS_SPEC.md §5 for invariants and the qualitative-only constraint.
 """
@@ -37,10 +33,10 @@ from typing import Optional
 import numpy as np
 
 from frontier_ops.sensing.market_signals import (
-    DeceptionTaxSignal,
+    SeveritySignal,
+    IntervalAnomalySignal,
     DSignalResult,
     SSignalResult,
-    StagnationTaxSignal,
 )
 
 __all__ = [
@@ -55,7 +51,6 @@ __all__ = [
 # Qualitative label mapping
 # ---------------------------------------------------------------------------
 
-# Every value must pass _NUMERIC_PATTERNS checks (enforced at import time).
 SIGNAL_LABELS: dict[str, str] = {
     "d_only": "Behavioral trajectory deviating from expected path.",
     "s_only": "Extended period of low-productivity activity detected.",
@@ -64,9 +59,6 @@ SIGNAL_LABELS: dict[str, str] = {
     "exploration_boundary": "Exploration near safety boundary — exercise caution.",
 }
 
-# Label rotation pool: 3-5 semantically equivalent variants per signal state.
-# First variant in each list is the canonical label (== SIGNAL_LABELS value).
-# All variants validated at import time (LR1, LR5).
 SIGNAL_LABEL_VARIANTS: dict[str, list[str]] = {
     "d_only": [
         "Behavioral trajectory deviating from expected path.",
@@ -109,30 +101,22 @@ _NUMERIC_PATTERNS = [
 
 
 def _validate_label(key: str, label: str) -> None:
-    """Raise AssertionError if a label leaks numeric information."""
     for pattern in _NUMERIC_PATTERNS:
         assert not pattern.search(label), (
-            f"SIGNAL_LABELS[{key!r}] contains numeric information "
+            f"Label [{key!r}] contains numeric information "
             f"matching {pattern.pattern!r}: {label!r}"
         )
 
 
-# Validate all labels at import time — fail fast on any violation (LR5)
+# Validate at import time
 for _k, _v in SIGNAL_LABELS.items():
     _validate_label(_k, _v)
-
 for _k, _variants in SIGNAL_LABEL_VARIANTS.items():
     for _idx, _v in enumerate(_variants):
         _validate_label(f"{_k}[{_idx}]", _v)
-
-# Verify canonical labels match first variant
 for _k in SIGNAL_LABELS:
-    assert _k in SIGNAL_LABEL_VARIANTS, (
-        f"SIGNAL_LABELS key {_k!r} missing from SIGNAL_LABEL_VARIANTS"
-    )
-    assert SIGNAL_LABEL_VARIANTS[_k][0] == SIGNAL_LABELS[_k], (
-        f"First variant of {_k!r} must equal canonical SIGNAL_LABELS value"
-    )
+    assert _k in SIGNAL_LABEL_VARIANTS
+    assert SIGNAL_LABEL_VARIANTS[_k][0] == SIGNAL_LABELS[_k]
 
 
 # ---------------------------------------------------------------------------
@@ -143,28 +127,25 @@ for _k in SIGNAL_LABELS:
 class MarketSignalState:
     """
     Immutable snapshot of all market signal states.
-
-    This is for logging/governance/auditing — NEVER expose to the agent.
+    For logging/governance/auditing — NEVER expose to the agent.
     """
     d_statistic: float = 0.0
     d_alarm: bool = False
-    d_raw: float = 1.0
+    d_raw: float = 0.0
     s_statistic: float = 0.0
     s_alarm: bool = False
-    s_raw: float = 0.0
-    observed_rate: float = 0.0
+    s_raw: float = 0.5
+    last_interval: float = 0.0
     # X and U — placeholders for Phase 4
     x_value: float = 0.0
     u_value: float = 0.0
 
     @property
     def any_elevated(self) -> bool:
-        """True if any signal is in alarm state."""
         return self.d_alarm or self.s_alarm
 
     @property
     def signal_vector(self) -> np.ndarray:
-        """[D, S, X, U] magnitude vector for entropy computation."""
         return np.array([
             self.d_statistic,
             self.s_statistic,
@@ -174,18 +155,11 @@ class MarketSignalState:
 
 
 # ---------------------------------------------------------------------------
-# Label rotation helper
+# Label rotation
 # ---------------------------------------------------------------------------
 
 def _select_variant(signal_key: str, n_evaluations: int) -> str:
-    """
-    Deterministic label selection from the variant pool.
-
-    Uses hash(n_evaluations) to select. Deterministic for same count (LR2)
-    but unpredictable to the agent.
-    """
     variants = SIGNAL_LABEL_VARIANTS[signal_key]
-    # Hash the evaluation count for deterministic but unpredictable selection
     h = hashlib.sha256(str(n_evaluations).encode()).hexdigest()
     index = int(h, 16) % len(variants)
     return variants[index]
@@ -199,24 +173,22 @@ class MarketGate:
     """
     Binary gate for qualitative market signal injection.
 
+    Post-pivot: consumes sidecar verdicts (D) and action timestamps (S)
+    instead of raw concept vectors.
+
     Invariants (CORRECTNESS_SPEC §5.2):
-      G1: Output is None or a string from SIGNAL_LABELS / SIGNAL_LABEL_VARIANTS
+      G1: Output is None or a string from SIGNAL_LABEL_VARIANTS
       G2-G3: Output contains no numeric substrings
       G4: None ⟺ no signal in alarm
       G5: get_state() always returns valid MarketSignalState
       G6: evaluate() is the only public mutation method
       G7: evaluate() calls D.step() then S.step() in fixed order
-
-    Label rotation invariants (CORRECTNESS_SPEC §10.2):
-      LR1: All variants pass numeric validation
-      LR2: Same evaluation count → same label
-      LR3: Different counts → different labels (usually)
     """
 
     def __init__(
         self,
-        d_signal: DeceptionTaxSignal,
-        s_signal: StagnationTaxSignal,
+        d_signal: SeveritySignal,
+        s_signal: IntervalAnomalySignal,
         audit_chain: Optional[object] = None,
     ):
         self._d = d_signal
@@ -227,24 +199,26 @@ class MarketGate:
 
     def evaluate(
         self,
-        concept_vec: np.ndarray,
+        verdict: str,
         action_timestamp: float,
     ) -> Optional[str]:
         """
         Evaluate all market signals and return qualitative label if any elevated.
 
-        Returns None if all signals nominal (silent pass-through, zero token cost).
-        Returns a label string if any signal is elevated.
+        Args:
+            verdict: Sidecar verdict — one of "pass", "monitor", "flag", "block".
+            action_timestamp: Unix timestamp of the action.
 
-        This is the single entry point for market evaluation (invariant G6).
-        D is always evaluated before S (invariant G7).
+        Returns:
+            None if all signals nominal.
+            A qualitative label string if any signal is elevated.
         """
         self._n_evaluations += 1
 
-        # D signal (invariant G7: D first)
-        d_result: DSignalResult = self._d.step(concept_vec)
+        # D signal: severity (invariant G7: D first)
+        d_result: DSignalResult = self._d.step(verdict)
 
-        # S signal
+        # S signal: interval anomaly
         s_result: SSignalResult = self._s.step(action_timestamp)
 
         # Update state snapshot
@@ -255,22 +229,13 @@ class MarketGate:
             s_statistic=s_result.cusum_statistic,
             s_alarm=s_result.alarm,
             s_raw=s_result.s_raw,
-            observed_rate=s_result.observed_rate,
+            last_interval=s_result.interval,
         )
 
-        # Optional: entropy redistribution
+        # Select label with rotation (G4: None ⟺ no alarm)
         label: Optional[str] = None
-        try:
-            from frontier_ops.sensing.market_entropy import redistribute
-            sv = self._state.signal_vector
-            # Only redistribute if there are non-zero signals
-            if float(np.sum(np.abs(sv))) > 1e-12:
-                redistribute(sv)  # side-effect free check; used for audit
-        except ImportError:
-            pass
-
-        # Select label with rotation (invariant G4: None ⟺ no alarm)
         signal_key: Optional[str] = None
+
         if d_result.alarm and s_result.alarm:
             signal_key = "d_and_s"
         elif d_result.alarm:
@@ -281,14 +246,11 @@ class MarketGate:
         if signal_key is not None:
             label = _select_variant(signal_key, self._n_evaluations)
 
-        # Optional: audit chain recording
+        # Optional audit chain
         if self._audit_chain is not None:
             try:
                 from frontier_ops.governance.market_audit import MarketChainEntry
-                from frontier_ops.sensing.market_entropy import (
-                    market_entropy,
-                    market_health,
-                )
+                from frontier_ops.sensing.market_entropy import market_entropy, market_health
                 import time as _time
 
                 sv = self._state.signal_vector
@@ -299,7 +261,7 @@ class MarketGate:
                     s_statistic=self._state.s_statistic,
                     s_alarm=self._state.s_alarm,
                     s_raw=self._state.s_raw,
-                    observed_rate=self._state.observed_rate,
+                    observed_rate=1.0 / max(self._state.last_interval, 0.001),
                     label_emitted=label,
                     market_entropy=market_entropy(sv),
                     market_health=market_health(sv),
@@ -312,15 +274,8 @@ class MarketGate:
         return label
 
     def get_state(self) -> MarketSignalState:
-        """
-        Current signal state snapshot. For logging/governance only — NOT for agent.
-
-        Returns the state from the most recent evaluate() call, or a zero-state
-        if evaluate() has never been called (invariant G5).
-        """
         return self._state
 
     @property
     def n_evaluations(self) -> int:
-        """Total number of evaluate() calls."""
         return self._n_evaluations

@@ -1,26 +1,25 @@
 """
-Market Signal Definitions — D (Deception Tax) and S (Stagnation Tax)
-=====================================================================
+Market Signal Definitions — D (Sustained Severity) and S (Interval Anomaly)
+============================================================================
 
-Proprioceptive market signals that detect behavioral pathologies via
-constitutional-metric-weighted trajectory analysis.
+Pivoted 2026-03-20 after calibration against 330K sidecar entries, 538 frontier-ops
+observations, and 24 labeled deep suite traces. The original geodesic ratio (D) and
+rate deviation (S) signals were invalidated — see CALIBRATION_REPORT.md.
 
-Signal D (Deception Tax):
-    CUSUM over geodesic efficiency ratio. Measures how much longer the agent's
-    actual path is compared to the direct distance from start to current position,
-    weighted by the constitutional metric G. Zigzag evasion patterns produce D >> 1.
+Signal D (Sustained Severity):
+    DAS-CUSUM over windowed mean verdict severity from the existing sidecar.
+    Detects when the sidecar has been elevated for a sustained period —
+    the pattern that a single FLAG/BLOCK does not capture.
 
-Signal S (Stagnation Tax):
-    CUSUM over windowed action-rate deviation from empirical baseline. Replaces
-    the binary paralysis detector with a continuous signal.
+Signal S (Interval Anomaly):
+    DAS-CUSUM over percentile-normalized inter-action intervals.
+    Transforms bimodal raw intervals (burst vs idle) into a uniform [0,1]
+    signal calibrated against the empirical benign distribution.
 
-Both signals expose a single atomic ``step()`` method that combines update+detect,
-preventing the ordering bugs that arise from separate update()/detect() calls.
+Both consume sidecar output rather than recomputing from scratch.
+Both expose a single atomic ``step()`` method.
 
 See CORRECTNESS_SPEC.md §3-4 for invariants and boundary conditions.
-
-References:
-    Ahmed et al. (2024), Sequential Analysis 43(1):1-27 (DAS-CUSUM)
 """
 
 from __future__ import annotations
@@ -32,32 +31,47 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-from frontier_ops.boundary.constitution import ConstitutionalMetric
 from frontier_ops.sensing.cusum import DASCUSUM, _validate_finite
 
-__all__ = ["DeceptionTaxSignal", "StagnationTaxSignal", "DSignalResult", "SSignalResult"]
+__all__ = [
+    "SeveritySignal",
+    "IntervalAnomalySignal",
+    "DSignalResult",
+    "SSignalResult",
+    # Legacy names for backward compat with imports
+    "DeceptionTaxSignal",
+    "StagnationTaxSignal",
+]
 
 
 # ---------------------------------------------------------------------------
-# Default CUSUM parameters (deliberately conservative)
+# Default CUSUM parameters (calibrated from 330K + 538 + 24 labeled traces)
 # ---------------------------------------------------------------------------
 
 _DEFAULT_D_CUSUM = {
     "threshold": 5.0,
     "drift": 0.5,
-    "window_size": 50,
-    "decay": 0.98,
-    "ceiling": 30.0,
-    "signal_name": "deception_tax",
-}
-
-_DEFAULT_S_CUSUM = {
-    "threshold": 4.0,
-    "drift": 0.3,
     "window_size": 30,
     "decay": 0.98,
     "ceiling": 30.0,
-    "signal_name": "stagnation_tax",
+    "signal_name": "sustained_severity",
+}
+
+_DEFAULT_S_CUSUM = {
+    "threshold": 5.0,
+    "drift": 0.5,
+    "window_size": 30,
+    "decay": 0.98,
+    "ceiling": 30.0,
+    "signal_name": "interval_anomaly",
+}
+
+# Verdict severity mapping (CORRECTNESS_SPEC §3.2)
+VERDICT_SEVERITY: Dict[str, float] = {
+    "pass": 0.0,
+    "monitor": 1.0,
+    "flag": 2.0,
+    "block": 3.0,
 }
 
 
@@ -68,129 +82,116 @@ _DEFAULT_S_CUSUM = {
 @dataclass(frozen=True)
 class DSignalResult:
     """Immutable result from one D signal step."""
-    d_raw: float           # Geodesic efficiency ratio (≥ 1.0 for non-stationary)
-    cusum_statistic: float # Accumulated CUSUM value
-    alarm: bool            # Whether CUSUM threshold is exceeded
+    d_raw: float            # Windowed mean severity [0, 3]
+    cusum_statistic: float  # Accumulated CUSUM value
+    alarm: bool             # Whether CUSUM threshold is exceeded
+    window_size: int        # Current window fill level
 
 
 @dataclass(frozen=True)
 class SSignalResult:
     """Immutable result from one S signal step."""
-    s_raw: float           # Rate deviation (positive = stagnation)
-    observed_rate: float   # Windowed action rate
+    s_raw: float            # Interval percentile [0, 1+]
+    interval: float         # Raw inter-action interval (seconds)
     cusum_statistic: float
     alarm: bool
 
 
 # ---------------------------------------------------------------------------
-# Signal D — Deception Tax
+# Signal D — Sustained Severity
 # ---------------------------------------------------------------------------
 
-class DeceptionTaxSignal:
+class SeveritySignal:
     """
-    Signal D: CUSUM over geodesic efficiency ratio.
+    Signal D: DAS-CUSUM over windowed mean verdict severity.
 
-    D_raw(t) = PathLength_G(trajectory) / max(DirectDistance_G(start, current), ε)
+    Consumes the sidecar's per-step verdicts (PASS/MONITOR/FLAG/BLOCK),
+    maps them to severity scores (0/1/2/3), computes a rolling mean over
+    a window of W recent verdicts, and feeds the windowed mean into DAS-CUSUM.
 
-    Where PathLength_G is the cumulative metric-weighted step distance and
-    DirectDistance_G is the metric-weighted distance from start to current
-    using the midpoint approximation.
+    A single FLAG is normal (tool-type switching). Sustained FLAG/BLOCK is
+    the signal that the sidecar has been elevated for a concerning period.
 
-    A perfectly efficient straight-line trajectory has D_raw ≈ 1.0.
-    Zigzag or evasive trajectories have D_raw >> 1.0.
-
-    Invariants (CORRECTNESS_SPEC §3.2):
-      D1: D_raw ≥ 1.0 for non-stationary trajectories (enforced by floor)
-      D3: D_raw = 1.0 when stationary
-      D4: path_length monotonically non-decreasing
-      D5: Memory bounded (only start + last + path_length stored)
-      D6: step() is atomic update+detect
+    Invariants (CORRECTNESS_SPEC §3.3):
+      D1: D_raw ∈ [0.0, 3.0]
+      D2: D_raw = 0.0 when all recent verdicts are PASS
+      D3: Verdict must be one of {PASS, MONITOR, FLAG, BLOCK}
+      D4: Severity window bounded by capacity W
+      D5: step() is atomic
+      D6: Unknown verdict → ValueError
     """
-
-    _EPSILON = 1e-10  # Floor for geodesic distance to avoid div-by-zero
 
     def __init__(
         self,
-        metric: ConstitutionalMetric,
+        severity_window: int = 10,
         cusum_params: Optional[Dict] = None,
     ):
-        self.metric = metric
+        if severity_window < 1:
+            raise ValueError(f"severity_window must be ≥ 1, got {severity_window}")
+
+        self._severity_window = severity_window
         params = {**_DEFAULT_D_CUSUM, **(cusum_params or {})}
         self._cusum = DASCUSUM(**params)
-        self._start: Optional[np.ndarray] = None
-        self._last: Optional[np.ndarray] = None
-        self._path_length: float = 0.0
-        self._d_raw: float = 1.0
+        self._window: deque[float] = deque(maxlen=severity_window)
+        self._d_raw: float = 0.0
         self._n_steps: int = 0
 
-    def step(self, concept_vec: np.ndarray) -> DSignalResult:
+    def step(self, verdict: str) -> DSignalResult:
         """
-        Atomic update + detect. Feed one concept vector, get result.
+        Atomic update + detect. Feed one sidecar verdict, get result.
 
-        This is the ONLY public mutation method. There is no separate
-        update()/detect() to prevent ordering bugs (invariant D6).
+        Args:
+            verdict: One of "pass", "monitor", "flag", "block" (case-insensitive).
+
+        Raises:
+            ValueError: If verdict is not in the allowed set.
         """
-        concept_vec = np.asarray(concept_vec, dtype=float)
-        if not np.all(np.isfinite(concept_vec)):
-            raise ValueError(f"concept_vec contains non-finite values: {concept_vec}")
+        verdict_lower = verdict.strip().lower()
+        if verdict_lower not in VERDICT_SEVERITY:
+            raise ValueError(
+                f"Unknown verdict {verdict!r}. "
+                f"Must be one of: {sorted(VERDICT_SEVERITY.keys())}"
+            )
 
         self._n_steps += 1
+        severity = VERDICT_SEVERITY[verdict_lower]
+        self._window.append(severity)
 
-        # First observation: initialize, no signal
-        if self._start is None:
-            self._start = concept_vec.copy()
-            self._last = concept_vec.copy()
-            self._d_raw = 1.0
-            return DSignalResult(d_raw=1.0, cusum_statistic=0.0, alarm=False)
+        # Windowed mean severity (invariant D1: ∈ [0, 3])
+        self._d_raw = float(np.mean(self._window))
 
-        # Accumulate path length (invariant D4: monotonically non-decreasing)
-        step_dist = self.metric.metric_weighted_distance(self._last, concept_vec)
-        self._path_length += step_dist
-        self._last = concept_vec.copy()
+        # First observation: return raw, no CUSUM yet
+        if self._n_steps < 2:
+            return DSignalResult(
+                d_raw=self._d_raw,
+                cusum_statistic=0.0,
+                alarm=False,
+                window_size=len(self._window),
+            )
 
-        # Direct distance from start
-        geodesic = self.metric.metric_weighted_distance(self._start, concept_vec)
-
-        # Compute ratio
-        if geodesic < self._EPSILON:
-            # Stationary trajectory — no directional information (invariant D3)
-            self._d_raw = 1.0
-        else:
-            raw = self._path_length / geodesic
-            # Floor at 1.0 to handle midpoint-approximation artifacts (invariant D1)
-            self._d_raw = max(1.0, raw)
-
-        # Feed into CUSUM (atomic detect)
+        # Feed into CUSUM
         cusum_stat, alarm = self._cusum.update(self._d_raw)
 
         return DSignalResult(
             d_raw=self._d_raw,
             cusum_statistic=cusum_stat,
             alarm=alarm,
+            window_size=len(self._window),
         )
 
     def reset(self) -> None:
         """Reset all mutable state."""
         self._cusum.reset()
-        self._start = None
-        self._last = None
-        self._path_length = 0.0
-        self._d_raw = 1.0
+        self._window.clear()
+        self._d_raw = 0.0
         self._n_steps = 0
 
     @property
     def d_raw(self) -> float:
-        """Current geodesic efficiency ratio."""
         return self._d_raw
 
     @property
-    def path_length(self) -> float:
-        """Accumulated metric-weighted path length."""
-        return self._path_length
-
-    @property
     def statistic(self) -> float:
-        """Current CUSUM statistic."""
         return self._cusum.statistic
 
     @property
@@ -199,138 +200,158 @@ class DeceptionTaxSignal:
 
 
 # ---------------------------------------------------------------------------
-# Signal S — Stagnation Tax
+# Signal S — Interval Anomaly
 # ---------------------------------------------------------------------------
 
-class StagnationTaxSignal:
+class IntervalAnomalySignal:
     """
-    Signal S: CUSUM over windowed action-rate deviation.
+    Signal S: DAS-CUSUM over percentile-normalized inter-action intervals.
 
-    Uses a sliding window of recent timestamps to compute observed action rate,
-    then measures deviation from empirical baseline:
+    Calibrated against the empirical benign interval distribution. Transforms
+    bimodal raw intervals (burst 0.01-2s vs idle 30s-60min+) into a uniform
+    [0,1] signal where 0.5 = median benign interval.
 
-      S_raw = baseline_rate - windowed_observed_rate
+    Values > 1.0 indicate intervals longer than any observed benign interval
+    (extrapolation is valid and meaningful).
 
-    Positive S_raw = stagnation (slower than baseline).
-    Negative S_raw = faster than baseline (no alarm).
-
-    Invariants (CORRECTNESS_SPEC §4.2):
+    Invariants (CORRECTNESS_SPEC §4.3):
       S1: Timestamps monotonically non-decreasing
-      S2: baseline_rate > 0
-      S3: Timestamp buffer bounded
-      S4: observed_rate ≥ 0
-      S6: step() is atomic update+detect
+      S2: S_raw ≥ 0
+      S3: S_raw ≈ 0.5 for median benign interval
+      S4: S_raw > 1.0 for intervals exceeding all calibration data
+      S5: step() is atomic
+      S6: Calibration data must have ≥ 10 intervals
+      S7: O(1) memory for timestamps (stores only last)
     """
 
     def __init__(
         self,
-        baseline_rate: float = 1.0,
-        rate_window: int = 10,
         cusum_params: Optional[Dict] = None,
     ):
-        if baseline_rate <= 0:
-            raise ValueError(f"baseline_rate must be > 0, got {baseline_rate}")
-        if rate_window < 2:
-            raise ValueError(f"rate_window must be ≥ 2, got {rate_window}")
-
-        self.baseline_rate = baseline_rate
-        self.rate_window = rate_window
         params = {**_DEFAULT_S_CUSUM, **(cusum_params or {})}
         self._cusum = DASCUSUM(**params)
-        self._timestamps: deque[float] = deque(maxlen=rate_window)
-        self._s_raw: float = 0.0
-        self._observed_rate: float = 0.0
+        self._benign_intervals: Optional[np.ndarray] = None  # sorted, for bisect
+        self._last_timestamp: Optional[float] = None
+        self._s_raw: float = 0.5
+        self._last_interval: float = 0.0
         self._n_steps: int = 0
+        self._calibrated: bool = False
+
+    def calibrate(self, benign_intervals: List[float]) -> None:
+        """
+        Set the benign interval distribution for percentile computation.
+
+        Args:
+            benign_intervals: Inter-action intervals (seconds) from known-benign sessions.
+                              Must have ≥ 10 values.
+
+        Raises:
+            ValueError: If fewer than 10 intervals provided.
+        """
+        intervals = np.array(benign_intervals, dtype=float)
+        intervals = intervals[np.isfinite(intervals) & (intervals >= 0)]
+        if len(intervals) < 10:
+            raise ValueError(
+                f"Need ≥ 10 benign intervals for calibration, got {len(intervals)}"
+            )
+        self._benign_intervals = np.sort(intervals)
+        self._calibrated = True
+
+    def calibrate_from_timestamps(self, timestamps: List[float]) -> None:
+        """
+        Convenience: calibrate from sorted action timestamps.
+
+        Computes inter-action intervals and calls calibrate().
+        """
+        ts = np.array(sorted(timestamps), dtype=float)
+        intervals = np.diff(ts)
+        intervals = intervals[intervals > 0.001]  # filter < 1ms (duplicate timestamps)
+        self.calibrate(intervals.tolist())
+
+    def _percentile(self, interval: float) -> float:
+        """Compute where interval falls in the benign CDF. Returns [0, 1+]."""
+        if self._benign_intervals is None:
+            raise RuntimeError("Must call calibrate() before step()")
+        idx = np.searchsorted(self._benign_intervals, interval, side="right")
+        return float(idx) / len(self._benign_intervals)
 
     def step(self, timestamp: float) -> SSignalResult:
         """
         Atomic update + detect. Feed one action timestamp, get result.
 
-        Raises ValueError if timestamp is non-finite or decreasing.
+        Raises:
+            ValueError: If timestamp is non-finite or decreasing.
+            RuntimeError: If calibrate() has not been called.
         """
         _validate_finite(timestamp, "timestamp")
 
+        if not self._calibrated:
+            raise RuntimeError("Must call calibrate() before step()")
+
         # Monotonicity check (invariant S1)
-        if self._timestamps and timestamp < self._timestamps[-1]:
+        if self._last_timestamp is not None and timestamp < self._last_timestamp:
             raise ValueError(
                 f"Timestamps must be non-decreasing. "
-                f"Got {timestamp} after {self._timestamps[-1]}"
+                f"Got {timestamp} after {self._last_timestamp}"
             )
 
         self._n_steps += 1
-        self._timestamps.append(timestamp)
 
-        # Need at least 2 timestamps for rate
-        if len(self._timestamps) < 2:
-            self._s_raw = 0.0
-            self._observed_rate = 0.0
+        # First timestamp: neutral, no CUSUM
+        if self._last_timestamp is None:
+            self._last_timestamp = timestamp
+            self._s_raw = 0.5
+            self._last_interval = 0.0
             return SSignalResult(
-                s_raw=0.0, observed_rate=0.0, cusum_statistic=0.0, alarm=False,
+                s_raw=0.5, interval=0.0, cusum_statistic=0.0, alarm=False,
             )
 
-        # Windowed rate estimation (invariant S4: rate ≥ 0)
-        window_duration = self._timestamps[-1] - self._timestamps[0]
-        n_intervals = len(self._timestamps) - 1
+        # Compute interval and percentile
+        interval = timestamp - self._last_timestamp
+        self._last_timestamp = timestamp
+        self._last_interval = interval
 
-        if window_duration < 1e-10:
-            # All timestamps identical — treat as baseline rate
-            self._observed_rate = self.baseline_rate
-        else:
-            self._observed_rate = n_intervals / window_duration
-
-        # Rate deviation (positive = stagnation, invariant S5)
-        self._s_raw = self.baseline_rate - self._observed_rate
+        percentile = self._percentile(interval)
+        self._s_raw = percentile
 
         # Feed into CUSUM
-        cusum_stat, alarm = self._cusum.update(self._s_raw)
+        cusum_stat, alarm = self._cusum.update(percentile)
 
         return SSignalResult(
-            s_raw=self._s_raw,
-            observed_rate=self._observed_rate,
+            s_raw=percentile,
+            interval=interval,
             cusum_statistic=cusum_stat,
             alarm=alarm,
         )
 
-    def set_baseline(self, action_timestamps: List[float]) -> None:
-        """
-        Calibrate baseline action rate from historical timestamps.
-
-        Uses mean inter-action interval. Requires ≥ 2 timestamps.
-        """
-        if len(action_timestamps) < 2:
-            return  # Can't compute rate from single timestamp
-
-        intervals = np.diff(sorted(action_timestamps))
-        intervals = intervals[intervals > 1e-10]  # Filter simultaneous actions
-        if len(intervals) == 0:
-            return
-
-        mean_interval = float(np.mean(intervals))
-        self.baseline_rate = 1.0 / mean_interval
-
     def reset(self) -> None:
-        """Reset all mutable state. Preserves baseline_rate."""
+        """Reset mutable state. Preserves calibration."""
         self._cusum.reset()
-        self._timestamps.clear()
-        self._s_raw = 0.0
-        self._observed_rate = 0.0
+        self._last_timestamp = None
+        self._s_raw = 0.5
+        self._last_interval = 0.0
         self._n_steps = 0
 
     @property
     def s_raw(self) -> float:
-        """Current rate deviation. Positive = stagnation."""
         return self._s_raw
 
     @property
-    def observed_rate(self) -> float:
-        """Current windowed action rate."""
-        return self._observed_rate
-
-    @property
     def statistic(self) -> float:
-        """Current CUSUM statistic."""
         return self._cusum.statistic
 
     @property
     def n_steps(self) -> int:
         return self._n_steps
+
+    @property
+    def is_calibrated(self) -> bool:
+        return self._calibrated
+
+
+# ---------------------------------------------------------------------------
+# Legacy aliases (backward compat for imports)
+# ---------------------------------------------------------------------------
+
+DeceptionTaxSignal = SeveritySignal
+StagnationTaxSignal = IntervalAnomalySignal

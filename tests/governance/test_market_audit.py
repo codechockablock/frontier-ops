@@ -15,25 +15,20 @@ import pytest
 from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.governance.market_audit import MarketAuditChain, MarketChainEntry
 from frontier_ops.sensing.market_gate import MarketGate, SIGNAL_LABELS
-from frontier_ops.sensing.market_signals import DeceptionTaxSignal, StagnationTaxSignal
-from frontier_ops.boundary.constitution import (
-    ConstitutionalMetric,
-    ConstitutionSpec,
-    Boundary,
-)
+from frontier_ops.sensing.market_signals import SeveritySignal, IntervalAnomalySignal
 
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
-def _simple_metric(n_dims: int = 6) -> ConstitutionalMetric:
-    spec = ConstitutionSpec(
-        name="test",
-        boundaries=[Boundary("dim_0", threshold=0.8, sharpness=3.0)],
-        baseline_weight=1.0,
-    )
-    return ConstitutionalMetric(spec, dim_names=[f"dim_{i}" for i in range(n_dims)])
+def _make_calibrated_s():
+    """Create a calibrated IntervalAnomalySignal for testing."""
+    import numpy as np
+    s = IntervalAnomalySignal()
+    rng = np.random.default_rng(42)
+    s.calibrate(sorted(rng.exponential(scale=10.0, size=200)))
+    return s
 
 
 def _make_entry(**overrides) -> MarketChainEntry:
@@ -55,9 +50,8 @@ def _make_entry(**overrides) -> MarketChainEntry:
 
 
 def _make_gate_with_audit():
-    metric = _simple_metric()
-    d = DeceptionTaxSignal(metric)
-    s = StagnationTaxSignal()
+    d = SeveritySignal()
+    s = _make_calibrated_s()
     audit = MarketAuditChain()
     gate = MarketGate(d, s, audit_chain=audit)
     return gate, audit
@@ -74,7 +68,7 @@ class TestAuditChainInvariants:
         """A1: Every evaluate() call produces exactly one chain entry."""
         gate, audit = _make_gate_with_audit()
         for i in range(10):
-            gate.evaluate(np.zeros(6), float(i))
+            gate.evaluate("pass", float(i))
         assert len(audit) == 10
 
     def test_a2_chain_is_tamper_evident(self):
@@ -117,14 +111,12 @@ class TestAuditChainInvariants:
 
     def test_a5_gate_works_without_audit_chain(self):
         """A5: MarketGate operates normally without audit chain."""
-        metric = _simple_metric()
-        d = DeceptionTaxSignal(metric)
-        s = StagnationTaxSignal()
+        d = SeveritySignal()
+        s = _make_calibrated_s()
         gate = MarketGate(d, s)  # No audit chain
 
         for i in range(10):
-            result = gate.evaluate(np.zeros(6), float(i))
-            # Should work fine, just no auditing
+            result = gate.evaluate("pass", float(i))
         assert gate.n_evaluations == 10
 
     def test_a6_chain_length_equals_evaluations(self):
@@ -132,7 +124,7 @@ class TestAuditChainInvariants:
         gate, audit = _make_gate_with_audit()
         n = 25
         for i in range(n):
-            gate.evaluate(np.random.rand(6) * 0.1, float(i))
+            gate.evaluate("pass", float(i))
         assert len(audit) == n
         assert gate.n_evaluations == n
 
@@ -148,9 +140,9 @@ class TestAuditChainIntegration:
         """Chain verifies correctly after 100 evaluations."""
         gate, audit = _make_gate_with_audit()
         rng = np.random.default_rng(42)
+        verdicts = ["pass", "monitor", "flag", "block"]
         for i in range(100):
-            vec = rng.uniform(0, 0.5, 6)
-            gate.evaluate(vec, float(i))
+            gate.evaluate(verdicts[rng.integers(0, 4)], float(i))
         assert len(audit) == 100
         result = audit.verify()
         assert result.valid

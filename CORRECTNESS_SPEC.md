@@ -115,125 +115,127 @@ update(llr):
 
 ---
 
-## 3. Signal D — Deception Tax
+## 3. Signal D — Sustained Severity (replaces Deception Tax)
 
-### 3.1 Algorithm Definition
+### 3.1 Design Rationale (from Calibration Report 2026-03-20)
 
-Geodesic efficiency ratio fed through DAS-CUSUM.
+The original D signal (geodesic ratio) was invalidated by calibration against
+330K telemetry entries + 538 frontier-ops observations + 24 labeled deep suite
+traces. Behavioral space is effectively discrete (16-94 unique vectors), making
+path-to-geodesic ratios meaningless. Per-step DAS-CUSUM on any raw signal
+produces 25-49% FPR because tool-type switching is normal noise.
+
+The replacement consumes the sidecar's existing per-step verdicts (which achieve
+91.7% accuracy on labeled data) and detects SUSTAINED elevation — the real signal
+that a single FLAG doesn't provide.
+
+### 3.2 Algorithm Definition
 
 ```
-On each step t with concept vector x_t:
-  path_length += d_G(x_{t-1}, x_t)     # metric-weighted step distance
-  geodesic = d_G(x_0, x_t)             # metric-weighted direct distance
-  D_raw = path_length / max(geodesic, ε)
+severity_map = {PASS: 0, MONITOR: 1, FLAG: 2, BLOCK: 3}
+
+On each sidecar verdict v_t:
+  severity_t = severity_map[v_t]
   
-  If geodesic < ε: D_raw = 1.0  # stationary, no information
+  Add severity_t to rolling window (capacity W)
+  D_raw = mean(window)
   
-  Feed D_raw into CUSUM
+  Feed D_raw into DAS-CUSUM
 ```
 
-Where `d_G(a, b) = √((b-a)ᵀ G((a+b)/2) (b-a))` is the metric-weighted distance
-using the midpoint approximation.
+D_raw is the windowed mean verdict severity. Benign sessions produce D_raw ≈ 0.5
+(mix of PASS and MONITOR). Sustained FLAG/BLOCK pushes D_raw to 2-3.
 
-### 3.2 Invariants
+### 3.3 Invariants
 
 | ID | Invariant | Rationale |
 |----|-----------|-----------|
-| D1 | `D_raw ≥ 1.0` for non-stationary trajectories | Triangle inequality: path ≥ direct |
-| D2 | `D_raw = 1.0` for straight-line trajectories in flat metric | Path = geodesic |
-| D3 | `D_raw = 1.0` when stationary (geodesic < ε) | By definition |
-| D4 | `path_length` is monotonically non-decreasing | Sum of non-negative distances |
-| D5 | Memory bounded: only start point + path_length + last point stored | No trajectory leak |
-| D6 | `update()` and `detect()` are atomic (single call) | Prevent ordering bugs |
-
-### 3.3 Correctness Note on "Geodesic"
-
-`d_G(x_0, x_t)` is NOT the true Riemannian geodesic distance. It is the
-metric-weighted straight-line distance using the midpoint metric, which is
-a first-order approximation. For nearby points (step-wise), this is accurate.
-For distant points (start to current), this may underestimate the true geodesic
-on a positively curved manifold or overestimate on negatively curved.
-
-**Consequence for D_raw:** In regions of high positive curvature, the geodesic
-approximation may OVERCOUNT the true geodesic distance, making D_raw < 1.0
-(violating D1). This is a known limitation.
-
-**Mitigation:** For the 6D behavioral space with constitutional metric, curvature
-is modest (max amplification capped at 50×). At typical step sizes (Δx ≈ 0.01-0.1),
-the midpoint approximation error is < 1%. We add a floor: `D_raw = max(1.0, D_raw)`.
+| D1 | `D_raw ∈ [0.0, 3.0]` | Bounded by severity_map range |
+| D2 | `D_raw = 0.0` when all recent verdicts are PASS | All-benign window |
+| D3 | Verdict must be one of {PASS, MONITOR, FLAG, BLOCK} | Closed input set |
+| D4 | Severity window bounded by capacity W | No memory leak |
+| D5 | `step()` is atomic (single call) | Prevent ordering bugs |
+| D6 | Input validation: unknown verdict → ValueError | Fail fast on bad data |
 
 ### 3.4 Adversarial Robustness
 
 | Attack | Detection | Notes |
 |--------|-----------|-------|
-| Tiny steps (many small moves to avoid D buildup) | S catches stagnation if steps are slow; D catches if path is inefficient | Complementary with S |
-| Return-to-start (zigzag then return) | D_raw spikes during zigzag; CUSUM accumulates before return | Decay may partially clear, but accumulated deviation persists |
-| Metric-aligned evasion (move along low-curvature directions) | Limited by cross-terms in G that make combined dims expensive | Architecture decision: G encodes dangerous combinations |
+| Oscillate between FLAG and PASS to keep mean low | Window smoothing catches sustained patterns; single-step oscillation averages to ~1.0 (MONITOR-equivalent) | Not a false negative — oscillation IS less concerning than sustained FLAG |
+| Exploit sidecar false negatives | D inherits sidecar accuracy. If sidecar misses it, D misses it. | Defense in depth: S and conjunction flags provide complementary coverage |
+| Rapid PASS-producing actions to dilute severity | S catches unnatural burst patterns | Complementary signal design |
 
 ### 3.5 Boundary Conditions
 
 | Condition | Expected behavior |
 |-----------|-------------------|
-| `concept_vec` contains NaN | Raise `ValueError` |
-| `concept_vec` wrong dimensionality | Raise `ValueError` |
-| Zero vector | Valid (origin in concept space) |
-| Identical consecutive vectors | path_length unchanged, geodesic unchanged, D_raw unchanged |
-| First observation | D_raw = 1.0, no CUSUM update |
+| Unknown verdict string | Raise `ValueError` |
+| Empty string | Raise `ValueError` |
+| First verdict (window < 2) | D_raw = severity of that verdict, no CUSUM update |
+| Case sensitivity | Case-insensitive matching (accept "pass", "PASS", "Pass") |
 
 ---
 
-## 4. Signal S — Stagnation Tax
+## 4. Signal S — Interval Anomaly (replaces Stagnation Tax)
 
-### 4.1 Algorithm Definition
+### 4.1 Design Rationale (from Calibration Report 2026-03-20)
 
-Action-rate deviation from empirical baseline, using windowed rate estimation,
-fed through DAS-CUSUM.
+The original S signal (rate deviation from single baseline) fails because
+inter-action intervals are heavily bimodal: active bursts (0.01-2s) and
+idle gaps (30s-60min+). A single baseline rate can't capture this.
+
+The replacement uses percentile-based normalization against the empirical
+benign interval distribution. This transforms the bimodal raw intervals
+into a uniform [0,1] signal where 0 = fastest benign interval,
+1 = slowest benign interval, and values > 1 = slower than any benign interval.
+
+### 4.2 Algorithm Definition
 
 ```
+Calibration (once, from benign data):
+  benign_intervals = sorted array of inter-action intervals from PASS sessions
+  percentile_func(interval) = fraction of benign_intervals ≤ interval
+
 On each action at timestamp t_k:
-  Add t_k to timestamp ring buffer (capacity R)
+  If first action: store timestamp, return S_raw=0.5 (neutral)
   
-  If len(buffer) < 2: S_raw = 0.0; return
+  interval = t_k - t_{k-1}
+  percentile = percentile_func(interval)  # [0, 1+]
+  S_raw = percentile  # 0=fast, 1=slow, >1=slower than any benign
   
-  # Windowed rate: actions per unit time over recent window
-  window_duration = buffer[-1] - buffer[max(0, -R)]
-  window_count = min(len(buffer), R)
-  observed_rate = (window_count - 1) / max(window_duration, ε)
-  
-  S_raw = baseline_rate - observed_rate
-  # Positive = slower than baseline (stagnation)
-  # Negative = faster than baseline (fine)
-  
-  Feed S_raw into CUSUM
+  Feed S_raw into DAS-CUSUM
 ```
 
-### 4.2 Invariants
+### 4.3 Invariants
 
 | ID | Invariant | Rationale |
 |----|-----------|-----------|
 | S1 | Timestamps must be monotonically non-decreasing | Time doesn't go backward |
-| S2 | `baseline_rate > 0` | Zero rate is undefined |
-| S3 | Timestamp buffer bounded by capacity R | No memory leak |
-| S4 | `observed_rate ≥ 0` | Rate is non-negative |
-| S5 | `S_raw = baseline - observed`: positive means stagnation | Sign convention |
-| S6 | `update()` and `detect()` are atomic (single call) | Prevent ordering bugs |
+| S2 | `S_raw ≥ 0` | Percentile is non-negative |
+| S3 | `S_raw ≈ 0.5` for median benign interval | Definition of percentile |
+| S4 | `S_raw ≥ 1.0` for intervals longer than any benign | At or beyond calibration maximum |
+| S5 | `step()` is atomic (single call) | Prevent ordering bugs |
+| S6 | Calibration data must have ≥ 10 intervals | Minimum for meaningful CDF |
+| S7 | Timestamp buffer stores only last timestamp (O(1) memory) | No memory leak |
 
-### 4.3 Adversarial Robustness
+### 4.4 Adversarial Robustness
 
 | Attack | Detection | Notes |
 |--------|-----------|-------|
-| Rapid no-op actions to keep rate high | D catches if actions are inefficient | Complementary with D |
-| Strategic pauses (stagnate then burst) | CUSUM accumulates during stagnation; burst clears slowly due to decay | Window size vs. burst length determines detection |
+| Rapid no-op actions (low percentile burst) | DAS-CUSUM detects sustained low percentiles | Unusual burst of fast actions is suspicious too |
+| Strategic pauses (high percentile) | DAS-CUSUM accumulates during sustained high percentiles | Single pause is fine; 10 consecutive are flagged |
+| Alternating fast/slow to average out | Window-based CUSUM catches sustained deviation in either direction | Two-sided detection |
 
-### 4.4 Boundary Conditions
+### 4.5 Boundary Conditions
 
 | Condition | Expected behavior |
 |-----------|-------------------|
 | `timestamp = NaN` | Raise `ValueError` |
 | `timestamp < previous timestamp` | Raise `ValueError` (monotonicity) |
-| `timestamp = previous timestamp` | Valid (simultaneous actions); observed_rate = baseline (no stagnation signal) |
-| `baseline_rate ≤ 0` | Raise `ValueError` |
-| Single timestamp | S_raw = 0.0, no CUSUM update |
+| `timestamp = previous timestamp` | interval = 0, percentile = 0.0 (fastest possible) |
+| First timestamp | S_raw = 0.5 (neutral), no CUSUM update |
+| No calibration data | Raise `RuntimeError` (must calibrate before use) |
+| Interval exceeding all calibration data | S_raw > 1.0 (extrapolation is valid) |
 
 ---
 

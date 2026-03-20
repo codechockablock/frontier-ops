@@ -1,0 +1,1500 @@
+15:58:05 [INFO] Pipeline initialized with 6-dim constitution
+15:58:05 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+15:58:05 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+15:58:05 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+15:58:05 [INFO] frontier-ops sidecar starting
+15:58:05 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-19.log
+16:06:51 [INFO] User message → intent=conversation conf=0.33
+16:08:03 [INFO] Stopping sidecar...
+16:08:03 [INFO] Chain integrity:  (length=0)
+16:08:03 [INFO] frontier-ops sidecar stopped
+16:09:00 [INFO] Pipeline initialized with 6-dim constitution
+16:09:00 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+16:09:00 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+16:09:00 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+16:09:00 [INFO] frontier-ops sidecar starting
+16:09:00 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-19.log
+16:13:19 [INFO] User message → intent=unknown conf=0.00
+16:14:14 [INFO] User message → intent=unknown conf=0.00
+16:19:14 [INFO] User message → intent=unknown conf=0.00
+16:19:14 [INFO] New run: a05bdd81-18e5-43c2-baa7-9883e42cd725
+16:19:20 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.13 aligned=False state=exploring
+16:19:24 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.02 aligned=False state=exploring
+16:19:31 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=372.90 aligned=True state=exploring
+16:19:31 [INFO] ✖ [BLOCK] tool=read intent=unknown e=33926697.57 aligned=True state=exploring
+16:19:39 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=188755855.56 aligned=True state=exploring
+16:22:30 [INFO] User message → intent=search conf=0.20
+16:22:30 [INFO] New run: 2c296200-4571-4351-a917-f796d0f6e945
+16:23:05 [INFO] ✖ [BLOCK] tool=exec intent=search e=28735982.30 aligned=True state=exploring
+16:26:38 [INFO] User message → intent=unknown conf=0.00
+16:26:39 [INFO] New run: f54e575b-6ccf-4304-b768-a611675911ad
+16:26:52 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3779202.23 aligned=False state=exploring
+16:26:52 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: resetting governance budget
+16:26:56 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=468425.60 aligned=False state=exploring
+16:27:11 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=58928.70 aligned=False state=exploring
+16:28:41 [INFO] User message → intent=conversation conf=0.33
+16:28:41 [INFO] New run: 5f0dd410-c2c8-41a9-a0fa-3a9ecfed5ecd
+16:28:55 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=98168.92 aligned=True state=wrapping_up
+16:29:05 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=4370088858.80 aligned=False state=exploring
+16:29:16 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=217578128877.95 aligned=True state=exploring
+16:29:16 [INFO] ✖ [BLOCK] tool=read intent=conversation e=6830940242342469.00 aligned=True state=exploring
+16:29:22 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=1365627339096183.50 aligned=True state=exploring
+16:29:36 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=425803151773411.44 aligned=True state=initializing
+16:29:48 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=18440811610887157760.00 aligned=True state=focused
+16:30:06 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=2408019113698620033990656.00 aligned=True state=exploring
+16:30:14 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=82033903534716579114647552.00 aligned=True state=exploring
+16:30:29 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=953262581036255463537115136.00 aligned=True state=exploring
+16:30:43 [INFO] ✖ [BLOCK] tool=exec intent=conversation e=338146288894996950913384448.00 aligned=True state=initializing
+16:48:58 [INFO] User message → intent=unknown conf=0.00
+16:48:58 [INFO] New run: 75ac0f68-0a62-47a6-aff2-d2b479af7927
+16:52:00 [INFO] User message → intent=unknown conf=0.00
+16:52:01 [INFO] New run: 18d65d0e-2f2a-44b6-9e26-386cd55fcf0a
+16:52:10 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=243383865817140718785789952.00 aligned=True state=exploring
+16:52:10 [WARNING] ⏱️  TIMING: 1287s gap between actions
+16:52:17 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=134660934485041579085004800.00 aligned=False state=focused
+16:52:24 [INFO] ✖ [BLOCK] tool=read intent=unknown e=71674487976362420408942592.00 aligned=True state=exploring
+16:52:24 [INFO] ✖ [BLOCK] tool=read intent=unknown e=14540361536477394420891648.00 aligned=False state=exploring
+16:52:32 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=4921792172061654182264832.00 aligned=False state=exploring
+16:52:43 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=1467030215220856893734912.00 aligned=True state=exploring
+16:52:49 [INFO] ✖ [BLOCK] tool=read intent=unknown e=259927228159606088794112.00 aligned=False state=exploring
+16:52:49 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=73239655309595740471296.00 aligned=False state=exploring
+16:52:56 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=12239781196856001822720.00 aligned=False state=exploring
+16:53:10 [INFO] Stopping sidecar...
+16:53:10 [INFO] Final briefing: Over the last 60 minutes, 29 actions were observed. 1 passed, 1 were monitored, 0 were flagged, 27 were blocked. The primary detector was fisher_divergence (fired 13 times). Behavioral regime: EXPLORING. Sustained conjunctions detected. Overall: critical.
+16:53:10 [INFO] Chain integrity:  (length=29)
+16:53:10 [INFO] frontier-ops sidecar stopped
+16:53:12 [INFO] Pipeline initialized with 6-dim constitution
+16:53:12 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+16:53:12 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+16:53:12 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+16:53:12 [INFO] frontier-ops sidecar starting
+16:53:12 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-19.log
+16:53:22 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.13 aligned=False state=wrapping_up
+16:53:42 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.19 aligned=True state=exploring
+16:53:57 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.08 aligned=True state=exploring
+16:53:57 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=5.17 aligned=True state=exploring
+16:54:03 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=21.27 aligned=True state=exploring
+16:54:09 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=5.53 aligned=True state=exploring
+16:54:15 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=1.74 aligned=False state=exploring
+16:54:21 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.39 aligned=True state=exploring
+16:54:34 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.06 aligned=False state=exploring
+16:54:45 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.02 aligned=True state=exploring
+16:55:39 [INFO] User message → intent=unknown conf=0.00
+16:55:39 [INFO] New run: 4d38d525-3969-464e-9399-54be77fc02ad
+16:59:37 [INFO] User message → intent=unknown conf=0.00
+16:59:38 [INFO] New run: 0c256894-b768-4a85-a909-c1f18a45104e
+17:01:10 [INFO] User message → intent=search conf=0.20
+17:01:10 [INFO] New run: 026bc931-ef73-447c-b57b-0cfed81ab7d4
+17:18:36 [INFO] User message → intent=unknown conf=0.00
+17:18:37 [INFO] New run: d73bd318-0abb-4141-a19f-4cb36f24221f
+18:17:52 [INFO] New run: a7da68fa-e441-4842-8de1-672a76a0dfe7
+18:18:02 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=exploring
+18:18:02 [WARNING] ⏱️  TIMING: 4997s gap between actions
+18:18:10 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.01 aligned=False state=exploring
+18:18:18 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+18:18:18 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+18:18:26 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=focused
+19:29:50 [INFO] New run: 44a2d74e-791f-4333-bbcf-e49cb0d5e7d3
+19:30:10 [INFO] New run: 43d673fb-dd50-4bea-94e2-28b44ad70386
+19:31:23 [INFO] New run: 25ca1542-655b-4442-8e5d-8269f55cd57f
+19:41:10 [INFO] New run: bf8d309e-dd5f-48a6-aa25-bb17e9a64a81
+19:41:40 [INFO] New run: 332417f8-5e5f-445e-8a50-960f4ed8fd03
+19:47:31 [INFO] New run: 93bfb940-a23d-43e1-b579-b1c57d0d1a48
+19:47:39 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+19:47:39 [WARNING] ⏱️  TIMING: 5353s gap between actions
+19:47:47 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+19:48:01 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=exploring
+19:48:01 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+19:48:12 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+19:48:18 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+19:48:23 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.59 aligned=True state=exploring
+19:49:33 [INFO] New run: 3e8db85e-e974-4b71-8018-8133be959c63
+19:49:44 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.16 aligned=False state=exploring
+19:49:56 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.11 aligned=True state=exploring
+19:50:26 [INFO] New run: e1db3565-540c-4894-8f5a-1ef7ccf3c261
+19:54:04 [INFO] New run: 022ee08e-fae4-42ec-806d-3dd9d17cec9e
+19:54:41 [INFO] New run: 39e9ae74-4fac-499c-805e-d7b0eb10ae41
+19:56:23 [INFO] New run: 34e85396-6b9a-4b0f-9628-46716dfdcc83
+19:56:30 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.04 aligned=True state=exploring
+19:56:30 [WARNING] ⏱️  TIMING: 394s gap between actions
+19:56:36 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.01 aligned=True state=exploring
+19:56:48 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.03 aligned=True state=focused
+19:56:56 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.01 aligned=True state=focused
+19:57:22 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+19:57:40 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+19:57:58 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+19:58:04 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+20:00:15 [INFO] New run: 0dbbcd6b-91fe-48b7-b39a-d97bbda59f4c
+20:01:10 [INFO] New run: cf2c8f8a-826e-4f7d-bb05-bc1566ce4bfb
+20:03:50 [INFO] New run: slug-gen-1773965029811
+20:03:57 [INFO] New run: 9109e9c2-facd-401b-8dd7-b88a6e7898b9
+20:04:14 [INFO] New run: 675cc72d-5f74-4b53-b459-5fc0e75ee351
+20:04:19 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=True state=exploring
+20:04:19 [WARNING] ⏱️  TIMING: 375s gap between actions
+20:04:22 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+20:04:22 [WARNING] ⏱️  TIMING: Action at 00:04 (unusual hours)
+20:04:26 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+20:04:26 [WARNING] ⏱️  TIMING: Action at 00:04 (unusual hours)
+20:04:26 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+20:04:26 [WARNING] ⏱️  TIMING: Action at 00:04 (unusual hours)
+20:05:01 [INFO] New run: 2a1e1f1b-c29b-4508-81ee-fd2e5903a254
+20:05:07 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+20:05:07 [WARNING] ⏱️  TIMING: Action at 00:05 (unusual hours)
+20:05:25 [INFO] New run: 3f7d51d1-715b-42be-a565-ad1fddbbe342
+20:05:30 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+20:05:30 [WARNING] ⏱️  TIMING: Action at 00:05 (unusual hours)
+20:05:45 [INFO] ◎ [MONITOR] tool=process intent=unknown e=0.00 aligned=False state=initializing
+20:05:45 [WARNING] ⏱️  TIMING: Action at 00:05 (unusual hours)
+20:05:54 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+20:05:54 [WARNING] ⏱️  TIMING: Action at 00:05 (unusual hours)
+20:05:58 [INFO] New run: ae52c3c4-21f8-483d-a9e9-8db22c5ebb32
+20:06:25 [INFO] New run: 0e407043-18fe-4077-b8e7-0185a73b325a
+20:06:29 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+20:06:29 [WARNING] ⏱️  TIMING: Action at 00:06 (unusual hours)
+20:07:11 [INFO] New run: 5ea833c7-4e54-48bb-8ecf-7865a9188a95
+20:07:19 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:07:19 [WARNING] ⏱️  TIMING: Action at 00:07 (unusual hours)
+20:07:27 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:07:27 [WARNING] ⏱️  TIMING: Action at 00:07 (unusual hours)
+20:07:33 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:07:33 [WARNING] ⏱️  TIMING: Action at 00:07 (unusual hours)
+20:08:29 [INFO] New run: a0fa9781-f076-42f0-bf71-ef9ded8d9221
+20:08:44 [INFO] ✓ [PASS] tool=web_search intent=unknown e=0.00 aligned=False state=initializing
+20:08:44 [WARNING] ⏱️  TIMING: Action at 00:08 (unusual hours)
+20:08:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:08:44 [WARNING] ⏱️  TIMING: Action at 00:08 (unusual hours)
+20:08:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:08:44 [WARNING] ⏱️  TIMING: Action at 00:08 (unusual hours)
+20:08:52 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:08:52 [WARNING] ⏱️  TIMING: Action at 00:08 (unusual hours)
+20:08:52 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:08:52 [WARNING] ⏱️  TIMING: Action at 00:08 (unusual hours)
+20:08:52 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:08:52 [WARNING] ⏱️  TIMING: Action at 00:08 (unusual hours)
+20:09:13 [INFO] ✓ [PASS] tool=process intent=unknown e=0.00 aligned=False state=initializing
+20:09:13 [WARNING] ⏱️  TIMING: Action at 00:09 (unusual hours)
+20:09:22 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:09:22 [WARNING] ⏱️  TIMING: Action at 00:09 (unusual hours)
+20:09:22 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:09:22 [WARNING] ⏱️  TIMING: Action at 00:09 (unusual hours)
+20:09:22 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:09:22 [WARNING] ⏱️  TIMING: Action at 00:09 (unusual hours)
+20:09:38 [INFO] ✓ [PASS] tool=process intent=unknown e=0.00 aligned=False state=initializing
+20:09:38 [WARNING] ⏱️  TIMING: Action at 00:09 (unusual hours)
+20:09:50 [INFO] ✓ [PASS] tool=process intent=unknown e=0.00 aligned=False state=initializing
+20:09:50 [WARNING] ⏱️  TIMING: Action at 00:09 (unusual hours)
+20:10:00 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:00 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:10:00 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:00 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:10:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:10:00 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['15.81s', '11.62s', '10.50s', '0.03s', '0.02s']
+20:10:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:13 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:10:18 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:18 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:10:29 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:29 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:10:47 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:47 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:10:57 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:10:57 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:10:57 [WARNING] ⏱️  TIMING: Action at 00:10 (unusual hours)
+20:11:07 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:11:07 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:11:07 [WARNING] ⏱️  TIMING: Action at 00:11 (unusual hours)
+20:11:11 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:11:11 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:11:11 [WARNING] ⏱️  TIMING: Action at 00:11 (unusual hours)
+20:11:20 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:11:20 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:11:20 [WARNING] ⏱️  TIMING: Action at 00:11 (unusual hours)
+20:11:32 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:11:32 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:11:32 [WARNING] ⏱️  TIMING: Action at 00:11 (unusual hours)
+20:11:46 [INFO] ✓ [PASS] tool=process intent=unknown e=0.00 aligned=False state=initializing
+20:11:46 [WARNING] ⏱️  TIMING: Action at 00:11 (unusual hours)
+20:12:02 [INFO] ✓ [PASS] tool=process intent=unknown e=0.00 aligned=False state=initializing
+20:12:02 [WARNING] ⏱️  TIMING: Action at 00:12 (unusual hours)
+20:12:02 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:12:02 [WARNING] ⏱️  TIMING: Action at 00:12 (unusual hours)
+20:12:22 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:12:22 [WARNING] ⏱️  TIMING: Action at 00:12 (unusual hours)
+20:12:27 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:12:27 [WARNING] ⏱️  TIMING: Action at 00:12 (unusual hours)
+20:12:32 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:12:32 [WARNING] ⏱️  TIMING: Action at 00:12 (unusual hours)
+20:12:53 [INFO] New run: df727d8b-b396-46b1-9a90-5f23625fd8f1
+20:27:33 [INFO] New run: e166f5b1-839b-4b1e-934b-5ceddf934dc8
+20:27:45 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:27:45 [WARNING] ⏱️  TIMING: 913s gap between actions
+20:27:45 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:27:45 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:27:45 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:27:45 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:27:45 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:27:45 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:27:45 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:27:45 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['913.36s', '0.05s', '0.02s', '0.02s', '0.01s']
+20:27:56 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:27:56 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:27:56 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:27:56 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:27:56 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:27:56 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:27:56 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:27:56 [WARNING] ⏱️  TIMING: Action at 00:27 (unusual hours)
+20:28:26 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:28:26 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:28:26 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:28:26 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:28:26 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:28:26 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:28:26 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:28:26 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:28:26 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:28:26 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['29.37s', '0.05s', '0.02s', '0.02s', '0.02s']
+20:28:52 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:28:52 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:28:52 [INFO] ◎ [MONITOR] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:28:52 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:28:52 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+20:28:52 [WARNING] ⏱️  TIMING: Action at 00:28 (unusual hours)
+20:29:16 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:29:16 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:16 [INFO] ◎ [MONITOR] tool=edit intent=unknown e=0.00 aligned=True state=wrapping_up
+20:29:16 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:16 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:16 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:16 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:16 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:16 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:16 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:33 [INFO] ✓ [PASS] tool=image intent=unknown e=0.00 aligned=False state=initializing
+20:29:33 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:33 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:33 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:33 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:33 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:33 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:33 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:43 [INFO] ✓ [PASS] tool=image intent=unknown e=0.00 aligned=False state=initializing
+20:29:43 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:43 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:43 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:43 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:29:43 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:29:43 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:29:43 [WARNING] ⏱️  TIMING: Action at 00:29 (unusual hours)
+20:30:19 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:30:19 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:19 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:30:19 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:19 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:30:19 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:28 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:30:28 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:28 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:30:28 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:30:28 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:43 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:30:43 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:30:43 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:43 [INFO] ◎ [MONITOR] tool=cron intent=unknown e=0.00 aligned=False state=initializing
+20:30:43 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:30:43 [INFO] ✓ [PASS] tool=image intent=unknown e=0.00 aligned=False state=initializing
+20:30:43 [WARNING] ⏱️  TIMING: Action at 00:30 (unusual hours)
+20:31:10 [INFO] ✓ [PASS] tool=image intent=unknown e=0.00 aligned=False state=initializing
+20:31:10 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:10 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:10 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:10 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:10 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:10 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:31:10 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:42 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:42 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:42 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:42 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:42 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:42 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:59 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:59 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:59 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:59 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:31:59 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:31:59 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:31:59 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:31:59 [WARNING] ⏱️  TIMING: Action at 00:31 (unusual hours)
+20:32:11 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:11 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:32:11 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:11 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:11 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:32:11 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:11 [INFO] ◎ [MONITOR] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:32:11 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:20 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:32:20 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:20 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:20 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:30 [INFO] ◎ [MONITOR] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:32:30 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:30 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=initializing
+20:32:30 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:30 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:30 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:38 [INFO] ◎ [MONITOR] tool=sessions_spawn intent=unknown e=0.00 aligned=False state=initializing
+20:32:38 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:38 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:38 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:38 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:38 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:38 [INFO] New run: 1a5e6258-e21e-49b4-92db-1bd581e10542
+20:32:41 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:41 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:44 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:59 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:59 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+20:32:59 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:59 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:32:59 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:32:59 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:32:59 [WARNING] ⏱️  TIMING: Action at 00:32 (unusual hours)
+20:33:31 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:33:31 [WARNING] ⏱️  TIMING: Action at 00:33 (unusual hours)
+20:33:36 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:33:36 [WARNING] ⏱️  TIMING: Action at 00:33 (unusual hours)
+20:33:52 [INFO] New run: announce:v1:agent:main:subagent:9f3dfc48-e0eb-4990-93ff-76050eff8f9e:1a5e6258-e21e-49b4-92db-1bd581e10542
+20:34:00 [INFO] New run: a670f2cf-5d34-4f53-9f37-d970b8b8fd43
+20:34:11 [INFO] ◎ [MONITOR] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:34:11 [WARNING] ⏱️  TIMING: Action at 00:34 (unusual hours)
+20:34:21 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:34:21 [WARNING] ⏱️  TIMING: Action at 00:34 (unusual hours)
+20:36:08 [INFO] New run: 3b866657-4fe0-4810-9a42-a83e09c0b2ca
+20:36:15 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:15 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:22 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:22 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:26 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:26 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:36:26 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:31 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:31 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:36:31 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:36 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:36 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:36:36 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:42 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:42 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:36:42 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:47 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:47 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:36:47 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:36:57 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:36:57 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:36:57 [WARNING] ⏱️  TIMING: Action at 00:36 (unusual hours)
+20:37:07 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:07 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:07 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:18 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:18 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:18 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:23 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:23 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:23 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:28 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:28 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:28 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:33 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:33 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:33 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:39 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:39 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:39 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:44 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:44 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:44 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:49 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:49 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:49 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:54 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+20:37:54 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'browser' with same content
+20:37:54 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:37:54 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:37:54 [WARNING] ⏱️  TIMING: Action at 00:37 (unusual hours)
+20:39:37 [INFO] New run: 80f1da4d-7de1-474c-95e8-1a8c590fcf13
+20:40:08 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:40:08 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:08 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+20:40:08 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:08 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+20:40:08 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:14 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=wrapping_up
+20:40:14 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:14 [INFO] ◎ [MONITOR] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:40:14 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:14 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:40:14 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:21 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:40:21 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:21 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:40:21 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:21 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:40:21 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:49 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=initializing
+20:40:49 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:49 [INFO] ◎ [MONITOR] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+20:40:49 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:49 [INFO] ✓ [PASS] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+20:40:49 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:57 [INFO] ⚠ [FLAG] tool=image intent=unknown e=0.00 aligned=False state=wrapping_up
+20:40:57 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:57 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:40:57 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:40:57 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:40:57 [WARNING] ⏱️  TIMING: Action at 00:40 (unusual hours)
+20:41:20 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:41:20 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:21 [INFO] ◎ [MONITOR] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:41:21 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:21 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:41:21 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:32 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:41:32 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:32 [INFO] ◎ [MONITOR] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:41:32 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:32 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+20:41:32 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:41 [INFO] ⚠ [FLAG] tool=cron intent=unknown e=0.00 aligned=False state=initializing
+20:41:41 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:41 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:41:41 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:41:41 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:41:41 [WARNING] ⏱️  TIMING: Action at 00:41 (unusual hours)
+20:42:24 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:42:24 [WARNING] ⏱️  TIMING: Action at 00:42 (unusual hours)
+20:42:24 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+20:42:24 [WARNING] ⏱️  TIMING: Action at 00:42 (unusual hours)
+20:42:24 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+20:42:24 [WARNING] ⏱️  TIMING: Action at 00:42 (unusual hours)
+20:42:35 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+20:42:35 [WARNING] ⏱️  TIMING: Action at 00:42 (unusual hours)
+20:42:36 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:42:36 [WARNING] ⏱️  TIMING: Action at 00:42 (unusual hours)
+20:42:36 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:42:36 [WARNING] ⏱️  TIMING: Action at 00:42 (unusual hours)
+20:45:00 [INFO] New run: d362d3b7-3fa5-443a-9650-80626c57dfc4
+20:45:10 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:45:10 [WARNING] ⏱️  TIMING: Action at 00:45 (unusual hours)
+20:45:26 [INFO] New run: 4d49f58a-44ad-4880-8005-d8d0af5daa10
+20:45:40 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:45:40 [WARNING] ⏱️  TIMING: Action at 00:45 (unusual hours)
+20:45:40 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:45:40 [WARNING] ⏱️  TIMING: Action at 00:45 (unusual hours)
+20:45:40 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:45:40 [WARNING] ⏱️  TIMING: Action at 00:45 (unusual hours)
+20:45:40 [INFO] ◎ [MONITOR] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:45:40 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['154.62s', '29.60s', '0.08s', '0.03s', '0.03s']
+20:45:40 [INFO] ◎ [MONITOR] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:45:40 [WARNING] ⏱️  TIMING: Action at 00:45 (unusual hours)
+20:46:05 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:46:05 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:05 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+20:46:05 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:05 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+20:46:05 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:20 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=wrapping_up
+20:46:20 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:20 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:46:20 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:20 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:46:20 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:30 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=initializing
+20:46:30 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:30 [INFO] ⚠ [FLAG] tool=image intent=unknown e=0.00 aligned=False state=initializing
+20:46:30 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:46:30 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:46:30 [WARNING] ⏱️  TIMING: Action at 00:46 (unusual hours)
+20:47:26 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+20:47:26 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:26 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+20:47:26 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:26 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:47:26 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:26 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:47:26 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:35 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:47:35 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:35 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:47:35 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:35 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:47:35 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:46 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:47:46 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:46 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+20:47:46 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:46 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=wrapping_up
+20:47:46 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:46 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:47:46 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:58 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:47:58 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:58 [INFO] ◎ [MONITOR] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+20:47:58 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:58 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:47:58 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:47:58 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:47:58 [WARNING] ⏱️  TIMING: Action at 00:47 (unusual hours)
+20:48:18 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:48:18 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:48:18 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+20:48:18 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:48:18 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:48:18 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:48:18 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:48:18 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:48:37 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+20:48:37 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:48:37 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+20:48:37 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:48:37 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:48:37 [WARNING] ⏱️  TIMING: Action at 00:48 (unusual hours)
+20:49:15 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:49:15 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:15 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+20:49:15 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:15 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=wrapping_up
+20:49:15 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:15 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+20:49:15 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:15 [INFO] ⚠ [FLAG] tool=image intent=unknown e=0.00 aligned=False state=initializing
+20:49:15 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:35 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=initializing
+20:49:35 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:35 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+20:49:35 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:49:53 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+20:49:53 [WARNING] ⏱️  TIMING: Action at 00:49 (unusual hours)
+20:59:10 [INFO] New run: b48277d6-6000-4948-9b16-ffdf5e0d2dcd
+21:00:21 [INFO] New run: 31f007b9-6600-44ee-9204-9825c50b2605
+21:01:05 [INFO] New run: 0e6b2dd7-e521-4df6-9f00-ae8197d2881b
+21:02:06 [INFO] New run: 90caa499-4e84-4f36-9739-ee814b3b71d0
+21:05:12 [INFO] New run: 42ffd119-90df-426b-91e5-4851229e350b
+21:06:41 [INFO] New run: 45176940-e008-4ac5-996c-7749a616bf79
+21:06:52 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+21:06:52 [WARNING] ⏱️  TIMING: 1019s gap between actions
+21:07:02 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+21:07:02 [WARNING] ⏱️  TIMING: Action at 01:07 (unusual hours)
+21:07:10 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:07:10 [WARNING] ⏱️  TIMING: Action at 01:07 (unusual hours)
+21:07:25 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:07:25 [WARNING] ⏱️  TIMING: Action at 01:07 (unusual hours)
+21:07:48 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:07:48 [WARNING] ⏱️  TIMING: Action at 01:07 (unusual hours)
+21:07:56 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:07:56 [WARNING] ⏱️  TIMING: Action at 01:07 (unusual hours)
+21:08:01 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:08:01 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:08:01 [WARNING] ⏱️  TIMING: Action at 01:08 (unusual hours)
+21:08:06 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:08:06 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:08:06 [WARNING] ⏱️  TIMING: Action at 01:08 (unusual hours)
+21:08:22 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:08:22 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:08:22 [WARNING] ⏱️  TIMING: Action at 01:08 (unusual hours)
+21:08:35 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:08:35 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:08:35 [WARNING] ⏱️  TIMING: Action at 01:08 (unusual hours)
+21:09:10 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:09:10 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:09:10 [WARNING] ⏱️  TIMING: Action at 01:09 (unusual hours)
+21:09:38 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:09:38 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:09:38 [WARNING] ⏱️  TIMING: Action at 01:09 (unusual hours)
+21:09:51 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:09:51 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:09:51 [WARNING] ⏱️  TIMING: Action at 01:09 (unusual hours)
+21:09:55 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:09:55 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:09:55 [WARNING] ⏱️  TIMING: Action at 01:09 (unusual hours)
+21:10:04 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:10:04 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:10:04 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:10:12 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:10:12 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:10:12 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:10:24 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:10:24 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:10:24 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:10:29 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:10:29 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:10:29 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:10:34 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:10:34 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+21:10:34 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:10:38 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+21:10:38 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:10:44 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=initializing
+21:10:44 [WARNING] ⏱️  TIMING: Action at 01:10 (unusual hours)
+21:12:46 [INFO] New run: efc47561-ec60-477a-b6bb-27d9d3e16acf
+21:13:02 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:13:02 [WARNING] ⏱️  TIMING: Action at 01:13 (unusual hours)
+21:13:20 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:13:20 [WARNING] ⏱️  TIMING: Action at 01:13 (unusual hours)
+21:13:53 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:13:53 [WARNING] ⏱️  TIMING: Action at 01:13 (unusual hours)
+21:14:20 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:14:20 [WARNING] ⏱️  TIMING: Action at 01:14 (unusual hours)
+21:14:37 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=initializing
+21:14:37 [WARNING] ⏱️  TIMING: Action at 01:14 (unusual hours)
+21:14:52 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=initializing
+21:14:52 [WARNING] ⏱️  TIMING: Action at 01:14 (unusual hours)
+21:15:10 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:15:10 [WARNING] ⏱️  TIMING: Action at 01:15 (unusual hours)
+21:15:15 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=wrapping_up
+21:15:15 [WARNING] ⏱️  TIMING: Action at 01:15 (unusual hours)
+21:15:28 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+21:15:28 [WARNING] ⏱️  TIMING: Action at 01:15 (unusual hours)
+21:15:34 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+21:15:34 [WARNING] ⏱️  TIMING: Action at 01:15 (unusual hours)
+21:15:46 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:15:46 [WARNING] ⏱️  TIMING: Action at 01:15 (unusual hours)
+21:16:01 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=initializing
+21:16:01 [WARNING] ⏱️  TIMING: Action at 01:16 (unusual hours)
+21:16:13 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:16:13 [WARNING] ⏱️  TIMING: Action at 01:16 (unusual hours)
+21:16:21 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=wrapping_up
+21:16:21 [WARNING] ⏱️  TIMING: Action at 01:16 (unusual hours)
+21:16:27 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+21:16:27 [WARNING] ⏱️  TIMING: Action at 01:16 (unusual hours)
+21:16:37 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:16:37 [WARNING] ⏱️  TIMING: Action at 01:16 (unusual hours)
+21:17:02 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:17:02 [WARNING] ⏱️  TIMING: Action at 01:17 (unusual hours)
+21:17:11 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=initializing
+21:17:11 [WARNING] ⏱️  TIMING: Action at 01:17 (unusual hours)
+21:17:21 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:17:21 [WARNING] ⏱️  TIMING: Action at 01:17 (unusual hours)
+21:17:31 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:17:31 [WARNING] ⏱️  TIMING: Action at 01:17 (unusual hours)
+21:17:48 [INFO] Stopping sidecar...
+21:17:48 [INFO] Final briefing: Over the last 60 minutes, 200 actions were observed. 84 passed, 27 were monitored, 69 were flagged, 20 were blocked. Behavioral regime: INITIALIZING. No sustained conjunctions detected. Overall: critical.
+21:17:48 [INFO] Chain integrity:  (length=276)
+21:17:48 [INFO] frontier-ops sidecar stopped
+21:17:49 [INFO] Pipeline initialized with 6-dim constitution
+21:17:49 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+21:17:49 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+21:17:49 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+21:17:49 [INFO] frontier-ops sidecar starting
+21:17:49 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-19.log
+21:17:56 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.13 aligned=False state=initializing
+21:17:56 [WARNING] ⏱️  TIMING: Action at 01:17 (unusual hours)
+21:18:10 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.02 aligned=False state=initializing
+21:18:10 [WARNING] ⏱️  TIMING: Action at 01:18 (unusual hours)
+21:18:10 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+21:18:10 [WARNING] ⏱️  TIMING: Action at 01:18 (unusual hours)
+21:18:10 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=True state=initializing
+21:18:10 [WARNING] ⏱️  TIMING: Action at 01:18 (unusual hours)
+21:18:14 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+21:18:14 [WARNING] ⏱️  TIMING: Action at 01:18 (unusual hours)
+22:00:00 [INFO] New run: 26a05a85-df44-4bc6-a3d0-fa0d14e692a0
+22:00:05 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:05 [WARNING] ⏱️  TIMING: 2510s gap between actions
+22:00:05 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:05 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:08 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:00:08 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:12 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:12 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:12 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:12 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:16 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:16 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:16 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:16 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:20 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:20 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:00:20 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:30 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:30 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:00:30 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:30 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:00:30 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:00:30 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:00:46 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+22:00:46 [WARNING] ⏱️  TIMING: Action at 02:00 (unusual hours)
+22:08:44 [INFO] New run: fba3efa9-df11-4143-a313-674ac9b9e24a
+22:09:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:00 [WARNING] ⏱️  TIMING: 494s gap between actions
+22:09:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:00 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:00 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:00 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:00 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'read' with same content
+22:09:00 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['494.48s', '0.02s', '0.02s', '0.01s', '0.01s']
+22:09:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:09:13 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:09:13 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:09:13 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:09:13 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:09:13 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:09:13 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['12.76s', '0.03s', '0.02s', '0.01s', '0.01s']
+22:09:49 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+22:09:49 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:49 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+22:09:49 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:49 [INFO] ✓ [PASS] tool=edit intent=unknown e=0.00 aligned=False state=wrapping_up
+22:09:49 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:49 [INFO] ✓ [PASS] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+22:09:49 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:56 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:56 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:56 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:56 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:09:56 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:09:56 [WARNING] ⏱️  TIMING: Action at 02:09 (unusual hours)
+22:10:11 [INFO] ✓ [PASS] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+22:10:11 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:11 [INFO] ✓ [PASS] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+22:10:11 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:11 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+22:10:11 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:24 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:10:24 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:10:44 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:10:44 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:10:44 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:10:44 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:10:44 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:10:49 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:10:49 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:10:49 [WARNING] ⏱️  TIMING: Action at 02:10 (unusual hours)
+22:11:02 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:11:02 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:11:02 [WARNING] ⏱️  TIMING: Action at 02:11 (unusual hours)
+22:11:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:11:13 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:11:13 [WARNING] ⏱️  TIMING: Action at 02:11 (unusual hours)
+22:11:20 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:11:20 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:11:20 [WARNING] ⏱️  TIMING: Action at 02:11 (unusual hours)
+22:11:28 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:11:28 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:11:28 [WARNING] ⏱️  TIMING: Action at 02:11 (unusual hours)
+22:12:53 [INFO] New run: 81fd3be6-9c9b-4b16-bcfe-d4e259bf1a0f
+22:17:31 [INFO] New run: 3e34be8e-76b6-4363-ae70-90326987cf4f
+22:17:42 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:17:42 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:17:42 [WARNING] ⏱️  TIMING: 373s gap between actions
+22:17:42 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:17:42 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:17:42 [WARNING] ⏱️  TIMING: Action at 02:17 (unusual hours)
+22:17:42 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:17:42 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:17:42 [WARNING] ⏱️  TIMING: Action at 02:17 (unusual hours)
+22:17:54 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:17:54 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:17:54 [WARNING] ⏱️  TIMING: Action at 02:17 (unusual hours)
+22:18:03 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:03 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:03 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:09 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:09 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:09 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:13 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:13 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:13 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:20 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:20 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:20 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:25 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:25 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:25 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:38 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:38 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:38 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:44 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:44 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:44 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:51 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:51 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:51 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:18:57 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:18:57 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:18:57 [WARNING] ⏱️  TIMING: Action at 02:18 (unusual hours)
+22:19:06 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:06 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:06 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:19:11 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:11 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:11 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:19:18 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:18 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:18 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:19:27 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:27 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:27 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:19:38 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:38 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:38 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:19:48 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:48 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:48 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:19:59 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:19:59 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'exec' with same content
+22:19:59 [WARNING] ⏱️  TIMING: Action at 02:19 (unusual hours)
+22:20:10 [INFO] ✓ [PASS] tool=gateway intent=unknown e=0.00 aligned=False state=initializing
+22:20:10 [WARNING] ⏱️  TIMING: Action at 02:20 (unusual hours)
+22:20:25 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:20:25 [WARNING] ⏱️  TIMING: Action at 02:20 (unusual hours)
+22:20:37 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=initializing
+22:20:37 [WARNING] ⏱️  TIMING: Action at 02:20 (unusual hours)
+22:20:37 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:20:37 [WARNING] ⏱️  TIMING: Action at 02:20 (unusual hours)
+22:21:02 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:21:02 [WARNING] ⏱️  TIMING: Action at 02:21 (unusual hours)
+22:21:09 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+22:21:09 [WARNING] ⏱️  TIMING: Action at 02:21 (unusual hours)
+22:24:10 [INFO] New run: 03215b1b-7438-4ccd-96ba-548c5980d433
+22:24:20 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:24:20 [WARNING] ⏱️  TIMING: Action at 02:24 (unusual hours)
+22:24:35 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:24:35 [WARNING] ⏱️  TIMING: Action at 02:24 (unusual hours)
+22:24:35 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:24:35 [WARNING] ⏱️  TIMING: Action at 02:24 (unusual hours)
+22:24:41 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:24:41 [WARNING] ⏱️  TIMING: Action at 02:24 (unusual hours)
+22:24:48 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:24:48 [WARNING] ⏱️  TIMING: Action at 02:24 (unusual hours)
+22:25:42 [INFO] New run: fb44c2b5-5049-4d6e-ae85-30efca3863b3
+22:25:58 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:25:58 [WARNING] ⏱️  TIMING: Action at 02:25 (unusual hours)
+22:25:58 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:25:58 [WARNING] ⏱️  TIMING: Action at 02:25 (unusual hours)
+22:25:58 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:25:58 [WARNING] ⏱️  TIMING: Action at 02:25 (unusual hours)
+22:25:58 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:25:58 [WARNING] ⏱️  TIMING: Action at 02:25 (unusual hours)
+22:25:58 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:25:58 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['69.93s', '0.05s', '0.02s', '0.02s', '0.01s']
+22:26:13 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:26:13 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:13 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:26:13 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:13 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:26:13 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:13 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:26:13 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:13 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:26:13 [WARNING] ⏸️  PARALYSIS: 10 consecutive read-only actions with no writes or execution
+22:26:13 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['15.30s', '0.05s', '0.02s', '0.02s', '0.01s']
+22:26:25 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:26:25 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:25 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:26:25 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:25 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:26:25 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:25 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:26:25 [WARNING] ⏱️  TIMING: Action at 02:26 (unusual hours)
+22:26:25 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+22:26:25 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['11.89s', '0.04s', '0.02s', '0.02s', '0.02s']
+22:27:09 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=focused
+22:27:09 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:09 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+22:27:09 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:09 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=exploring
+22:27:09 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:09 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+22:27:09 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:17 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=True state=initializing
+22:27:17 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:17 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+22:27:17 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:17 [INFO] ✓ [PASS] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+22:27:17 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:17 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=False state=initializing
+22:27:17 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:17 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=True state=initializing
+22:27:17 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:37 [INFO] ⚠ [FLAG] tool=image intent=unknown e=0.00 aligned=True state=exploring
+22:27:37 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:37 [INFO] ✓ [PASS] tool=image intent=unknown e=0.00 aligned=False state=exploring
+22:27:37 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:37 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=True state=initializing
+22:27:37 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:37 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=True state=initializing
+22:27:37 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:37 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+22:27:37 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['20.13s', '0.05s', '0.03s', '0.02s', '0.02s']
+22:27:52 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+22:27:52 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:52 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:27:52 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:52 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:27:52 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:52 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:27:52 [WARNING] ⏱️  TIMING: Action at 02:27 (unusual hours)
+22:27:52 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:27:52 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['14.49s', '0.05s', '0.03s', '0.02s', '0.02s']
+22:28:04 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:28:04 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:04 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:28:04 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:04 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=focused
+22:28:04 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:29 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+22:28:29 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: tampering with hash chain
+22:28:29 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:29 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+22:28:29 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:29 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+22:28:29 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:30 [INFO] ✓ [PASS] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+22:28:30 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:30 [INFO] ⚠ [FLAG] tool=memory_search intent=unknown e=0.00 aligned=True state=initializing
+22:28:30 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['25.80s', '0.06s', '0.03s', '0.02s', '0.02s']
+22:28:30 [INFO] ✓ [PASS] tool=memory_search intent=unknown e=0.00 aligned=False state=initializing
+22:28:30 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:48 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+22:28:48 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:48 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:28:48 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:48 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=focused
+22:28:48 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:48 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+22:28:48 [WARNING] ⏱️  TIMING: Action at 02:28 (unusual hours)
+22:28:48 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:28:48 [WARNING] ⏱️  TIMING: Inter-action time decreasing: ['18.05s', '0.06s', '0.03s', '0.02s', '0.02s']
+22:29:10 [INFO] ⚠ [FLAG] tool=sessions_spawn intent=unknown e=0.00 aligned=True state=exploring
+22:29:10 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:10 [INFO] ⚠ [FLAG] tool=browser intent=unknown e=0.00 aligned=True state=initializing
+22:29:10 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:10 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+22:29:10 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:10 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:29:10 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:10 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:29:10 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:10 [INFO] New run: 014ccfaf-e918-4ad7-b7fd-18b73769a2c7
+22:29:13 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+22:29:13 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:21 [INFO] ⚠ [FLAG] tool=browser intent=unknown e=0.00 aligned=True state=initializing
+22:29:21 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:30 [INFO] ✓ [PASS] tool=browser intent=unknown e=0.00 aligned=False state=initializing
+22:29:30 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:30 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+22:29:30 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:30 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:29:30 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:30 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=exploring
+22:29:30 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:37 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+22:29:37 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:37 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+22:29:37 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:37 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+22:29:37 [WARNING] ⏱️  TIMING: Action at 02:29 (unusual hours)
+22:29:53 [INFO] New run: announce:v1:agent:main:subagent:79dfc55a-c345-4fa1-a5b4-8f92c5a9ba22:014ccfaf-e918-4ad7-b7fd-18b73769a2c7
+22:34:25 [INFO] New run: e347c072-b13e-42b8-bdff-31cb94058e34
+22:36:33 [INFO] New run: 9c509b73-cb90-402d-b804-7c65f4ca731e
+22:42:58 [INFO] New run: 43ba4b8c-8dcf-4b6f-8b6a-f1a177594c58
+22:44:34 [INFO] New run: 1b1b9bb6-d6ee-4cd4-9c97-52f2935d62a4
+22:47:32 [INFO] New run: b40ceebb-fca7-4df8-937e-e2a8bbf0fdec
+22:48:53 [INFO] New run: 4a2880d2-c1fc-4bdd-876b-44e25b3431f4
+22:55:02 [INFO] New run: f8935961-9c04-466a-bc8d-3b6f8ee81c60
+22:55:31 [INFO] New run: 9d8ef372-8931-46de-9d9c-e5c37691ae70
+22:58:19 [INFO] New run: fa5ba5e2-75dc-4edb-a1f8-483a000366df
+22:59:52 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+22:59:52 [WARNING] ⏱️  TIMING: 1815s gap between actions
+23:00:27 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+23:00:27 [WARNING] ⏱️  TIMING: Action at 03:00 (unusual hours)
+23:22:52 [INFO] New run: 7f7612f4-10b6-4de0-b9cf-751881c0f800
+23:23:05 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+23:23:05 [WARNING] ⏱️  TIMING: 1358s gap between actions
+08:21:14 [INFO] New run: faefe1ab-d3b0-4b9c-af95-73298112e866
+08:21:22 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+08:21:22 [WARNING] ⏱️  TIMING: 32297s gap between actions
+08:21:29 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+08:21:29 [INFO] ◎ [MONITOR] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+08:21:29 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+08:21:54 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+08:37:11 [INFO] New run: cd8ed6c9-7741-43b2-b391-af10ca68c5e7
+08:38:43 [INFO] New run: b6667925-df94-4574-b375-2483aada3462
+08:39:22 [INFO] New run: c4cc8492-8984-4051-95e9-979d7c1fe163
+08:39:46 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+08:39:46 [WARNING] ⏱️  TIMING: 1072s gap between actions
+08:39:46 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+08:39:50 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=focused
+08:39:55 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+08:39:55 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:39:55 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:00 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:18 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:18 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:24 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:24 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:24 [WARNING] ⏸️  PARALYSIS: 10 consecutive read-only actions with no writes or execution
+08:40:32 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:32 [WARNING] ⏸️  PARALYSIS: 11 consecutive read-only actions with no writes or execution
+08:40:36 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+08:40:40 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+08:40:47 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:40:52 [INFO] ✓ [PASS] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:41:09 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:41:13 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+08:41:17 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+08:42:19 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+08:42:26 [INFO] ⚠ [FLAG] tool=process intent=unknown e=0.00 aligned=True state=initializing
+08:44:33 [INFO] ⚠ [FLAG] tool=process intent=unknown e=0.00 aligned=False state=initializing
+08:44:35 [INFO] ⚠ [FLAG] tool=process intent=unknown e=0.00 aligned=False state=initializing
+08:46:13 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+08:46:17 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:46:21 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:46:24 [INFO] ◎ [MONITOR] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:46:28 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:46:31 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+08:46:35 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=focused
+08:46:54 [INFO] New run: 27370358-1ab8-4eaf-8497-deca4eceed03
+08:49:29 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=exploring
+08:49:46 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+08:49:57 [INFO] New run: 5eaab825-d90e-4b08-882a-7a400e8cccfa
+08:50:17 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:50:31 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:50:31 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:50:31 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+08:52:59 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+08:53:59 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+08:54:50 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+08:55:32 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+08:55:43 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+08:57:54 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+08:57:54 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+08:58:05 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+08:58:13 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=focused
+08:58:41 [INFO] New run: b7b27226-de12-4522-aa0b-432c69aec12c
+08:58:51 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+08:59:08 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:00:00 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:00:00 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: tampering with hash chain
+09:00:07 [INFO] ⚠ [FLAG] tool=process intent=unknown e=0.00 aligned=True state=initializing
+09:03:31 [INFO] ⚠ [FLAG] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:04:00 [INFO] New run: d070cf15-b06b-4a57-b56a-a3282e9859de
+09:04:53 [INFO] ⚠ [FLAG] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:05:12 [INFO] New run: c5eddc8f-2ab0-4c62-8c8e-fd2d06e4a83e
+09:05:27 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+09:13:49 [INFO] New run: d530e329-30d7-4e8c-af90-7ee2fe3bdeaa
+09:14:01 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:14:01 [WARNING] ⏱️  TIMING: 514s gap between actions
+09:14:06 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:14:11 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+09:14:17 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+09:14:31 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:15:11 [INFO] ⚠ [FLAG] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+09:15:18 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:15:30 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:15:38 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+09:15:43 [INFO] ⚠ [FLAG] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+09:15:55 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:15:59 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:16:02 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:16:12 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+09:16:22 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+09:16:28 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:16:34 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:16:48 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:17:36 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+09:18:08 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:18:16 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=True state=initializing
+09:20:27 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:20:46 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:22:52 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:23:04 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:23:04 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'process' with same content
+09:24:19 [INFO] New run: 5093beea-0b49-49f2-8779-21a1f4ff6e16
+09:24:30 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=False state=initializing
+09:24:30 [WARNING] ⏸️  PARALYSIS: 5+ identical calls to 'process' with same content
+09:24:35 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:24:42 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=True state=exploring
+09:24:53 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:24:57 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:02 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:10 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:15 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:21 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:25 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:31 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+09:25:39 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:49 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:54 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:25:54 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=False state=exploring
+09:26:01 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:26:10 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:26:27 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+09:26:27 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: tampering with hash chain
+09:26:43 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+09:26:57 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+09:27:07 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+09:27:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:27:26 [INFO] New run: 9046adf8-b307-4596-a918-8d849f66fa0e
+09:27:43 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:38:36 [INFO] New run: 2cde521e-813c-4e49-8d45-b48db67ed2f0
+09:38:48 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+09:38:48 [WARNING] ⏱️  TIMING: 665s gap between actions
+09:38:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+09:39:07 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:39:21 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:39:51 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:40:31 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:40:31 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:40:53 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:40:53 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:41:39 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:42:21 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:43:21 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+09:43:21 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:43:33 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:43:33 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:44:04 [INFO] New run: 4966b26c-b9e0-4b24-8ee6-f338920bb976
+09:44:15 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+09:44:26 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:44:26 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: accessing governance configuration
+09:44:49 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:44:49 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: accessing governance configuration
+09:45:11 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:45:26 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:46:11 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:46:57 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=focused
+09:46:57 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:47:40 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+09:47:40 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:48:49 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+09:48:49 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:49:11 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+09:49:11 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: modifying detection thresholds
+09:49:32 [INFO] New run: e3d19d73-d342-48dc-b35b-e20f32da9b82
+10:46:37 [INFO] New run: 0130cd74-2330-4454-834d-97c7493dc84a
+10:47:54 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+10:47:54 [WARNING] ⏱️  TIMING: 3523s gap between actions
+10:48:48 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+10:49:42 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+10:50:10 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=True state=wrapping_up
+10:51:59 [INFO] ✖ [BLOCK] tool=write intent=unknown e=0.00 aligned=False state=wrapping_up
+10:52:11 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=focused
+10:52:31 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+10:52:57 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+10:53:05 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+10:53:15 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=True state=exploring
+10:53:23 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+10:53:46 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+10:54:18 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+10:54:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+10:54:40 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+10:54:52 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+10:54:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=focused
+10:55:09 [INFO] ✖ [BLOCK] tool=read intent=unknown e=0.00 aligned=True state=exploring
+10:55:20 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=True state=exploring
+10:55:58 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+10:56:06 [INFO] ✖ [BLOCK] tool=edit intent=unknown e=0.00 aligned=False state=exploring
+10:56:06 [INFO] Log rotation: /tmp/openclaw/openclaw-2026-03-19.log → /tmp/openclaw/openclaw-2026-03-20.log
+11:12:58 [INFO] Stopping sidecar...
+11:12:58 [INFO] Final briefing: Over the last 60 minutes, 21 actions were observed. 0 passed, 0 were monitored, 0 were flagged, 21 were blocked. The primary detector was mmd (fired 21 times). Behavioral regime: EXPLORING. No sustained conjunctions detected. Overall: critical.
+11:12:58 [INFO] Chain integrity:  (length=290)
+11:12:58 [INFO] frontier-ops sidecar stopped
+11:12:59 [INFO] Pipeline initialized with 6-dim constitution
+11:12:59 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:12:59 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:12:59 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:12:59 [INFO] frontier-ops sidecar starting
+11:12:59 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:15:06 [INFO] Stopping sidecar...
+11:15:06 [INFO] Chain integrity:  (length=0)
+11:15:06 [INFO] frontier-ops sidecar stopped
+Traceback (most recent call last):
+  File "/Users/joseph/.openclaw/workspace/frontier-ops-sidecar.py", line 25, in <module>
+    from frontier_ops.pipeline import Pipeline
+ImportError: cannot import name 'Pipeline' from 'frontier_ops.pipeline' (/Users/joseph/frontier-ops/frontier_ops/pipeline.py). Did you mean: 'pipeline'?
+Traceback (most recent call last):
+  File "/Users/joseph/.openclaw/workspace/frontier-ops-sidecar.py", line 25, in <module>
+    from frontier_ops.pipeline import Pipeline
+ImportError: cannot import name 'Pipeline' from 'frontier_ops.pipeline' (/Users/joseph/frontier-ops/frontier_ops/pipeline.py). Did you mean: 'pipeline'?
+Traceback (most recent call last):
+  File "/Users/joseph/.openclaw/workspace/frontier-ops-sidecar.py", line 25, in <module>
+    from frontier_ops.pipeline import Pipeline
+ImportError: cannot import name 'Pipeline' from 'frontier_ops.pipeline' (/Users/joseph/frontier-ops/frontier_ops/pipeline.py). Did you mean: 'pipeline'?
+11:15:37 [WARNING] Market hook disabled: No module named 'frontier_ops.integration'
+11:15:37 [INFO] Pipeline initialized with 6-dim constitution
+11:15:37 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:15:37 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:15:37 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:15:37 [INFO] frontier-ops sidecar starting
+11:15:37 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:16:43 [INFO] Stopping sidecar...
+11:16:43 [INFO] Chain integrity:  (length=0)
+11:16:43 [INFO] frontier-ops sidecar stopped
+11:16:44 [WARNING] Market hook disabled: No module named 'frontier_ops.integration'
+11:16:44 [INFO] Pipeline initialized with 6-dim constitution
+11:16:44 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:16:44 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:16:44 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:16:44 [INFO] frontier-ops sidecar starting
+11:16:44 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:17:18 [INFO] Stopping sidecar...
+11:17:18 [INFO] Chain integrity:  (length=0)
+11:17:18 [INFO] frontier-ops sidecar stopped
+[market] Calibrated from 506 benign intervals (median=0.59s)
+11:17:19 [INFO] Market hook initialized (auto-calibrated from telemetry)
+11:17:19 [INFO] Pipeline initialized with 6-dim constitution
+11:17:19 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:17:19 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:17:19 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:17:19 [INFO] frontier-ops sidecar starting
+11:17:19 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:19:15 [INFO] Stopping sidecar...
+11:19:15 [INFO] Chain integrity:  (length=0)
+11:19:15 [INFO] frontier-ops sidecar stopped
+11:19:17 [WARNING] Market hook disabled: Market daemon exited immediately: Traceback (most recent call last):
+  File "/Users/joseph/frontier-ops/frontier_ops/integration/market_daemon.py", line 22, in <module>
+    from frontier_ops.integration.market_hook import MarketHook
+ModuleNotFoundError: No module named 'frontier_ops.integration'
+
+11:19:17 [INFO] Pipeline initialized with 6-dim constitution
+11:19:17 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:19:17 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:19:17 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:19:17 [INFO] frontier-ops sidecar starting
+11:19:17 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:19:53 [INFO] Stopping sidecar...
+11:19:53 [INFO] Chain integrity:  (length=0)
+11:19:53 [INFO] frontier-ops sidecar stopped
+11:19:55 [WARNING] Market hook disabled: Market daemon exited immediately: Traceback (most recent call last):
+  File "/Users/joseph/frontier-ops/frontier_ops/integration/market_daemon.py", line 22, in <module>
+    from frontier_ops.integration.market_hook import MarketHook
+ModuleNotFoundError: No module named 'frontier_ops.integration'
+
+11:19:55 [INFO] Pipeline initialized with 6-dim constitution
+11:19:55 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:19:55 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:19:55 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:19:55 [INFO] frontier-ops sidecar starting
+11:19:55 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:20:18 [INFO] Stopping sidecar...
+11:20:18 [INFO] Chain integrity:  (length=0)
+11:20:19 [INFO] frontier-ops sidecar stopped
+11:20:20 [INFO] Market daemon started (persistent process, FIFO IPC)
+11:20:20 [INFO] Pipeline initialized with 6-dim constitution
+11:20:20 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:20:20 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:20:20 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:20:20 [INFO] frontier-ops sidecar starting
+11:20:20 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-20.log
+11:28:29 [INFO] Stopping sidecar...
+11:28:29 [INFO] Chain integrity:  (length=0)
+11:28:29 [INFO] frontier-ops sidecar stopped
+11:28:30 [INFO] Auto-detected log: /tmp/openclaw/openclaw-2026-03-19.log
+11:28:31 [INFO] Market daemon started (persistent process, FIFO IPC)
+11:28:31 [INFO] Pipeline initialized with 6-dim constitution
+11:28:31 [INFO] Observations → /Users/joseph/.openclaw/workspace/frontier-ops-observations.jsonl
+11:28:31 [INFO] DuckDB → /Users/joseph/.openclaw/workspace/frontier-ops-observations.db
+11:28:31 [INFO] Governance keys → /Users/joseph/.openclaw/workspace/frontier-ops-governance-keys
+11:28:31 [INFO] frontier-ops sidecar starting
+11:28:31 [INFO] Tailing /tmp/openclaw/openclaw-2026-03-19.log
+11:28:46 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.13 aligned=False state=focused
+11:29:04 [INFO] ⚠ [FLAG] tool=process intent=unknown e=3.25 aligned=True state=initializing
+11:29:16 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=4261.51 aligned=True state=exploring
+11:29:37 [INFO] New run: d7c0b763-ac66-4e15-b072-022d0f92fd27
+11:29:56 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=10965.36 aligned=True state=exploring
+11:30:03 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=1672.91 aligned=True state=exploring
+12:08:52 [INFO] New run: 70fe4c20-9ac3-4436-a0e7-39aef2c20c4c
+12:14:08 [INFO] New run: e6a82420-3284-45ce-a8b5-6a637b0453e0
+12:14:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=296.85 aligned=False state=exploring
+12:14:30 [WARNING] ⏱️  TIMING: 2667s gap between actions
+12:14:38 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=82.95 aligned=True state=initializing
+12:14:46 [INFO] ◎ [MONITOR] tool=read intent=unknown e=16.26 aligned=True state=exploring
+12:14:46 [INFO] ✓ [PASS] tool=read intent=unknown e=2.07 aligned=False state=exploring
+12:14:53 [INFO] ◎ [MONITOR] tool=web_search intent=unknown e=0.41 aligned=True state=initializing
+12:14:53 [INFO] ✓ [PASS] tool=web_search intent=unknown e=0.05 aligned=False state=initializing
+12:15:04 [INFO] ◎ [MONITOR] tool=web_fetch intent=unknown e=0.01 aligned=True state=initializing
+12:15:04 [INFO] ⚠ [FLAG] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+12:15:04 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+12:15:18 [INFO] ⚠ [FLAG] tool=web_fetch intent=unknown e=0.00 aligned=True state=initializing
+12:15:18 [INFO] ⚠ [FLAG] tool=read intent=unknown e=0.00 aligned=True state=exploring
+12:15:18 [INFO] ✓ [PASS] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+12:15:32 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.21 aligned=True state=focused
+12:15:32 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=13344.73 aligned=True state=wrapping_up
+12:15:32 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=70357.30 aligned=True state=exploring
+12:15:42 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=13211.68 aligned=False state=exploring
+12:15:42 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=5001.65 aligned=True state=initializing
+12:15:52 [INFO] ✖ [BLOCK] tool=web_fetch intent=unknown e=966.28 aligned=True state=initializing
+12:15:52 [INFO] ✖ [BLOCK] tool=web_fetch intent=unknown e=137.93 aligned=False state=initializing
+12:15:52 [INFO] ◎ [MONITOR] tool=web_fetch intent=unknown e=17.76 aligned=False state=initializing
+12:16:21 [INFO] ⚠ [FLAG] tool=write intent=unknown e=45.94 aligned=True state=wrapping_up
+12:16:21 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: tampering with hash chain
+12:16:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3885.72 aligned=True state=initializing
+12:16:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=56692.87 aligned=True state=exploring
+12:16:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=10723.98 aligned=False state=focused
+12:16:45 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=72872.91 aligned=False state=focused
+12:16:54 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=142528921.26 aligned=True state=exploring
+12:17:07 [INFO] ✖ [BLOCK] tool=browser intent=unknown e=82661982.11 aligned=True state=initializing
+12:17:14 [INFO] ✖ [BLOCK] tool=browser intent=unknown e=22018778.88 aligned=False state=initializing
+12:17:25 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=21126168.67 aligned=True state=focused
+12:17:25 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3762341.38 aligned=False state=focused
+12:17:31 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=637221.32 aligned=False state=focused
+12:18:31 [INFO] ✖ [BLOCK] tool=write intent=unknown e=4532646.08 aligned=True state=wrapping_up
+12:18:31 [WARNING] 🚨 SOVEREIGN COLLAPSE SIGNAL: tampering with hash chain
+12:18:40 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=993730.04 aligned=True state=initializing
+12:18:40 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=216702.77 aligned=False state=initializing
+12:18:56 [INFO] ✖ [BLOCK] tool=process intent=unknown e=31789.88 aligned=False state=initializing
+12:19:03 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=8184.52 aligned=True state=initializing
+12:19:03 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3183.90 aligned=True state=exploring
+12:19:15 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=2067.89 aligned=False state=focused
+12:19:28 [INFO] ✖ [BLOCK] tool=memory_search intent=unknown e=47964.16 aligned=True state=initializing
+12:19:36 [INFO] ✖ [BLOCK] tool=image intent=unknown e=277760.35 aligned=True state=initializing
+12:20:02 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=364431.88 aligned=True state=exploring
+12:20:02 [INFO] ✖ [BLOCK] tool=read intent=unknown e=60007.16 aligned=False state=exploring
+12:20:02 [INFO] ✖ [BLOCK] tool=read intent=unknown e=8095.74 aligned=False state=exploring
+12:20:24 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=664589258.67 aligned=True state=focused
+12:20:37 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=14894780624069.56 aligned=True state=exploring
+12:20:47 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3167761430147.42 aligned=True state=exploring
+12:20:53 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=553088865980.00 aligned=False state=focused
+12:21:14 [INFO] New run: 143fca1f-428a-46e2-be75-3b1ea276ffb8
+12:23:03 [INFO] New run: 2dfeec50-a97b-4ec5-b710-51bd3a172ebd
+12:33:04 [INFO] New run: 11d1b6aa-f6d5-49cb-90a5-7cd46d37aadc
+12:33:29 [INFO] ✖ [BLOCK] tool=message intent=unknown e=745036574905.20 aligned=True state=wrapping_up
+12:33:29 [WARNING] ⏱️  TIMING: 756s gap between actions
+12:33:38 [INFO] ✖ [BLOCK] tool=message intent=unknown e=121565714899.03 aligned=False state=initializing
+12:33:49 [INFO] ✖ [BLOCK] tool=message intent=unknown e=18896571087.90 aligned=True state=wrapping_up
+12:34:00 [INFO] ✖ [BLOCK] tool=message intent=unknown e=144316662159.33 aligned=True state=initializing
+12:34:06 [INFO] ✖ [BLOCK] tool=message intent=unknown e=679180419981.79 aligned=True state=initializing
+12:35:24 [INFO] ✖ [BLOCK] tool=canvas intent=unknown e=100170577872.48 aligned=True state=initializing
+12:35:34 [INFO] ✖ [BLOCK] tool=canvas intent=unknown e=17635214952.99 aligned=True state=initializing
+12:35:42 [INFO] ✖ [BLOCK] tool=nodes intent=unknown e=3151470516.31 aligned=False state=initializing
+12:35:57 [INFO] ✖ [BLOCK] tool=cron intent=unknown e=385927704.34 aligned=False state=initializing
+12:36:13 [INFO] ✖ [BLOCK] tool=cron intent=unknown e=83914179.39 aligned=True state=wrapping_up
+12:36:21 [INFO] ✖ [BLOCK] tool=cron intent=unknown e=17388172.31 aligned=False state=initializing
+12:36:29 [INFO] ✖ [BLOCK] tool=cron intent=unknown e=2138285.30 aligned=False state=initializing
+12:36:49 [INFO] ✖ [BLOCK] tool=cron intent=unknown e=263989.05 aligned=False state=initializing
+12:37:05 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=64402.37 aligned=True state=initializing
+12:37:15 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=7986.85 aligned=False state=initializing
+12:37:22 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=1404.03 aligned=False state=initializing
+12:37:38 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=234.67 aligned=True state=initializing
+12:37:38 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=29.22 aligned=False state=initializing
+12:37:38 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3.65 aligned=False state=initializing
+12:37:46 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.46 aligned=False state=initializing
+12:37:46 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.06 aligned=False state=initializing
+12:37:46 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.01 aligned=False state=initializing
+12:37:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:37:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:37:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:38:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:38:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:38:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:38:21 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:38:29 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:38:29 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:38:29 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:38:43 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:39:10 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:39:17 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:39:26 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:39:26 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:39:26 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:39:37 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:39:48 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:40:04 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:40:14 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=wrapping_up
+12:40:22 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:40:29 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=wrapping_up
+12:40:47 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+12:40:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=exploring
+12:41:32 [INFO] New run: 666e206a-f312-42b6-92d0-4599b3f91287
+12:41:39 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:41:48 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+12:41:59 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+12:42:17 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=True state=initializing
+12:42:25 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:42:43 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=True state=initializing
+12:42:50 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=True state=initializing
+12:43:01 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=initializing
+12:43:07 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=0.00 aligned=False state=exploring
+12:43:39 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=True state=initializing
+12:44:15 [INFO] ✖ [BLOCK] tool=process intent=unknown e=0.00 aligned=False state=initializing
+12:44:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=1.69 aligned=True state=wrapping_up
+12:44:38 [INFO] ✖ [BLOCK] tool=process intent=unknown e=61431.00 aligned=True state=initializing
+12:44:43 [INFO] ✖ [BLOCK] tool=process intent=unknown e=8815.32 aligned=False state=initializing
+12:44:52 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=131071242.37 aligned=True state=wrapping_up
+12:45:04 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=79248088.49 aligned=True state=initializing
+12:45:11 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=30269770.40 aligned=True state=initializing
+12:45:21 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=10568740.33 aligned=True state=initializing
+12:45:32 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=752733100.99 aligned=True state=wrapping_up
+12:45:53 [INFO] ✖ [BLOCK] tool=process intent=unknown e=21912033967588.50 aligned=True state=initializing
+12:46:01 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=15251054163246.52 aligned=True state=initializing
+12:46:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=2085301499247.96 aligned=False state=initializing
+12:46:20 [INFO] ✖ [BLOCK] tool=process intent=unknown e=1316952624665.83 aligned=True state=initializing
+12:48:34 [INFO] ✖ [BLOCK] tool=process intent=unknown e=164047237555.88 aligned=False state=initializing
+12:48:43 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=172755731470.42 aligned=True state=initializing
+12:48:50 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=21228757602.47 aligned=False state=initializing
+12:49:05 [INFO] ✖ [BLOCK] tool=process intent=unknown e=20726588464.14 aligned=True state=initializing
+12:49:29 [INFO] ✖ [BLOCK] tool=process intent=unknown e=2540956415.86 aligned=False state=initializing
+12:49:35 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=733146061706.13 aligned=True state=wrapping_up
+12:49:45 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=230473046043.86 aligned=False state=wrapping_up
+12:49:52 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=29433881476.81 aligned=False state=wrapping_up
+12:50:01 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=1405097709883.07 aligned=True state=initializing
+12:50:01 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=98914332017163.08 aligned=False state=wrapping_up
+12:50:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=18280789919115.26 aligned=True state=initializing
+12:50:22 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=11703918861642.98 aligned=True state=initializing
+12:50:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=8752304981103.01 aligned=False state=initializing
+12:50:42 [INFO] ✖ [BLOCK] tool=process intent=unknown e=139579911731793440.00 aligned=True state=initializing
+12:52:02 [INFO] New run: 70568f92-6cd6-4df8-9b7c-daaab1e323da
+12:52:19 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=18834642050965721088.00 aligned=True state=exploring
+12:52:25 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=47607957036727394304.00 aligned=True state=exploring
+12:53:03 [INFO] New run: bc6d6324-3c46-4d1c-b89e-a0e5eeac6eea
+12:53:12 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=2483955976345413484544.00 aligned=True state=wrapping_up
+12:53:25 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=336145948011759206400.00 aligned=True state=wrapping_up
+12:53:38 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=49884227901775200256.00 aligned=False state=initializing
+12:53:46 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=8221635175457922048.00 aligned=False state=initializing
+12:53:54 [INFO] ✖ [BLOCK] tool=process intent=unknown e=195370761248710164480.00 aligned=True state=initializing
+12:54:05 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=1168397681737993420800.00 aligned=True state=initializing
+12:54:14 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=187077917604692623360.00 aligned=True state=initializing
+12:54:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=22351878184200441856.00 aligned=False state=initializing
+12:54:36 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=2677956016141889536.00 aligned=False state=initializing
+12:54:44 [INFO] ✖ [BLOCK] tool=process intent=unknown e=635180596194337920.00 aligned=False state=initializing
+12:54:52 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=8474723388855931633664.00 aligned=True state=initializing
+12:54:59 [INFO] ✖ [BLOCK] tool=process intent=unknown e=104874101255928594974113792.00 aligned=True state=initializing
+12:55:07 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=24044913419671075620388864.00 aligned=True state=initializing
+12:55:20 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=4835442370099386324615168.00 aligned=False state=initializing
+12:55:29 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=956515285024676253794304.00 aligned=True state=initializing
+12:55:38 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=154977672012604991602688.00 aligned=False state=initializing
+12:55:50 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=21795656037474272018432.00 aligned=False state=wrapping_up
+12:56:08 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=3047756307264137330688.00 aligned=False state=exploring
+12:56:16 [INFO] ✖ [BLOCK] tool=process intent=unknown e=67545264696686770900697088.00 aligned=True state=initializing
+12:56:27 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=761384274541986234510279180288.00 aligned=True state=initializing
+12:56:42 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=142872331338556718750663442432.00 aligned=True state=wrapping_up
+12:57:01 [INFO] ✖ [BLOCK] tool=process intent=unknown e=16479431175638752397273591709696.00 aligned=True state=initializing
+12:57:07 [INFO] ✖ [BLOCK] tool=process intent=unknown e=1951215246948497373799586463744.00 aligned=False state=initializing
+12:57:19 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=19019255717729010900130779365376.00 aligned=True state=initializing
+12:57:46 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=2422598188079610253068929597440.00 aligned=False state=initializing
+12:57:54 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=505904707621258962986940235776.00 aligned=True state=wrapping_up
+12:58:21 [INFO] ✖ [BLOCK] tool=process intent=unknown e=7030508484515339503895390969659392.00 aligned=True state=initializing
+12:58:28 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=4095583030196663730714090749820928.00 aligned=True state=initializing
+12:58:40 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=63539575220559219185431057524588544.00 aligned=True state=exploring
+12:58:50 [INFO] ✖ [BLOCK] tool=process intent=unknown e=1224655382100665920247792446471789346816.00 aligned=True state=initializing
+12:58:55 [INFO] ✖ [BLOCK] tool=process intent=unknown e=142295228736191905277306634752292290560.00 aligned=False state=initializing
+12:59:16 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=468400178036565762896633465448121237504.00 aligned=True state=exploring
+12:59:30 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=17528169221284678392341652225940440395808768.00 aligned=False state=focused
+12:59:37 [INFO] ✖ [BLOCK] tool=exec intent=unknown e=93075969334565728323069761171335235938287616.00 aligned=True state=focused
+12:59:53 [INFO] ✖ [BLOCK] tool=process intent=unknown e=6372746402407783587871879225680052751917046038528.00 aligned=True state=initializing

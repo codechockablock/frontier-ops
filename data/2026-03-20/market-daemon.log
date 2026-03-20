@@ -1,0 +1,171 @@
+[market] Calibrated from 506 benign intervals (median=0.59s)
+[market-daemon] Listening on /Users/joseph/.openclaw/workspace/market_fifo
+[market-daemon] Shutting down (signal 15)
+[market-daemon] Chain: 0 entries, valid=True
+[market] Calibrated from 506 benign intervals (median=0.59s)
+[market-daemon] Listening on /Users/joseph/.openclaw/workspace/market_fifo
+[market] step=9 verdict=pass d_raw=1.89 s_raw=0.09 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=10 verdict=monitor d_raw=1.80 s_raw=0.72 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=11 verdict=pass d_raw=1.80 s_raw=0.16 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=12 verdict=monitor d_raw=1.70 s_raw=0.76 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=13 verdict=flag d_raw=1.60 s_raw=0.19 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=14 verdict=pass d_raw=1.30 s_raw=0.08 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=15 verdict=flag d_raw=1.20 s_raw=0.79 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=16 verdict=flag d_raw=1.10 s_raw=0.24 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=17 verdict=pass d_raw=0.90 s_raw=0.11 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=18 verdict=block d_raw=1.10 s_raw=0.78 label='Multiple behavioral pressures active — review approach.'
+[market-daemon] 📊 Multiple behavioral pressures active — review approach.
+[market] step=19 verdict=block d_raw=1.40 s_raw=0.23 label='Combined directional and tempo signals suggest course correction.'
+[market-daemon] 📊 Combined directional and tempo signals suggest course correction.
+[market] step=20 verdict=block d_raw=1.60 s_raw=0.06 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=21 verdict=block d_raw=1.90 s_raw=0.76 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=22 verdict=block d_raw=2.10 s_raw=0.24 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=23 verdict=block d_raw=2.20 s_raw=0.75 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=24 verdict=block d_raw=2.50 s_raw=0.24 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=25 verdict=monitor d_raw=2.40 s_raw=0.09 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=26 verdict=flag d_raw=2.40 s_raw=0.86 label='Prolonged reduction in task-relevant activity observed.'
+[market-daemon] 📊 Prolonged reduction in task-relevant activity observed.
+[market] step=27 verdict=block d_raw=2.70 s_raw=0.75 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=28 verdict=block d_raw=2.70 s_raw=0.00 label='Concurrent trajectory and activity anomalies detected.'
+[market-daemon] 📊 Concurrent trajectory and activity anomalies detected.
+[market] step=29 verdict=block d_raw=2.70 s_raw=0.00 label='Simultaneous deviation in path and pace — consider adjustments.'
+[market-daemon] 📊 Simultaneous deviation in path and pace — consider adjustments.
+[market-daemon] Shutting down (signal 15)
+[market-daemon] Chain: 0 entries, valid=True
+[market-daemon] Stopped. 0 steps, 0 alerts.
+[market] step=30 verdict=block d_raw=2.70 s_raw=0.79 label='Simultaneous deviation in path and pace — consider adjustments.'
+[market-daemon] 📊 Simultaneous deviation in path and pace — consider adjustments.
+[market] step=31 verdict=block d_raw=2.70 s_raw=0.75 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=32 verdict=block d_raw=2.70 s_raw=0.76 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=33 verdict=block d_raw=2.70 s_raw=0.72 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=34 verdict=block d_raw=2.70 s_raw=0.76 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=35 verdict=block d_raw=2.90 s_raw=0.23 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=36 verdict=block d_raw=3.00 s_raw=0.70 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=37 verdict=block d_raw=3.00 s_raw=0.89 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=38 verdict=block d_raw=3.00 s_raw=0.74 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=39 verdict=block d_raw=3.00 s_raw=0.25 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=40 verdict=block d_raw=3.00 s_raw=0.80 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=41 verdict=block d_raw=3.00 s_raw=0.72 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=42 verdict=block d_raw=3.00 s_raw=0.20 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=43 verdict=block d_raw=3.00 s_raw=0.76 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=44 verdict=block d_raw=3.00 s_raw=0.77 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=45 verdict=block d_raw=3.00 s_raw=0.74 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=46 verdict=block d_raw=3.00 s_raw=0.86 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=47 verdict=block d_raw=3.00 s_raw=0.24 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=48 verdict=block d_raw=3.00 s_raw=0.18 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=49 verdict=block d_raw=3.00 s_raw=0.83 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=50 verdict=block d_raw=3.00 s_raw=0.76 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=51 verdict=block d_raw=3.00 s_raw=0.76 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=52 verdict=block d_raw=3.00 s_raw=0.70 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=53 verdict=block d_raw=3.00 s_raw=0.97 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=54 verdict=block d_raw=3.00 s_raw=0.75 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=55 verdict=block d_raw=3.00 s_raw=0.76 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=56 verdict=block d_raw=3.00 s_raw=0.76 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=57 verdict=block d_raw=3.00 s_raw=0.72 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=58 verdict=block d_raw=3.00 s_raw=0.90 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=59 verdict=block d_raw=3.00 s_raw=0.75 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=60 verdict=block d_raw=3.00 s_raw=0.75 label='Approach pattern diverging from anticipated route.'
+[market-daemon] 📊 Approach pattern diverging from anticipated route.
+[market] step=61 verdict=block d_raw=3.00 s_raw=0.79 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=62 verdict=block d_raw=3.00 s_raw=0.79 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=63 verdict=block d_raw=3.00 s_raw=0.74 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=64 verdict=block d_raw=3.00 s_raw=0.74 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=65 verdict=block d_raw=3.00 s_raw=0.82 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=66 verdict=block d_raw=3.00 s_raw=0.80 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=67 verdict=block d_raw=3.00 s_raw=0.75 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=68 verdict=block d_raw=3.00 s_raw=0.72 label='Movement pattern shows unexpected directional choices.'
+[market-daemon] 📊 Movement pattern shows unexpected directional choices.
+[market] step=69 verdict=block d_raw=3.00 s_raw=0.80 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=70 verdict=block d_raw=3.00 s_raw=0.28 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=71 verdict=block d_raw=3.00 s_raw=0.24 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=72 verdict=block d_raw=3.00 s_raw=0.74 label='Observed trajectory not aligned with expected behavior.'
+[market-daemon] 📊 Observed trajectory not aligned with expected behavior.
+[market] step=73 verdict=block d_raw=3.00 s_raw=0.24 label='Behavioral trajectory deviating from expected path.'
+[market-daemon] 📊 Behavioral trajectory deviating from expected path.
+[market] step=74 verdict=block d_raw=3.00 s_raw=0.24 label='Multiple behavioral pressures active — review approach.'
+[market-daemon] 📊 Multiple behavioral pressures active — review approach.
+[market] step=75 verdict=block d_raw=3.00 s_raw=0.76 label='Combined directional and tempo signals suggest course correction.'
+[market-daemon] 📊 Combined directional and tempo signals suggest course correction.
+[market] step=76 verdict=block d_raw=3.00 s_raw=0.31 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=77 verdict=block d_raw=3.00 s_raw=0.24 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.
+[market] step=78 verdict=block d_raw=3.00 s_raw=0.76 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=79 verdict=block d_raw=3.00 s_raw=0.31 label='Prolonged reduction in task-relevant activity observed.'
+[market-daemon] 📊 Prolonged reduction in task-relevant activity observed.
+[market] step=80 verdict=block d_raw=3.00 s_raw=0.24 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=81 verdict=block d_raw=3.00 s_raw=0.74 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=82 verdict=block d_raw=3.00 s_raw=0.74 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=83 verdict=block d_raw=3.00 s_raw=0.31 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=84 verdict=block d_raw=3.00 s_raw=0.24 label='Action rate below expected baseline for sustained interval.'
+[market-daemon] 📊 Action rate below expected baseline for sustained interval.
+[market] step=85 verdict=block d_raw=3.00 s_raw=0.78 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=131 verdict=block d_raw=3.00 s_raw=0.38 label='Prolonged reduction in task-relevant activity observed.'
+[market-daemon] 📊 Prolonged reduction in task-relevant activity observed.
+[market] step=132 verdict=block d_raw=3.00 s_raw=0.76 label='Prolonged reduction in task-relevant activity observed.'
+[market-daemon] 📊 Prolonged reduction in task-relevant activity observed.
+[market] step=133 verdict=block d_raw=3.00 s_raw=0.76 label='Extended period of low-productivity activity detected.'
+[market-daemon] 📊 Extended period of low-productivity activity detected.
+[market] step=134 verdict=block d_raw=3.00 s_raw=0.74 label='Operational tempo has dropped below expected levels.'
+[market-daemon] 📊 Operational tempo has dropped below expected levels.

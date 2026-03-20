@@ -1,0 +1,40 @@
+{
+  "session_step": 172,
+  "timestamp": "2026-03-20T16:59:53.820510+00:00",
+  "regime": "sudden_shift",
+  "health_score": 0.0,
+  "steps_since_anomaly": 0,
+  "dominant_action_type": "process",
+  "dominant_source": "agent_reasoning",
+  "context_alignment_trend": "stable",
+  "signals": {
+    "fisher": 5.7318975467580335,
+    "cusum": 1.919246982127694,
+    "mmd": 0.19570734324465078,
+    "e_value": 6.372746402407784e+48,
+    "cumulative_e_value": 6.372746402407784e+48
+  },
+  "verdict": "BLOCK",
+  "verdict_confidence": 6.372746402407784e+48,
+  "hmm_state": "INITIALIZING",
+  "hmm_anomaly": 0.009999999999999995,
+  "intent": "unknown",
+  "intent_confidence": 0.0,
+  "intent_aligned": true,
+  "baseline_error": 1.231890804436431,
+  "intent_adjusted_error": 0.980728264037674,
+  "behavioral_vector": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "conformal_set": [
+    "escalate"
+  ],
+  "chain_length": 172,
+  "chain_valid": true,
+  "budget_remaining": 0.0
+}

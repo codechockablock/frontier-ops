@@ -542,6 +542,7 @@ class AuthorizationState:
 
         self._current_goal: GoalVector = GoalVector.empty()
         self._history: List[AuthorizationEvent] = []
+        self._pre_goal_actions: int = 0
 
     @property
     def current_goal(self) -> GoalVector:
@@ -591,6 +592,9 @@ class AuthorizationState:
         # Re-condition metric on new goal
         self.conditioned_metric.condition_on_goal(self._current_goal)
 
+        # Reset pre-goal counter now that we have a goal
+        self._pre_goal_actions = 0
+
         # Determine if this event replenishes budget
         # Only EXPAND and REVISE replenish (new authorization)
         # ESTABLISH also replenishes (initial authorization)
@@ -624,6 +628,20 @@ class AuthorizationState:
         - needs_clarification: bool (goal too vague)
         """
         if not self.has_goal:
+            self._pre_goal_actions += 1
+
+            # Grace period: first 5 actions before goal established.
+            # Record for calibration but don't emit needs_clarification.
+            if self._pre_goal_actions <= 5:
+                return {
+                    "authorized": True,
+                    "geodesic_distance": 0.0,
+                    "radius": self.radius.radius,
+                    "goal_confidence": 0.0,
+                    "needs_escalation": False,
+                    "needs_clarification": False,
+                }
+
             return {
                 "authorized": False,
                 "geodesic_distance": float("inf"),

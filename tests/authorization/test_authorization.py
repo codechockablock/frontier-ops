@@ -266,10 +266,41 @@ class TestAuthorizationState:
         self.state = AuthorizationState(metric=self.metric)
 
     def test_no_goal_needs_clarification(self):
+        """After grace period, no goal still produces needs_clarification."""
         action = np.array([0.5, 0.1, 0.0, 0.1, 0.0, 0.0])
+        # Exhaust grace period (5 actions)
+        for _ in range(5):
+            self.state.check_action(action)
+        # 6th action should need clarification
         result = self.state.check_action(action)
         assert result["needs_clarification"]
         assert not result["authorized"]
+
+    def test_grace_period_suppresses_needs_clarification(self):
+        """First 5 actions before goal should NOT emit needs_clarification."""
+        action = np.array([0.5, 0.1, 0.0, 0.1, 0.0, 0.0])
+        for i in range(5):
+            result = self.state.check_action(action)
+            assert not result["needs_clarification"], (
+                f"Action {i+1} during grace period should not need clarification"
+            )
+            assert result["authorized"], (
+                f"Action {i+1} during grace period should be permissive"
+            )
+
+        # 6th action: grace period exhausted
+        result = self.state.check_action(action)
+        assert result["needs_clarification"]
+
+    def test_grace_period_resets_on_goal(self):
+        """Grace period counter resets when a goal is established."""
+        action = np.array([0.5, 0.1, 0.0, 0.1, 0.0, 0.0])
+        # Use 3 of the 5 grace actions
+        for _ in range(3):
+            self.state.check_action(action)
+        # Establish a goal — should reset counter
+        self.state.process_user_message("Write a sorting function")
+        assert self.state._pre_goal_actions == 0
 
     def test_process_user_message_establishes_goal(self):
         event = self.state.process_user_message("Solve the math homework step by step")
@@ -502,6 +533,10 @@ class TestPipelineAuthorization:
         assert result.goal_confidence is not None
 
     def test_no_goal_produces_clarification(self):
+        # First 5 actions are grace period — exhaust them
+        for _ in range(5):
+            self.pipeline.process_step("warmup action")
+        # 6th action should need clarification
         result = self.pipeline.process_step("Some action without a directive")
         assert result.needs_clarification or result.authorization_verdict == "no_goal"
 

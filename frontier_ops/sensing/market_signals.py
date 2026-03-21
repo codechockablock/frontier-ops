@@ -168,6 +168,12 @@ class SeveritySignal:
                 window_size=len(self._window),
             )
 
+        # If the full window is all PASS (severity 0), the sustained pattern
+        # that D was tracking is over — reset CUSUM to allow recovery.
+        if (len(self._window) >= self._severity_window
+                and all(s == 0.0 for s in self._window)):
+            self._cusum.reset()
+
         # Feed into CUSUM
         cusum_stat, alarm = self._cusum.update(self._d_raw)
 

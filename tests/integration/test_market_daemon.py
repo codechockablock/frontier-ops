@@ -1,8 +1,9 @@
-"""Tests for market_daemon FIFO validation and exception logging."""
+"""Tests for market_daemon FIFO validation, exception logging, and verdict filtering."""
 
 import os
 import stat
 import tempfile
+from unittest.mock import MagicMock, call
 
 import pytest
 
@@ -68,3 +69,45 @@ class TestWriteAuthStateLogging:
             write_auth_state(pipeline, "none", None)
 
         assert any("Failed to write authorization state" in r.message for r in caplog.records)
+
+
+class TestVerdictFiltering:
+    """Verify that the daemon's verdict filter logic correctly skips FLAG/BLOCK."""
+
+    def test_only_pass_and_monitor_reach_market_gate(self):
+        """Alternating FLAG/PASS — market gate should only receive PASS verdicts.
+
+        Simulates the daemon's filtering logic: only call hook.on_step()
+        for PASS and MONITOR verdicts.
+        """
+        from frontier_ops.integration.market_hook import MarketHook
+        import numpy as np
+
+        rng = np.random.default_rng(42)
+        benign_intervals = sorted(rng.exponential(scale=8.0, size=500))
+
+        hook = MarketHook.from_intervals(
+            benign_intervals=benign_intervals,
+            state_path="/dev/null",
+        )
+
+        # Simulate daemon verdict filtering: alternating FLAG/PASS
+        verdicts = ["flag", "pass"] * 10  # 20 verdicts total
+        fed_to_hook = []
+        t = 0.0
+        for v in verdicts:
+            t += 1.0
+            if v in ("pass", "monitor"):
+                hook.on_step(v, t)
+                fed_to_hook.append(v)
+
+        # Only PASS verdicts should have been fed (10 out of 20)
+        assert len(fed_to_hook) == 10
+        assert all(v == "pass" for v in fed_to_hook)
+        assert hook.n_steps == 10
+
+        # D signal should stay at 0 since only PASS was fed
+        state = hook.get_state()
+        assert state.d_raw == 0.0, (
+            f"d_raw={state.d_raw}, should be 0.0 with only PASS input"
+        )

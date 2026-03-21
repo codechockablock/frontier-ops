@@ -335,3 +335,48 @@ class TestPerformance:
 
         p99 = np.percentile(latencies, 99)
         assert p99 < 1.0, f"P99 = {p99:.3f}ms, budget is 1.0ms"
+
+
+# ===========================================================================
+# CUSUM RECOVERY (Fix 3)
+# ===========================================================================
+
+class TestCUSUMRecovery:
+
+    def test_d_raw_recovers_after_blocks_then_passes(self):
+        """After 20 BLOCKs then PASS verdicts, d_raw < 1.0 within 15 PASS steps."""
+        hook = _make_hook(
+            d_cusum_params={"threshold": 5.0, "drift": 0.5, "window_size": 30,
+                            "decay": 0.98, "ceiling": 30.0},
+        )
+        t = 0.0
+        # 20 BLOCK verdicts — saturate D signal
+        for i in range(20):
+            t += 1.0
+            hook.on_step("block", t)
+
+        state = hook.get_state()
+        assert state.d_raw > 2.0, "D should be saturated after 20 BLOCKs"
+
+        # Now feed PASS verdicts — should recover within 15 steps
+        for i in range(15):
+            t += 1.0
+            hook.on_step("pass", t)
+
+        state = hook.get_state()
+        assert state.d_raw < 1.0, (
+            f"d_raw={state.d_raw:.2f} should be < 1.0 within 15 PASS steps"
+        )
+
+    def test_single_pass_in_block_window_does_not_reset(self):
+        """A single PASS among BLOCKs must NOT reset CUSUM."""
+        sig = SeveritySignal(severity_window=10)
+        # Fill window with BLOCKs
+        for _ in range(10):
+            sig.step("block")
+        stat_before = sig.statistic
+
+        # One PASS — window is now 9 BLOCKs + 1 PASS, not all-PASS
+        sig.step("pass")
+        # CUSUM should still be elevated (not reset)
+        assert sig.statistic > 0, "Single PASS should not reset CUSUM"

@@ -543,6 +543,7 @@ class AuthorizationState:
         self._current_goal: GoalVector = GoalVector.empty()
         self._history: List[AuthorizationEvent] = []
         self._pre_goal_actions: int = 0
+        self._init_time: float = __import__('time').time()
 
     @property
     def current_goal(self) -> GoalVector:
@@ -630,9 +631,13 @@ class AuthorizationState:
         if not self.has_goal:
             self._pre_goal_actions += 1
 
-            # Grace period: first 5 actions before goal established.
-            # Record for calibration but don't emit needs_clarification.
-            if self._pre_goal_actions <= 5:
+            # Grace period: first 5 actions AND first 30 seconds before goal
+            # established. Both conditions must be met — step count catches
+            # rapid-fire actions, time catches daemon restarts where step
+            # counter resets but time doesn't.
+            import time as _time
+            time_since_init = _time.time() - self._init_time
+            if self._pre_goal_actions <= 5 and time_since_init < 30:
                 return {
                     "authorized": True,
                     "geodesic_distance": 0.0,

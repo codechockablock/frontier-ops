@@ -57,6 +57,8 @@ def _fallback_defaults() -> Dict[str, Any]:
                 "cross_slot": {"fire": 0.20, "strong": 0.42},
                 "persistence": {"fire": 0.45, "strong": 0.70},
                 "cusum": {"fire": 5.5, "strong": 9.0},
+                "coherence": {"fire": 0.65, "strong": 0.80},
+                "refusal": {"fire": 0.40, "strong": 0.65},
             },
             "log_tail": {
                 "error": {"fire": 0.85, "strong": 0.95},
@@ -64,6 +66,8 @@ def _fallback_defaults() -> Dict[str, Any]:
                 "cross_slot": {"fire": 0.98, "strong": 0.999},
                 "persistence": {"fire": 0.98, "strong": 0.999},
                 "cusum": {"fire": 12.0, "strong": 20.0},
+                "coherence": {"fire": 0.65, "strong": 0.80},
+                "refusal": {"fire": 0.40, "strong": 0.65},
             },
         },
         "intent_binding": {

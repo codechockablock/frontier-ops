@@ -905,11 +905,14 @@ class SafetyPolytopeEngine:
         sig5 = self.sig5_grounding.observe(composite_hv, magnitude, context_alignment)
 
         # Collect verdict contributions
+        # sig4_coherence advisory-only: gated 2026-03-24 pending learned encoder calibration
+        # sig4 still runs and appears in output, but its verdict_contribution
+        # is excluded from the contributions list that drives max_verdict.
         contributions = [
             sig1["verdict_contribution"],
             sig2["verdict_contribution"],
             sig3["verdict_contribution"],
-            sig4["verdict_contribution"],
+            # sig4 excluded — advisory only (see above)
             sig5["verdict_contribution"],
         ]
 
@@ -921,12 +924,14 @@ class SafetyPolytopeEngine:
         firing_count = sum(1 for c in contributions if c != "PASS")
 
         # Composite signal: weighted average of all signature signals (base)
+        # sig4_coherence advisory-only: gated 2026-03-24 pending learned encoder calibration
+        # Weight redistributed: sig1=0.25, sig2=0.30, sig3=0.20, sig4=0.00, sig5=0.25
         base_composite = (
-            0.20 * sig1["signal"]
-            + 0.25 * sig2["signal"]
-            + 0.15 * sig3["signal"]
-            + 0.25 * sig4["signal"]
-            + 0.15 * sig5["signal"]
+            0.25 * sig1["signal"]
+            + 0.30 * sig2["signal"]
+            + 0.20 * sig3["signal"]
+            + 0.00 * sig4["signal"]
+            + 0.25 * sig5["signal"]
         )
 
         # Conjunction detection: multiplicative boost for dangerous co-occurrence

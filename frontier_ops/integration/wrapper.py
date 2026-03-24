@@ -36,6 +36,7 @@ import os
 import signal
 import sys
 import time
+from collections import deque
 from typing import Any, Dict, Optional
 
 
@@ -53,6 +54,8 @@ from frontier_ops.integration.paralysis_detector import ParalysisDetector
 from frontier_ops.integration.timing_signals import TimingSignalEngine
 from frontier_ops.integration.taint_tracker import TaintTracker
 from frontier_ops.integration.refusal_detector import RefusalDetectionSignal
+from frontier_ops.sensing.cold_start import ColdStartDetector
+from frontier_ops.integration.scope_classifier import reclassify_scope
 
 
 class ProprioceptiveWrapper:
@@ -122,6 +125,11 @@ class ProprioceptiveWrapper:
         # Refusal detection signal (Signal D)
         self.refusal_signal = RefusalDetectionSignal()
 
+        # Cold-start detector (wired 2026-03-24)
+        self.cold_start = ColdStartDetector()
+        # Rolling verdict history for cold-start feed (last 20 steps)
+        self._recent_verdicts: deque = deque(maxlen=20)
+
         # Proprioception manager
         ws = os.path.expanduser("~/.openclaw/workspace")
         self.proprio = ProprioceptionManager(
@@ -170,6 +178,11 @@ class ProprioceptiveWrapper:
             step_in_chain=self.steps_since_user,
             user_message_age=user_age,
         )
+
+        # Scope reclassification: correct known-benign misclassifications
+        # before encoding so the encoder produces appropriate feature vectors.
+        # Added 2026-03-24 to reduce FPs on system diagnostics.
+        classified = reclassify_scope(classified)
 
         # --- Phase 15 validation (decomposed to inject Signal B + D) ---
         # Step 1: Encode action and compute base detection signals
@@ -274,6 +287,31 @@ class ProprioceptiveWrapper:
             if current == "PASS":
                 verdict_result["verdict"] = "MONITOR"
                 verdict_result["monitor_reason"] = taint_state.alert_reason
+
+        # Feed cold-start detector and apply verdict downgrade if in cold-start.
+        # Cold-start downgrade: BLOCK→FLAG, FLAG→MONITOR (never suppress entirely).
+        current_verdict = verdict_result.get("verdict", "PASS")
+        self._recent_verdicts.append(current_verdict)
+        recent_list = list(self._recent_verdicts)
+        n_recent = len(recent_list)
+        cs_block_rate = sum(1 for v in recent_list if v == "BLOCK") / n_recent if n_recent else 0.0
+        cs_init_rate = sum(1 for v in recent_list if v in ("MONITOR", "FLAG", "BLOCK")) / n_recent if n_recent else 0.0
+        hmm_state_str = hmm_result.get("state", "INITIALIZING")
+        e_val = hmm_result.get("anomaly_score", 0.0)
+        self.cold_start.observe(
+            verdict=current_verdict,
+            hmm_state=hmm_state_str.lower() if isinstance(hmm_state_str, str) else str(hmm_state_str),
+            e_value=e_val,
+            timestamp=now,
+        )
+        if self.cold_start.is_suppressing:
+            if current_verdict == "BLOCK":
+                verdict_result["verdict"] = "FLAG"
+                verdict_result["cold_start_downgrade"] = "BLOCK→FLAG"
+            elif current_verdict == "FLAG":
+                verdict_result["verdict"] = "MONITOR"
+                verdict_result["cold_start_downgrade"] = "FLAG→MONITOR"
+        verdict_result["cold_start"] = self.cold_start.is_suppressing
 
         # Attach timing data to verdict result
         verdict_result["timing"] = {
@@ -383,6 +421,8 @@ class ProprioceptiveWrapper:
             self.hmm = AgentHMM()  # re-instantiate: cleanest reset for HMM priors
             self.timing_engine = TimingSignalEngine()
             self.refusal_signal.clear()
+            self.cold_start.reset()
+            self._recent_verdicts.clear()
             self.step = 0
             self.steps_since_user = 0
             self.last_user_message_time = time.time()

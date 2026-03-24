@@ -283,7 +283,9 @@ class RefusalDetectionSignal:
         # Score based on both count and consecutiveness
         count_score = (refusal_steps - CLUSTERING_MIN_COUNT + 1) / (len(window) - CLUSTERING_MIN_COUNT + 1)
         consec_score = max_consecutive / len(window)
-        score = float(np.clip(0.6 * count_score + 0.4 * consec_score + 0.15, 0.0, 1.0))
+        # Removed +0.15 floor — caused any 3 refusal steps to score ≥0.25 regardless of severity.
+        # Score should start from 0 and only reflect actual count + consecutiveness.
+        score = float(np.clip(0.6 * count_score + 0.4 * consec_score, 0.0, 1.0))
         return score
 
     def _escalation_score(self, window: List[StepRecord]) -> float:

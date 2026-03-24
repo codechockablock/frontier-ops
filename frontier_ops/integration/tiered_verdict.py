@@ -23,7 +23,8 @@ DEFAULT_THRESHOLDS = {
     "cross_slot": {"fire": 0.20, "strong": 0.42},
     "persistence": {"fire": 0.65, "strong": 0.85},
     "cusum": {"fire": 5.5, "strong": 9.0},
-    "coherence": {"fire": 0.82, "strong": 0.94},   # incoherence score: 1-coherence; raised 2026-03-24 (benign 3-tool cycles score ~0.80 incoherence)
+    # coherence intentionally excluded — weight=0.00, advisory-only until learned encoder.
+    # Excluding from thresholds prevents back-door influence via n_fire/n_strong bonuses.
     "refusal": {"fire": 0.40, "strong": 0.65},
 }
 
@@ -36,7 +37,7 @@ LOG_TAIL_THRESHOLDS = {
     "cross_slot": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "persistence": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "cusum": {"fire": 15.0, "strong": 25.0},
-    "coherence": {"fire": 0.82, "strong": 0.94},   # incoherence score: 1-coherence; raised 2026-03-24
+    # coherence excluded — same reason as DEFAULT_THRESHOLDS
     "refusal": {"fire": 0.40, "strong": 0.65},
 }
 
@@ -68,7 +69,7 @@ class TieredVerdictEngine:
         self.recent_external_high_risk = deque(maxlen=30)
         self.recent_nonuser_credential = deque(maxlen=30)
         self.payment_magnitudes = deque(maxlen=30)
-        self.payment_recipients = set()
+        self.payment_recipients: set = set()  # capped at 200 in add path (bounded memory)
 
     def _signal_levels(self, raw_signals: Dict[str, float]) -> Dict[str, int]:
         levels: Dict[str, int] = {}
@@ -428,7 +429,7 @@ class TieredVerdictEngine:
 
         if is_payment:
             self.payment_magnitudes.append(magnitude)
-            if recipient:
+            if recipient and len(self.payment_recipients) < 200:
                 self.payment_recipients.add(str(recipient))
 
         self.state.step += 1

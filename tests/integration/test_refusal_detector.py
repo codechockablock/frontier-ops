@@ -254,7 +254,7 @@ class TestClustering:
         # A couple more benign
         sig.push(_benign_coding_step())
         s = sig.score()
-        assert s["clustering_score"] > 0.5, f"Clustering not detected: {s}"
+        assert s["clustering_score"] > 0.35, f"Clustering not detected: {s}"  # threshold lowered 2026-03-24: removed +0.15 floor from _clustering_score
 
     def test_sparse_refusals_no_cluster(self):
         """Refusals spread out over many steps — should not cluster."""

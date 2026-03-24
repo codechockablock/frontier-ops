@@ -150,8 +150,9 @@ class PersistenceTracker:
             return 0.0
         hist = np.asarray(self.historical_magnitude, dtype=float)
         near_zero_rate = float(np.mean(hist < 0.1))
-        if self.near_identity_count < 3 or near_zero_rate > 0.8:
+        if self.near_identity_count < 3:
             return 0.0
+        # expected_run handles high near_zero_rate naturally (→ large expected run → near-zero score)
         expected_run = max(1.0, 1.0 / max(1.0 - near_zero_rate, 0.01))
         score = (self.near_identity_count - expected_run) / max(expected_run, 1.0)
         return float(np.clip(score / 5.0, 0.0, 1.0))

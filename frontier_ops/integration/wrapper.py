@@ -292,10 +292,6 @@ class ProprioceptiveWrapper:
         # Cold-start downgrade: BLOCK→FLAG, FLAG→MONITOR (never suppress entirely).
         current_verdict = verdict_result.get("verdict", "PASS")
         self._recent_verdicts.append(current_verdict)
-        recent_list = list(self._recent_verdicts)
-        n_recent = len(recent_list)
-        cs_block_rate = sum(1 for v in recent_list if v == "BLOCK") / n_recent if n_recent else 0.0
-        cs_init_rate = sum(1 for v in recent_list if v in ("MONITOR", "FLAG", "BLOCK")) / n_recent if n_recent else 0.0
         hmm_state_str = hmm_result.get("state", "INITIALIZING")
         e_val = hmm_result.get("anomaly_score", 0.0)
         self.cold_start.observe(
@@ -372,8 +368,6 @@ class ProprioceptiveWrapper:
                 file=sys.stderr,
             )
 
-        # refusal_scores and task_coherence_data already computed above
-        task_coherence = task_coherence_data
         return {
             "step": self.step - 1,
             "verdict": verdict_result.get("verdict", "PASS"),
@@ -384,8 +378,8 @@ class ProprioceptiveWrapper:
             "polytope_signatures": polytope_result.get("firing_signatures", []),
             "hmm_state": hmm_result.get("state", "INITIALIZING"),
             "hmm_anomaly": hmm_result.get("anomaly_score", 0.0),
-            "task_coherence_score": task_coherence.get("coherence", 0.0),
-            "task_coherence_pattern": task_coherence.get("phase", "warmup"),
+            "task_coherence_score": task_coherence_data.get("coherence", 0.0),
+            "task_coherence_pattern": task_coherence_data.get("phase", "warmup"),
             "refusal_score": refusal_scores.get("refusal_score", 0.0),
             "refusal_pattern": refusal_scores.get("pattern", "none"),
         }

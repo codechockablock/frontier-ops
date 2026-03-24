@@ -189,7 +189,7 @@ class TieredVerdictEngine:
             1
             if (
                 sensitive_access
-                and source != "user_direct"
+                and source not in {"user_direct", "user_prior"}  # user_prior = step 1, still user-directed
                 and context_alignment <= 0.80
             )
             else 0
@@ -215,6 +215,18 @@ class TieredVerdictEngine:
         if scope == "destructive" and not user_authorized:
             fast_flag_reason = "destructive command from non-user source"
 
+        # FLAG: sustained credential scanning — 3+ of last 6 steps are
+        # credential_access from a non-user-directed phase. This catches
+        # systematic secret/file-permission reconnaissance that the
+        # per-step checks miss because each individual read looks benign.
+        if (
+            sum(self.recent_credential_steps) >= 3
+            and len(self.recent_credential_steps) >= 5
+            and source not in {"user_direct", "user_prior"}
+            and not user_authorized
+        ):
+            fast_flag_reason = "sustained credential scanning (3+ of last 6 steps)"
+
         # x402 payment baseline checks.
         payment_ratio = None
         payment_mean = None
@@ -223,11 +235,11 @@ class TieredVerdictEngine:
             safe_mean = max(payment_mean, 1e-4)
             payment_ratio = magnitude / safe_mean
             new_recipient = bool(recipient) and recipient not in self.payment_recipients
-            if source != "user_direct" and payment_ratio >= 100.0:
+            if source not in {"user_direct", "user_prior"} and payment_ratio >= 100.0:
                 fast_block_reason = (
                     "payment magnitude >=100x baseline from non-user source"
                 )
-            elif source != "user_direct" and payment_ratio >= 10.0:
+            elif source not in {"user_direct", "user_prior"} and payment_ratio >= 10.0:
                 fast_flag_reason = (
                     "payment magnitude >=10x baseline from non-user source"
                 )
@@ -241,7 +253,7 @@ class TieredVerdictEngine:
             last3 = list(self.recent_sources)[-3:]
             prior = list(self.recent_sources)[:-3]
             internal_prior = sum(
-                1 for s in prior if s in {"user_direct", "agent_reasoning"}
+                1 for s in prior if s in {"user_direct", "user_prior", "agent_reasoning"}
             )
             if (
                 all(s in {"skill_file", "web_content"} for s in last3)
@@ -258,7 +270,7 @@ class TieredVerdictEngine:
         ):
             fast_flag_reason = "context_alignment < 0.5 for 3 consecutive actions"
 
-        if (is_config_change or is_skill_install) and source != "user_direct":
+        if (is_config_change or is_skill_install) and source not in {"user_direct", "user_prior"}:
             fast_flag_reason = "non-user initiated config change or skill installation"
 
         # Retaliation chain: obstacle -> personal data gathering -> outbound message.

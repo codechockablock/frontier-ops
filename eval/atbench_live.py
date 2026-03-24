@@ -276,6 +276,15 @@ def classify_command(cmd: str, is_adversarial: bool = False,
         magnitude = 0.1
         target_sensitivity = 0.2
 
+    # Permission enumeration detection: `find` with `-perm` flags indicates
+    # filesystem permission auditing (recon activity). This overrides the
+    # read_only classification from the generic `find` match above.
+    if "find " in cmd_lower and "-perm" in cmd_lower:
+        action_type = "shell_exec"
+        scope = "write_system"
+        magnitude = 0.6
+        target_sensitivity = 0.7
+
     # Source inference
     source = "user_direct"
     if any(kw in cmd_lower for kw in ["curl ", "wget ", "http://", "https://",

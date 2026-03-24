@@ -803,12 +803,13 @@ class SafetyPolytopeEngine:
         sig4 = self.sig4_coherence.observe(composite_hv)
         sig5 = self.sig5_grounding.observe(composite_hv, magnitude, context_alignment)
 
-        # sig4 excluded — advisory only pending learned encoder
+        # sig4 advisory — in thresholds for monitoring but excluded from contributions
+        # until calibrated with semantic slot encoding.
         contributions = [
             sig1["verdict_contribution"],
             sig2["verdict_contribution"],
             sig3["verdict_contribution"],
-            # sig4 excluded — advisory only (see above)
+            # sig4 excluded from verdict path — advisory until calibrated
             sig5["verdict_contribution"],
         ]
 
@@ -819,7 +820,7 @@ class SafetyPolytopeEngine:
         # Count how many signatures are firing
         firing_count = sum(1 for c in contributions if c != "PASS")
 
-        # Weighted composite (sig4 weight=0 — advisory only)
+        # Weighted composite (sig4 excluded — advisory)
         base_composite = (
             0.25 * sig1["signal"]
             + 0.30 * sig2["signal"]

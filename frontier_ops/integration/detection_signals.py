@@ -465,6 +465,9 @@ class DetectionSignalEngine:
             ]
         self.cross_slot = CrossSlotConsistency(algebra, cross_slot_roles)
 
+        # CUSUM on semantic novelty — detects sustained novel behavior
+        self.novelty_cusum = CUSUMDetector(warmup_steps=15, threshold_h=4.0, slack_k=0.05)
+
     def observe(self, fillers: Dict[str, np.ndarray]) -> Dict[str, object]:
         """Run all slot predictors and cross-slot checks, returning composite signals."""
         slot_meta: Dict[str, Dict[str, object]] = {}
@@ -491,6 +494,10 @@ class DetectionSignalEngine:
         semantic_novelty = float(slot_meta.get("semantic", {}).get("novelty_score", 0.0))
         fisher_signal = semantic_novelty if semantic_novelty > 0.0 else (max(novelty_vals) if novelty_vals else 0.0)
 
+        # Feed novelty into CUSUM
+        novelty_cusum_result = self.novelty_cusum.observe(fisher_signal)
+        novelty_cusum_score = float(novelty_cusum_result.get("cusum_score", 0.0))
+
         persistence_vals = []
         for role, meta in slot_meta.items():
             p = meta.get("persistence", {})
@@ -516,6 +523,7 @@ class DetectionSignalEngine:
             "cross_slot": float(np.clip(cross_slot_signal, 0.0, 1.0)),
             "persistence": float(np.clip(persistence_signal, 0.0, 1.0)),
             "cusum": float(max(cusum_signal, 0.0)),
+            "novelty_cusum": float(np.clip(novelty_cusum_score, 0.0, 1.0)),
         }
 
         return {

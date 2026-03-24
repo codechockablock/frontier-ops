@@ -37,6 +37,7 @@ DEFAULT_THRESHOLDS = {
     "cross_slot": {"fire": 0.20, "strong": 0.42},
     "persistence": {"fire": 0.65, "strong": 0.85},
     "cusum": {"fire": 4.0, "strong": 6.0},
+    "novelty_cusum": {"fire": 0.50, "strong": 0.80},  # CUSUM on semantic novelty — calibrate after first run
     "coherence": {"fire": 0.92, "strong": 1.00},   # P95/P99 of benign (2026-03-24 calibration, n=290)
     "refusal": {"fire": 0.40, "strong": 0.65},
 }
@@ -50,6 +51,7 @@ LOG_TAIL_THRESHOLDS = {
     "cross_slot": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "persistence": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "cusum": {"fire": 5.5, "strong": 6.5},
+    "novelty_cusum": {"fire": 0.50, "strong": 0.80},  # CUSUM on semantic novelty — calibrate after first run
     "coherence": {"fire": 0.92, "strong": 1.00},    # P95/P99 of benign (2026-03-24 calibration)
     "refusal": {"fire": 0.40, "strong": 0.65},
 }
@@ -100,7 +102,8 @@ class TieredVerdictEngine:
         self, raw_signals: Dict[str, float], levels: Dict[str, int]
     ) -> float:
         def normalize(name: str, value: float) -> float:
-            fire = self.thresholds[name]["fire"]
+            t = self.thresholds.get(name, {"fire": 1.0, "strong": 2.0})
+            fire = t["fire"]
             return float(np.clip(value / max(fire, 1e-6), 0.0, 6.0))
 
         # Active weights (sum=1.00).
@@ -114,12 +117,15 @@ class TieredVerdictEngine:
         #     until coherence scoring separates adversarial from benign.
         # Weights updated 2026-03-24: fisher re-enabled at 0.08 (semantic novelty signal).
         # Redistributed from cusum (0.27→0.24) and error (0.25→0.22). Sum=1.00.
+        # Weights updated 2026-03-24b: novelty_cusum added at 0.07 (CUSUM on semantic novelty).
+        # Redistributed from cusum (0.24→0.17). Sum=1.00.
         weighted = (
             0.22 * normalize("error", raw_signals["error"])
             + 0.08 * normalize("fisher", raw_signals["fisher"])    # semantic novelty signal re-enabled (2026-03-24)
             + 0.28 * normalize("cross_slot", raw_signals["cross_slot"])
             + 0.10 * normalize("persistence", raw_signals["persistence"])
-            + 0.24 * normalize("cusum", raw_signals["cusum"])
+            + 0.17 * normalize("cusum", raw_signals["cusum"])
+            + 0.07 * normalize("novelty_cusum", raw_signals.get("novelty_cusum", 0.0))  # CUSUM on semantic novelty
             + 0.00 * normalize("coherence", raw_signals.get("coherence", 0.0))  # thresholds set, weight 0 until discriminative
             + 0.10 * normalize("refusal", raw_signals.get("refusal", 0.0))
         )

@@ -495,7 +495,10 @@ class DetectionSignalEngine:
         for role, meta in slot_meta.items():
             c = meta.get("cusum", {})
             cusum_vals.append(float(c.get("cusum_score", 0.0)))
-        cusum_signal = float(np.mean(cusum_vals)) if cusum_vals else 0.0
+        # Use max, not mean: a single slot drifting is anomalous.
+        # Mean dilutes the signal — with 6 slots, one alarming slot gets
+        # averaged down to ~1/6th, making fire/strong thresholds unreachable.
+        cusum_signal = float(max(cusum_vals)) if cusum_vals else 0.0
 
         cross_slot_signal = 1.0 - float(cross_meta.get("consistency_score", 1.0))
 

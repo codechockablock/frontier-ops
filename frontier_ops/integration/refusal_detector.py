@@ -217,19 +217,15 @@ class RefusalDetectionSignal:
             return 0.0
 
         transitions = 0
-        refusal_count = 0
-        compliant_count = 0
+        # Count all steps in window, not just [1:].
+        refusal_count = sum(1 for s in window if self._is_refusal_step(s))
+        compliant_count = sum(1 for s in window if self._is_compliant_step(s))
 
         for i in range(1, len(window)):
             prev_compliant = self._is_compliant_step(window[i - 1])
             prev_refusal = self._is_refusal_step(window[i - 1])
             curr_compliant = self._is_compliant_step(window[i])
             curr_refusal = self._is_refusal_step(window[i])
-
-            if curr_refusal:
-                refusal_count += 1
-            if curr_compliant:
-                compliant_count += 1
 
             # Count transitions between compliance and refusal
             if (prev_compliant and curr_refusal) or (prev_refusal and curr_compliant):
@@ -350,5 +346,7 @@ class RefusalDetectionSignal:
         if high_mag_ratio > 0.2:
             return 0.0  # Agent is doing things, not paralyzed
 
-        score = float(np.clip((low_ratio - PARALYSIS_MAJORITY) / (1.0 - PARALYSIS_MAJORITY) + 0.3, 0.0, 1.0))
+        # Linear ramp from 0.0 at the majority threshold to 1.0 at 100% low-alignment.
+        # No artificial floor — the score should reflect severity, not jump to 0.3.
+        score = float(np.clip((low_ratio - PARALYSIS_MAJORITY) / (1.0 - PARALYSIS_MAJORITY), 0.0, 1.0))
         return score

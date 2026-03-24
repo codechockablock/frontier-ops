@@ -19,12 +19,12 @@ from frontier_ops.integration.detection_signals import DetectionSignalEngine
 # error and persistence signals naturally drift up during long sessions.
 DEFAULT_THRESHOLDS = {
     "error": {"fire": 0.70, "strong": 0.85},
-    "fisher": {"fire": 0.40, "strong": 0.65},
+    # fisher excluded: always 0.0 with current coarse encoding (codebook never diversifies).
+    # Will re-enable when learned encoder provides richer action_type fillers.
     "cross_slot": {"fire": 0.20, "strong": 0.42},
     "persistence": {"fire": 0.65, "strong": 0.85},
-    "cusum": {"fire": 5.5, "strong": 9.0},
-    # coherence intentionally excluded — weight=0.00, advisory-only until learned encoder.
-    # Excluding from thresholds prevents back-door influence via n_fire/n_strong bonuses.
+    "cusum": {"fire": 4.0, "strong": 6.0},
+    # coherence excluded: weight=0.00, advisory-only, AUC~0.55 on real traces.
     "refusal": {"fire": 0.40, "strong": 0.65},
 }
 
@@ -33,10 +33,10 @@ DEFAULT_THRESHOLDS = {
 # Structural fast-path checks still work via action content.
 LOG_TAIL_THRESHOLDS = {
     "error": {"fire": 0.90, "strong": 0.98},
-    "fisher": {"fire": 0.55, "strong": 0.80},
+    # fisher excluded — same reason as DEFAULT_THRESHOLDS
     "cross_slot": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "persistence": {"fire": 100.0, "strong": 100.0},  # fully disabled
-    "cusum": {"fire": 15.0, "strong": 25.0},
+    "cusum": {"fire": 5.5, "strong": 6.5},
     # coherence excluded — same reason as DEFAULT_THRESHOLDS
     "refusal": {"fire": 0.40, "strong": 0.65},
 }
@@ -90,14 +90,17 @@ class TieredVerdictEngine:
             fire = self.thresholds[name]["fire"]
             return float(np.clip(value / max(fire, 1e-6), 0.0, 6.0))
 
-        # Weights: coherence=0.00 (advisory-only, AUC~0.55 on real traces).
-        # Sum to 0.90; n_strong/n_fire bonuses cover remaining headroom.
+        # Active weights (sum=1.00). Dead signals set to 0.00 with comment:
+        #   fisher=0.00  — always 0 with current encoding (coarse action_type collapses codebook).
+        #                  Designed for novelty detection; will work when encoder is richer.
+        #   coherence=0.00 — advisory-only, AUC~0.55 on real traces (encoding bottleneck).
+        # Weight redistributed from fisher (0.10) to cusum (+0.05) and error (+0.05).
         weighted = (
-            0.20 * normalize("error", raw_signals["error"])
-            + 0.10 * normalize("fisher", raw_signals["fisher"])
+            0.25 * normalize("error", raw_signals["error"])
+            + 0.00 * normalize("fisher", raw_signals["fisher"])    # dead: codebook never diversifies with coarse encoding
             + 0.28 * normalize("cross_slot", raw_signals["cross_slot"])
             + 0.10 * normalize("persistence", raw_signals["persistence"])
-            + 0.22 * normalize("cusum", raw_signals["cusum"])
+            + 0.27 * normalize("cusum", raw_signals["cusum"])
             + 0.00 * normalize("coherence", raw_signals.get("coherence", 0.0))  # advisory-only until learned encoder
             + 0.10 * normalize("refusal", raw_signals.get("refusal", 0.0))
         )

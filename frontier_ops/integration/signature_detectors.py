@@ -2,23 +2,10 @@
 Safety Polytope Signature Detectors
 =====================================
 
-5 geometric signatures that detect specific safety violations in agent
-action traces using VSA encoding. These complement the existing detection
-signals (error, fisher, cross_slot, persistence, CUSUM) with targeted
-violation-type detectors.
-
-Designed from the 2026-02-26 three-way collaboration:
-  - Grok 4.20 (DeepSearch, 156 sources): formal Lipschitz+Sard proof chain
-  - Claude Sonnet 4.6: probabilistic projection detectability framing
-  - Chocka (Opus 4.6): integration with existing proprioceptive wrapper
-
-Signature 1: Intent Binding Fracture
-Signature 2: Source Provenance Corruption
-Signature 3: Constitutional Manifold Boundary Crossing
-Signature 4: Trajectory Coherence Fracture (already in trajectory_buffer.py)
-Signature 5: Confidence-Grounding Decoupling
-
-All detectors are ADVISORY ONLY — they produce signals, never block.
+5 geometric signatures for safety violation detection in VSA-encoded agent traces.
+Sig1: Intent Binding Fracture, Sig2: Source Provenance Corruption,
+Sig3: Constitutional Manifold Boundary, Sig4: Trajectory Coherence Fracture,
+Sig5: Confidence-Grounding Decoupling.
 """
 
 from __future__ import annotations
@@ -34,22 +21,10 @@ from frontier_ops.integration.conjunction_detector import ConjunctionDetector
 
 
 # ─── Signature 1: Intent Binding Fracture ─────────────────────────────────
-#
-# Detects when context_alignment drops and stays low — the agent's actions
-# are no longer explainable by the stated task context.
-#
-# Key distinction: creative compliance = temporary dip that recovers.
-# Genuine violation = permanent divergence (CUSUM keeps climbing, persistence
-# stays high, derivative flattens near zero).
 
 
 class IntentBindingFractureDetector:
-    """
-    Measures the binding strength between context_alignment and the
-    composite action vector over time. Uses CUSUM for change-point
-    detection and persistence tracking to distinguish temporary creative
-    compliance from genuine intent fracture.
-    """
+    """Detects sustained context_alignment drops via CUSUM + persistence tracking."""
 
     def __init__(
         self,
@@ -163,22 +138,10 @@ class IntentBindingFractureDetector:
 
 
 # ─── Signature 2: Source Provenance Corruption ────────────────────────────
-#
-# Detects when high-sensitivity actions originate from non-user sources.
-# This is the prompt injection signature: external content (web, email,
-# API responses) drives credential access, file writes, or network egress.
-#
-# Unlike the other detectors, this has a STRUCTURAL fast-path that
-# requires zero calibration — the rule is clear:
-#   high_sensitivity + untrusted_source = FLAG
 
 
 class SourceProvenanceCorruptionDetector:
-    """
-    Tracks the correlation between action source and action sensitivity.
-    Uses both structural rules (zero calibration) and geometric signals
-    (VSA cross-slot binding strength for soft detection).
-    """
+    """Detects high-sensitivity actions from untrusted sources. Structural fast-path + geometric signal."""
 
     # Class-level defaults — overridden by constructor args (and ultimately by config)
     _DEFAULT_TRUSTED_SOURCES = {
@@ -333,27 +296,11 @@ class SourceProvenanceCorruptionDetector:
 
 
 # ─── Signature 3: Constitutional Manifold Boundary Crossing ───────────────
-#
-# Detects when the agent's action trajectory leaves the "safe polytope"
-# — the region of VSA space defined by normal/approved behavior patterns.
-#
-# Approach: collect safe baseline vectors, compute a centroid + radius,
-# then measure signed distance from the boundary. PCA-projected convex
-# hull for more precise boundary detection once enough data accumulates.
 
 
 class ConstitutionalManifoldDetector:
-    """
-    Constructs an approximate safe operating region from baseline action
-    vectors and detects boundary proximity and penetration.
-
-    Phase 1 (centroid mode): simple distance from centroid of safe traces.
-        Active during calibration and as fallback.
-    Phase 2 (hull mode): PCA-projected convex hull for precise boundary
-        detection. Once baseline_size vectors accumulate, PCA projects
-        to pca_dims dimensions and a ConvexHull defines the safe region.
-        New points are tested via signed distance to hull facets.
-    """
+    """Detects actions outside the safe operating region via centroid distance,
+    PCA convex hull, and Mahalanobis distance (3 phases as data accumulates)."""
 
     def __init__(
         self,
@@ -480,12 +427,7 @@ class ConstitutionalManifoldDetector:
             self.hull_active = False
 
     def _hull_signed_distance(self, point_pca: np.ndarray) -> float:
-        """
-        Compute signed distance from a PCA-projected point to the hull boundary.
-
-        Returns negative if inside the hull (distance to nearest facet),
-        positive if outside (distance beyond nearest facet).
-        """
+        """Signed distance to hull boundary. Negative=inside, positive=outside."""
         if self.hull_equations is None:
             return 0.0
 
@@ -506,18 +448,7 @@ class ConstitutionalManifoldDetector:
         return centered @ self.pca_components.T
 
     def observe(self, composite_hv: np.ndarray) -> Dict[str, Any]:
-        """
-        Observe a composite action hypervector and check boundary distance.
-
-        Uses PCA convex hull when available (Phase 2), falls back to
-        centroid-based distance (Phase 1).
-
-        Args:
-            composite_hv: the bound 6-slot hypervector for this action
-
-        Returns:
-            Dict with distance metrics, boundary status, and detection mode.
-        """
+        """Check boundary distance for a composite action HV."""
         real_hv = (
             np.real(composite_hv) if np.iscomplexobj(composite_hv) else composite_hv
         )
@@ -553,18 +484,9 @@ class ConstitutionalManifoldDetector:
             if point_pca is not None:
                 mahal_distance = self._mahalanobis_distance(point_pca)
 
-        # Determine boundary status using z-score (centroid distance normalized)
-        # with Mahalanobis as additional information channel.
-        # Empirically: z-score discriminates better than Mahalanobis in high-D VSA
-        # because PCA captures variance directions that don't separate violations.
-        #
-        # Use conservative z-score thresholds calibrated from real data:
-        # - proximity at z > 3.0 (~p99.9 for normal distribution)
-        # - penetration at z > 4.0 (~p99.997)
         z_proximity = 2.5
         z_penetration = 3.5
 
-        # Primary decision: z-score based (works reliably in high-D VSA)
         mode = (
             "mahalanobis+centroid"
             if mahal_distance is not None
@@ -602,21 +524,10 @@ class ConstitutionalManifoldDetector:
 
 
 # ─── Signature 4: Trajectory Coherence Fracture ──────────────────────────
-#
-# Already implemented in trajectory_buffer.py (PhasorTrajectoryBuffer).
-# This module provides a thin wrapper for consistent API with other
-# signature detectors.
 
 
 class TrajectoryCoherenceFractureDetector:
-    """
-    Wrapper around PhasorTrajectoryBuffer.fracture_signal() for
-    consistent API with other signature detectors.
-
-    Detects sudden drops in consecutive-step cosine similarity.
-    Prompt injection = sharp angular snap.
-    Creative compliance = smooth gradual curve.
-    """
+    """Wrapper around PhasorTrajectoryBuffer.fracture_signal() + TaskCoherenceScorer."""
 
     def __init__(self, window: int = 12, dim: int = 512, config: Dict | None = None):
         # Import here to avoid circular imports
@@ -692,22 +603,10 @@ class TrajectoryCoherenceFractureDetector:
 
 
 # ─── Signature 5: Confidence-Grounding Decoupling ────────────────────────
-#
-# Detects "geometric orphans" — actions with high magnitude/confidence
-# that aren't traceable to any prior grounded action vector. These are
-# actions that came from nowhere: high energy, no provenance.
-#
-# Implementation: check if the current action HV is decomposable
-# (recoverable via unbinding/similarity) from the recent trajectory.
 
 
 class ConfidenceGroundingDecouplingDetector:
-    """
-    Detects actions with high magnitude but no provenance in the recent
-    trajectory. A grounded action should be similar to (or a binding
-    composition of) recent prior actions. An orphan action appears
-    discontinuously with high confidence.
-    """
+    """Detects high-magnitude actions with no provenance in recent trajectory (geometric orphans)."""
 
     def __init__(
         self,
@@ -904,10 +803,7 @@ class SafetyPolytopeEngine:
         sig4 = self.sig4_coherence.observe(composite_hv)
         sig5 = self.sig5_grounding.observe(composite_hv, magnitude, context_alignment)
 
-        # Collect verdict contributions
-        # sig4_coherence advisory-only: gated 2026-03-24 pending learned encoder calibration
-        # sig4 still runs and appears in output, but its verdict_contribution
-        # is excluded from the contributions list that drives max_verdict.
+        # sig4 excluded — advisory only pending learned encoder
         contributions = [
             sig1["verdict_contribution"],
             sig2["verdict_contribution"],
@@ -923,9 +819,7 @@ class SafetyPolytopeEngine:
         # Count how many signatures are firing
         firing_count = sum(1 for c in contributions if c != "PASS")
 
-        # Composite signal: weighted average of all signature signals (base)
-        # sig4_coherence advisory-only: gated 2026-03-24 pending learned encoder calibration
-        # Weight redistributed: sig1=0.25, sig2=0.30, sig3=0.20, sig4=0.00, sig5=0.25
+        # Weighted composite (sig4 weight=0 — advisory only)
         base_composite = (
             0.25 * sig1["signal"]
             + 0.30 * sig2["signal"]
@@ -934,10 +828,7 @@ class SafetyPolytopeEngine:
             + 0.25 * sig5["signal"]
         )
 
-        # Conjunction detection: multiplicative boost for dangerous co-occurrence
-        # Joseph's architectural note (2026-02-27): the weighted sum treats
-        # signatures as independent — they're not. Multi-signature firing is
-        # superlinear evidence of a violation.
+        # Conjunction: multi-signature co-occurrence is superlinear evidence
         source = action.get("source", "unknown")
         conj_result = self.conjunction.observe(
             firing_sigs=set(
@@ -959,12 +850,7 @@ class SafetyPolytopeEngine:
         )
         composite_signal = min(1.0, float(base_composite) * conj_result["multiplier"])
 
-        # Verdict escalation: only escalate when the post-conjunction composite
-        # crosses a meaningful threshold (Flaw 3 fix — multiplier alone is not
-        # sufficient; a 1.8x boost on a 0.01 base signal is still 0.018).
-        # High-confidence violations (5x multiplier) are the exception: if the
-        # three-way conjunction fired, escalate regardless of raw magnitude
-        # because the pattern itself is the signal.
+        # Escalate only when post-conjunction composite is meaningful
         if conj_result["label"] == "high_confidence_violation" and max_verdict in (
             "PASS",
             "MONITOR",
@@ -1009,17 +895,7 @@ class SafetyPolytopeEngine:
         }
 
     def reset(self) -> None:
-        """Reset all detector state for a new session.
-
-        Called on session_start events. Clears CUSUM accumulators, trajectory
-        buffers, and baseline data so accumulated state from a prior session
-        doesn't bleed into fresh session signals.
-
-        Note: constitutional manifold baseline is preserved — it's built from
-        calibration data, not from runtime observations, so it should survive
-        session resets.
-        """
-        # Reset intent binding fracture detector (has CUSUM accumulator)
+        """Reset detector state for a new session. Preserves sig3 manifold baseline."""
         self.sig1_intent.cusum_neg = 0.0
         self.sig1_intent.cusum_pos = 0.0
         self.sig1_intent.alignments.clear()
@@ -1028,17 +904,12 @@ class SafetyPolytopeEngine:
         self.sig1_intent.baseline_std = None
         self.sig1_intent.calibrated = False
 
-        # Reset source provenance (rolling deques, EMA binding)
         self.sig2_provenance.history.clear()
         self.sig2_provenance.ema_binding = None
         self.sig2_provenance.consecutive_untrusted_sensitive = 0
 
-        # sig3 manifold — do NOT reset baseline_vectors/centroid/hull
-        # Those are calibration data built from real traces. Resetting them
-        # would make the manifold detector blind for the next 100+ observations.
-        # sig3 has no runtime accumulator state that bleeds across sessions.
+        # sig3 baseline preserved — calibration data, not runtime state
 
-        # Reset trajectory coherence fracture detector (trajectory buffer + coherence scorer)
         if hasattr(self.sig4_coherence, "buffer"):
             self.sig4_coherence.buffer.clear()
         if hasattr(self.sig4_coherence, "coherence_scorer"):
@@ -1046,10 +917,8 @@ class SafetyPolytopeEngine:
         if hasattr(self.sig4_coherence, "trajectory"):
             self.sig4_coherence.trajectory.clear()
 
-        # Reset confidence grounding detector
         self.sig5_grounding.recent_hvs.clear()
         self.sig5_grounding.recent_magnitudes.clear()
         self.sig5_grounding.provenance_bundle = None
 
-        # Reset conjunction detector rolling window
         self.conjunction.reset()

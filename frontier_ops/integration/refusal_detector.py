@@ -1,15 +1,6 @@
 """
-Signal D: Refusal Detection
-============================
-
-Detects adversarial refusal patterns in agent action trajectories:
-- Compliance-refusal oscillation
-- Refusal clustering
-- Post-refusal escalation
-- Paralysis (majority low-alignment stalling)
-
-Composes with existing signals via push/score/clear/verdict_contribution interface.
-Advisory-only, escalation-only — never downgrades existing verdicts.
+Signal D: Refusal Detection — oscillation, clustering, escalation, paralysis.
+Escalation-only (never downgrades). Weight=0.10 in TieredVerdictEngine.
 """
 
 from __future__ import annotations

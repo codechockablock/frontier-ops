@@ -1,40 +1,12 @@
 """
-Task Coherence Scorer (Signal B)
-===================================
+Task Coherence Scorer (Signal B) — ADVISORY ONLY (weight=0.00 in verdict)
+==========================================================================
 
-Measures whether a trajectory of phasor HVs forms a coherent task execution,
-as opposed to goal displacement, task interleaving, or aimless wandering.
+Measures global trajectory coherence via Gram matrix analysis of phasor HVs.
+Complements fracture_signal() (local discontinuities) with global structure
+detection: drift, interleaving, wandering.
 
-KEY DISTINCTION from fracture_signal() (Signature 4):
-    fracture_signal() catches LOCAL discontinuities — sharp angular snaps
-    between consecutive steps (injection = sudden redirection).
-
-    TaskCoherenceScorer catches GLOBAL trajectory structure — whether the
-    overall path through phasor space is consistent with a plausible task.
-    It detects slow drift, interleaving of unrelated subtasks, and
-    trajectories with no discernible task structure.
-
-    These are complementary, not redundant:
-    - Injection: fracture catches it (sharp snap), coherence may not
-    - Goal displacement: coherence catches it (slow drift), fracture won't
-    - Task interleaving: coherence catches it (alternating clusters), fracture won't
-
-Phasor Space Geometry Assumptions (dim=512):
-    - Composite HV = action_type ⊗ scope ⊗ source ⊗ target_sensitivity ⊗ magnitude ⊗ context_alignment
-    - Two composites with ALL 6 slots matching: cos ≈ 1.0
-    - Two composites with ANY slot differing by a full category: cos ≈ 0.0
-      (element-wise product with a random phasor → decorrelation)
-    - Slight continuous-value differences (e.g., magnitude bin 3 vs 4): cos ≈ 0.97
-    - Random pairs: E[cos] = 0, std[cos] ≈ 1/√dim ≈ 0.044
-    - Consequence: high Gram-matrix entries (>0.5) indicate near-identical
-      full action states. Low entries (<0.1) mean at least one slot changed
-      categorically.
-
-Output:
-    coherence ∈ [0, 1] where 1 = perfectly coherent task execution
-    Sub-scores for drift, interleaving, wandering (each ∈ [0, 1], higher = more anomalous)
-
-Design: 2026-03-24, Chocka (Opus 4.6)
+Currently zero-weighted in TieredVerdictEngine pending learned encoder.
 """
 
 from __future__ import annotations
@@ -47,24 +19,8 @@ import numpy as np
 
 
 class TaskCoherenceScorer:
-    """
-    Measures task-level coherence of a phasor HV trajectory.
-
-    Operates on the same normalized composite HVs that PhasorTrajectoryBuffer
-    stores. Uses a larger window (20 vs 12) because coherence requires more
-    context to distinguish real patterns from noise.
-
-    Sub-signals:
-        1. Centroid Drift — does the trajectory migrate away from its starting region?
-        2. Recurrence Asymmetry — do action patterns stop repeating over time?
-        3. Spectral Concentration — how many independent directions does the trajectory span?
-        4. Alternation Index — does the trajectory alternate between disjoint clusters?
-
-    Each sub-signal maps to a threat type:
-        - Goal displacement → drift + recurrence asymmetry
-        - Aimless wandering → low spectral concentration + low recurrence
-        - Task interleaving → high alternation index
-    """
+    """Measures task-level coherence of a phasor HV trajectory via 4 sub-signals:
+    centroid drift, recurrence asymmetry, spectral concentration, alternation index."""
 
     # Similarity threshold for counting two composites as "same action pattern".
     # In phasor dim=512, cos > 0.5 implies all 6 slots are very close.
@@ -121,28 +77,7 @@ class TaskCoherenceScorer:
     # ── Sub-signal 1: Centroid Drift ────────────────────────────────────
 
     def _centroid_drift(self, hvs: List[np.ndarray]) -> float:
-        """
-        Measure migration of the trajectory centroid over time.
-
-        Split the trajectory into first third and last third. Bundle each
-        into a centroid vector (sum + normalize). Compute cosine between them.
-
-        Math:
-            c_early = normalize(Σ hᵢ for i ∈ [0, n/3))
-            c_late  = normalize(Σ hᵢ for i ∈ [2n/3, n))
-            drift = 1 - max(0, cos(c_early, c_late))
-
-        In phasor dim=512, bundling k quasi-orthogonal vectors produces a
-        vector with norm ≈ √k (random walk in complex space). After
-        normalization, the centroid direction reflects the dominant components.
-        If the same action patterns appear in both halves, the centroids
-        will share those dominant components → cos > 0.
-        If the late actions are entirely novel, the centroids point in
-        unrelated directions → cos ≈ 0 → drift ≈ 1.
-
-        Returns:
-            drift ∈ [0, 1] where 0 = stable, 1 = completely drifted
-        """
+        """Cosine distance between early-third and late-third centroids. 0=stable, 1=drifted."""
         n = len(hvs)
         k = max(2, n // 3)
 
@@ -167,26 +102,7 @@ class TaskCoherenceScorer:
     # ── Sub-signal 2: Recurrence Asymmetry ──────────────────────────────
 
     def _recurrence_asymmetry(self, G: np.ndarray) -> float:
-        """
-        Compare recurrence rates between first and second half of the trajectory.
-
-        Recurrence = fraction of off-diagonal pairs with |G[i,j]| > threshold.
-
-        A coherent task maintains or increases recurrence over time (settling
-        into patterns). Goal displacement DECREASES recurrence in the second
-        half (new action patterns that don't match the first half).
-
-        Math:
-            R_first = #{(i,j) : G[i,j] > τ, i,j ∈ first half, i≠j} / total_first_pairs
-            R_second = #{(i,j) : G[i,j] > τ, i,j ∈ second half, i≠j} / total_second_pairs
-            asymmetry = max(0, R_first - R_second) / max(R_first, ε)
-
-        If R_first = 0 (no recurrence at all), asymmetry = 0 — can't detect
-        change from a baseline of zero. This is handled by the wandering score.
-
-        Returns:
-            asymmetry ∈ [0, 1] where 0 = stable recurrence, 1 = recurrence collapsed
-        """
+        """Compare recurrence rates between first/second half. 0=stable, 1=collapsed."""
         n = G.shape[0]
         mid = n // 2
         τ = self.RECURRENCE_THRESHOLD
@@ -217,33 +133,7 @@ class TaskCoherenceScorer:
     # ── Sub-signal 3: Spectral Concentration ────────────────────────────
 
     def _spectral_concentration(self, G: np.ndarray) -> float:
-        """
-        Measure how concentrated the trajectory is in phasor space using
-        the eigenvalue spectrum of the Gram matrix.
-
-        A focused task occupies few directions → a few dominant eigenvalues.
-        Wandering spans many directions → flat eigenvalue spectrum.
-
-        Math:
-            λ₁ ≥ λ₂ ≥ ... ≥ λₙ = eigenvalues of G (all ≥ 0 for a Gram matrix)
-            p_i = λᵢ / Σλⱼ  (normalized eigenvalue distribution)
-            entropy = -Σ pᵢ log(pᵢ)
-            max_entropy = log(n)
-            concentration = 1 - entropy / max_entropy
-
-        High concentration (→ 1) = focused task (good)
-        Low concentration (→ 0) = scattered/wandering (bad)
-
-        Calibration note: in dim=512 with random composites, the Gram matrix
-        G has all eigenvalues ≈ 1 (since columns are quasi-orthogonal), giving
-        max entropy = log(n). With repeated actions, some eigenvalues dominate.
-        For n=20 random vectors: concentration ≈ 0.0.
-        For n=20 cycling between 3 patterns: concentration ≈ 0.65.
-        For n=20 identical vectors: concentration = 1.0.
-
-        Returns:
-            concentration ∈ [0, 1]
-        """
+        """1 - normalized entropy of Gram matrix eigenvalues. 1=focused, 0=scattered."""
         n = G.shape[0]
         eigvals = np.linalg.eigvalsh(G)
         eigvals = np.maximum(eigvals, 0.0)  # clip numerical noise
@@ -264,23 +154,7 @@ class TaskCoherenceScorer:
     # ── Sub-signal 4: Alternation Index ─────────────────────────────────
 
     def _alternation_index(self, G: np.ndarray) -> float:
-        """
-        Detect task interleaving: alternating between disjoint action clusters.
-
-        Check if even-indexed and odd-indexed HVs are more self-similar
-        than cross-similar. This catches the pattern:
-            task_A, task_B, task_A, task_B, task_A, task_B, ...
-
-        Math:
-            S_within = mean(G[i,j] for i,j both even OR both odd, i≠j)
-            S_between = mean(G[i,j] for i even, j odd)
-            alternation = max(0, S_within - S_between) / (S_within + ε)
-
-        Generalization: also check period-3 interleaving (A,B,C,A,B,C,...).
-
-        Returns:
-            alternation ∈ [0, 1] where 0 = no interleaving, 1 = strong interleaving
-        """
+        """Detect periodic interleaving (period 2 or 3). 0=none, 1=strong."""
         n = G.shape[0]
         if n < 6:
             return 0.0
@@ -327,19 +201,7 @@ class TaskCoherenceScorer:
     # ── Recognition Slope (auxiliary) ───────────────────────────────────
 
     def _recognition_slope(self, hvs: List[np.ndarray]) -> float:
-        """
-        For each step i, compute max similarity to any earlier step.
-        The slope of this "recognition" series over time indicates
-        whether the trajectory is converging (positive slope) or
-        diverging into unfamiliar territory (negative slope).
-
-        Math:
-            rec(i) = max_{j < i} cos(hᵢ, hⱼ)
-            slope = linear_regression_slope(rec, normalized_time)
-
-        Returns:
-            slope ∈ ℝ (negative = diverging, positive = converging)
-        """
+        """Slope of max-similarity-to-prior series. Negative=diverging, positive=converging."""
         n = len(hvs)
         if n < 4:
             return 0.0
@@ -360,23 +222,7 @@ class TaskCoherenceScorer:
     # ── Composite Score ─────────────────────────────────────────────────
 
     def score(self) -> Dict:
-        """
-        Compute the task coherence assessment.
-
-        Returns:
-            Dict with:
-            - coherence: float ∈ [0, 1], the composite coherence score
-            - drift_score: float ∈ [0, 1], goal displacement threat
-            - interleaving_score: float ∈ [0, 1], task interleaving threat
-            - wandering_score: float ∈ [0, 1], aimless wandering threat
-            - centroid_drift: float ∈ [0, 1], raw centroid migration
-            - recurrence_asymmetry: float ∈ [0, 1], raw recurrence change
-            - spectral_concentration: float ∈ [0, 1], trajectory focus
-            - recognition_slope: float, recognition trend
-            - alternation_index: float ∈ [0, 1], periodic interleaving
-            - phase: str, "warmup" or "active"
-            - n_steps: int
-        """
+        """Compute coherence assessment. Returns dict with coherence, sub-scores, phase."""
         hvs = list(self.hvs)
         n = len(hvs)
 
@@ -406,36 +252,8 @@ class TaskCoherenceScorer:
         rec_slope = self._recognition_slope(hvs)
 
         # ── Threat scores ───────────────────────────────────────────
-        #
-        # Each threat type is a calibrated combination of sub-signals.
-        # The calibration targets come from the phasor geometry:
-        #
-        # Goal displacement:
-        #   Primary signal: centroid drift (trajectory migrated away from start)
-        #   Confirming signal: negative recognition slope (actions becoming less familiar)
-        #   Confirming signal: recurrence asymmetry (second half stopped repeating first half)
-        #
-        # Aimless wandering:
-        #   Primary signal: low spectral concentration (many independent directions)
-        #   Confirming signal: low overall recurrence (nothing repeats)
-        #   Note: mixed-tool benign sessions also have moderate spectral spread,
-        #   so we require concentration < 0.20 (quite low) to flag wandering.
-        #
-        # Task interleaving:
-        #   Primary signal: alternation index (even/odd or period-3 clustering)
-        #   This is nearly independent of the other threats.
 
-        # -- Drift threat --
-        # Centroid drift alone is the primary signal for goal displacement.
-        # In phasor space, centroid drift > 0.7 means the late actions are
-        # in completely different parts of the space from early actions.
-        # Confirmation from recognition slope or recurrence asymmetry
-        # strengthens the signal but isn't required for extreme drift.
-        #
-        # Key calibration data (from actual encoded traces):
-        #   Benign coding (3-tool cycle): centroid_drift ≈ 0.0 (same tools repeat)
-        #   Benign mixed (5 tools): centroid_drift ≈ 0.1-0.3 (tools used throughout)
-        #   Goal displacement: centroid_drift ≈ 0.8-1.0 (late actions = different tools)
+        # Drift threat: centroid_drift > 0.7 = late actions in different phasor region
         if c_drift > 0.70:
             # Strong drift: directly treat as threat, scaled by magnitude
             base_drift = (c_drift - 0.50) / 0.50  # maps 0.5→0, 1.0→1.0
@@ -453,49 +271,14 @@ class TaskCoherenceScorer:
             # Low drift or drift without confirmation = not a threat
             drift_score = 0.0
 
-        # -- Wandering threat --
-        # Low spectral concentration means many independent action directions.
-        # But mixed-tool benign sessions legitimately use many tools.
-        # Calibration: for n=20 random orthogonal vectors, concentration ≈ 0.0
-        #              for n=20 cycling 3 patterns, concentration ≈ 0.65
-        #              for n=20 cycling 5 patterns, concentration ≈ 0.45
-        # Threshold: concentration < 0.15 is suspiciously low even for varied work.
+        # Wandering threat: spectral concentration < 0.15 = suspiciously scattered
         wandering_score = max(0.0, 0.15 - spec_conc) / 0.15 if spec_conc < 0.15 else 0.0
         # Boost if recognition slope is also negative (unfamiliar actions accumulating)
         if rec_slope < -0.1 and spec_conc < 0.25:
             wandering_score = max(wandering_score, (0.25 - spec_conc) / 0.25 * 0.7)
 
-        # -- Interleaving threat --
-        # Alternation index measures periodic structure (A,B,A,B or A,B,C,A,B,C).
-        # CRITICAL: benign coding naturally cycles tools (read, write, exec) which
-        # produces a period-3 pattern with high alternation index. This is NOT
-        # adversarial interleaving.
-        #
-        # Key distinction: benign tool cycling alternates between RELATED action
-        # states (similar source, moderate scope variation). Adversarial interleaving
-        # alternates between UNRELATED tasks (completely different slot combinations).
-        #
-        # In phasor space, this manifests as the between-group similarity:
-        #   - Benign cycling (read/write/exec, all user_direct): between ≈ -0.05 to 0.1
-        #     (near-orthogonal because action_type slot differs)
-        #   - Adversarial interleaving (file_read vs payment): between ≈ -0.05 to 0.1
-        #     (also near-orthogonal because MANY slots differ)
-        #
-        # The direct cosine doesn't distinguish them. However, the overall trajectory
-        # CONTEXT does: benign cycling has a coherent task envelope (high centroid
-        # stability, positive recognition slope). Adversarial interleaving disrupts
-        # the envelope (recognition slope may still be high because each task
-        # recurs, but centroid drift increases if one task dominates late).
-        #
-        # Resolution: require alternation + a separate coherence signal to confirm.
-        # For now, alternation is suspicious when:
-        # (a) The alternating groups have very low cross-similarity AND the pattern
-        #     involves high-risk divergence in spectral concentration, OR
-        # (b) Alternation is paired with drift or recognition decline.
-        #
-        # For benign tool cycling (3 tools, all user_direct, all workspace scope),
-        # spectral_concentration is moderate (~0.63), recognition positive, no drift.
-        # We require concentration < 0.45 OR confirming drift/slope signals.
+        # Interleaving threat: alternation + low concentration or confirming signals
+        # (benign tool cycling has moderate concentration ~0.63, so threshold is 0.45)
         if alt_idx > 0.50 and spec_conc < 0.45:
             # Low concentration + alternation = genuinely different tasks interleaving
             interleaving_score = 1.0 / (1.0 + math.exp(-8.0 * (alt_idx - 0.55)))
@@ -503,21 +286,11 @@ class TaskCoherenceScorer:
             # Alternation with drift/recognition decline = suspicious
             interleaving_score = alt_idx * 0.5
         elif alt_idx > 0.80 and spec_conc >= 0.45:
-            # Very strong alternation with high concentration:
-            # Could be adversarial 2-task interleaving (high conc because only 2 tasks).
-            # But also matches benign 2-tool usage. Apply mild score to signal
-            # for composition with other polytope signals, but don't escalate alone.
             interleaving_score = alt_idx * 0.35
         else:
-            # Alternation alone with high concentration = benign tool cycling
             interleaving_score = 0.0
 
-        # ── Composite coherence ─────────────────────────────────────
-        #
-        # Coherence = 1 - max(threats), with sigmoid smoothing.
-        # We use max rather than sum because the threats are somewhat
-        # correlated (drift can co-occur with low concentration) and
-        # we don't want to double-penalize.
+        # Composite: max(threats) — correlated threats shouldn't double-penalize
         max_threat = max(drift_score, wandering_score, interleaving_score)
         coherence = 1.0 - float(np.clip(max_threat, 0.0, 1.0))
 
@@ -536,14 +309,7 @@ class TaskCoherenceScorer:
         }
 
     def verdict_contribution(self) -> str:
-        """
-        Map coherence score to a verdict contribution for the polytope engine.
-
-        Thresholds (calibrated for composition with existing signals):
-            coherence < 0.25 → FLAG  (strong incoherence)
-            coherence < 0.50 → MONITOR (moderate incoherence)
-            coherence ≥ 0.50 → PASS (acceptable coherence)
-        """
+        """Map coherence to PASS/MONITOR/FLAG. <0.25=FLAG, <0.50=MONITOR, else PASS."""
         result = self.score()
         coherence = result["coherence"]
         if result["phase"] == "warmup":

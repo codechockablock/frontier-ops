@@ -243,11 +243,8 @@ class ProprioceptiveWrapper:
 
         return verdict_result
 
-    def _run_auxiliary(self, tool_name: str, parameters: Dict[str, Any],
-                       classified: dict, verdict_result: dict,
-                       polytope_result: dict, hmm_result: dict) -> dict:
-        """HMM, paralysis, taint, cold-start, timing, proprioception → updates verdict_result in place, returns timing/hmm results."""
-        # Run timing signal engine
+    def _run_timing(self, tool_name: str) -> dict:
+        """Timing signal engine → returns timing_result dict with timing_anomaly."""
         now = time.time()
         start_ts = getattr(self, "_event_start_ts", None) or (now - 0.1)
         end_ts = getattr(self, "_event_end_ts", None) or now
@@ -258,33 +255,35 @@ class ProprioceptiveWrapper:
             start_ts=start_ts,
             end_ts=end_ts,
         )
-        timing_anomaly = timing_result.get("timing_anomaly", 0.0)
+        return timing_result
 
-        # Run HMM task-state inference
+    def _run_hmm(self, classified: dict, polytope_result: dict, timing_anomaly: float) -> dict:
+        """HMM task-state inference → returns hmm_result dict."""
         obs_vector = build_observation_vector(
             polytope_result,
             timing_anomaly=timing_anomaly,
             context_alignment=float(classified.get("context_alignment", 0.8)),
         )
-        hmm_result_local = self.hmm.forward_step(obs_vector)
-        hmm_result.update(hmm_result_local)
+        return self.hmm.forward_step(obs_vector)
 
-        # Run paralysis detector
+    def _run_paralysis(self, tool_name: str, parameters: Dict[str, Any], classified: dict) -> dict:
+        """Paralysis detector → returns paralysis dict for verdict attachment."""
         paralysis_state = self.paralysis.observe(
             tool_name=tool_name,
             args=parameters,
             magnitude=float(classified.get("magnitude", 0.1)),
         )
-        verdict_result["paralysis"] = {
+        return {
             "is_paralyzed": paralysis_state.is_paralyzed,
             "confidence": paralysis_state.confidence,
             "pattern": paralysis_state.pattern,
             "detail": paralysis_state.detail,
         }
 
-        # Run taint tracker
+    def _run_taint(self, tool_name: str, parameters: Dict[str, Any], verdict_result: dict) -> dict:
+        """Taint tracker → returns taint dict, escalates verdict PASS→MONITOR on alert."""
         taint_state = self.taint.observe(tool_name, parameters)
-        verdict_result["taint"] = {
+        taint_dict = {
             "level": taint_state.level,
             "sources": taint_state.sources,
             "alert": taint_state.alert,
@@ -300,9 +299,14 @@ class ProprioceptiveWrapper:
             if current == "PASS":
                 verdict_result["verdict"] = "MONITOR"
                 verdict_result["monitor_reason"] = taint_state.alert_reason
+        return taint_dict
 
-        # Feed cold-start detector and apply verdict downgrade if in cold-start.
-        # Cold-start downgrade: BLOCK→FLAG, FLAG→MONITOR (never suppress entirely).
+    def _apply_cold_start(self, verdict_result: dict, hmm_result: dict) -> None:
+        """Feed cold-start detector and downgrade verdict if in cold-start phase.
+
+        Cold-start downgrade: BLOCK→FLAG, FLAG→MONITOR (never suppress entirely).
+        """
+        now = time.time()
         current_verdict = verdict_result.get("verdict", "PASS")
         self._recent_verdicts.append(current_verdict)
         hmm_state_str = hmm_result.get("state", "INITIALIZING")
@@ -322,21 +326,23 @@ class ProprioceptiveWrapper:
                 verdict_result["cold_start_downgrade"] = "FLAG→MONITOR"
         verdict_result["cold_start"] = self.cold_start.is_suppressing
 
-        # Attach timing data to verdict result
+    def _attach_subsystem_state(self, verdict_result: dict, timing_result: dict,
+                                hmm_result: dict, paralysis_dict: dict,
+                                taint_dict: dict, polytope_result: dict) -> None:
+        """Attach timing, HMM, paralysis, taint, and polytope data to verdict_result."""
+        timing_anomaly = timing_result.get("timing_anomaly", 0.0)
         verdict_result["timing"] = {
             "timing_anomaly": timing_anomaly,
             "burst_score": timing_result.get("burst_score", 0.0),
             "behavioral_rhythm": timing_result.get("behavioral_rhythm", "unknown"),
         }
-
-        # Attach HMM state to verdict result
         verdict_result["hmm"] = {
             "state": hmm_result["state"],
             "state_prob": hmm_result["state_prob"],
             "anomaly_score": hmm_result["anomaly_score"],
         }
-
-        # Attach polytope data to verdict result
+        verdict_result["paralysis"] = paralysis_dict
+        verdict_result["taint"] = taint_dict
         polytope_verdict = polytope_result.get("composite_verdict", "PASS")
         verdict_result["polytope"] = {
             "composite_signal": polytope_result.get("composite_signal", 0.0),
@@ -347,6 +353,33 @@ class ProprioceptiveWrapper:
                 "conjunction", {"label": "none", "multiplier": 1.0}
             ),
         }
+
+    def _run_auxiliary(self, tool_name: str, parameters: Dict[str, Any],
+                       classified: dict, verdict_result: dict,
+                       polytope_result: dict, hmm_result: dict) -> dict:
+        """Orchestrate auxiliary subsystems: timing, HMM, paralysis, taint, cold-start."""
+        # 1. Timing
+        timing_result = self._run_timing(tool_name)
+        timing_anomaly = timing_result.get("timing_anomaly", 0.0)
+
+        # 2. HMM (needs timing_anomaly)
+        hmm_result_local = self._run_hmm(classified, polytope_result, timing_anomaly)
+        hmm_result.update(hmm_result_local)
+
+        # 3. Paralysis (advisory — does not affect verdicts)
+        paralysis_dict = self._run_paralysis(tool_name, parameters, classified)
+
+        # 4. Taint (can escalate PASS → MONITOR)
+        taint_dict = self._run_taint(tool_name, parameters, verdict_result)
+
+        # 5. Cold-start (can downgrade BLOCK→FLAG, FLAG→MONITOR)
+        self._apply_cold_start(verdict_result, hmm_result)
+
+        # 6. Attach all subsystem state to verdict_result
+        self._attach_subsystem_state(
+            verdict_result, timing_result, hmm_result,
+            paralysis_dict, taint_dict, polytope_result,
+        )
 
         return {"timing_result": timing_result, "timing_anomaly": timing_anomaly}
 

@@ -162,15 +162,10 @@ class ProprioceptiveWrapper:
         self.last_user_message_time = time.time()
         self.steps_since_user = 0
 
-    def on_tool_call(
-        self, tool_name: str, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Process a single tool call event.
+    # ── Private pipeline stages ─────────────────────────────────────────
 
-        Returns the proprioceptive state dict (for optional injection).
-        """
-        # Classify the tool call
+    def _encode_action(self, tool_name: str, parameters: Dict[str, Any]) -> dict:
+        """Classify + encode → returns dict with classified, encoded, signal_meta, raw_signals, refusal_scores."""
         user_age = int(time.time() - self.last_user_message_time)
         classified = classify_tool_call(
             tool_name=tool_name,
@@ -184,19 +179,25 @@ class ProprioceptiveWrapper:
         # Added 2026-03-24 to reduce FPs on system diagnostics.
         classified = reclassify_scope(classified)
 
-        # --- Phase 15 validation (decomposed to inject Signal B + D) ---
-        # Step 1: Encode action and compute base detection signals
         encoded = self.validator.encoder.encode_action(classified)
         signal_meta = self.validator.signals.observe(encoded.fillers)
         raw_signals = dict(signal_meta["raw_signals"])
 
-        # Step 2: Run Safety Polytope (includes TaskCoherenceScorer)
+        return {
+            "classified": classified,
+            "encoded": encoded,
+            "signal_meta": signal_meta,
+            "raw_signals": raw_signals,
+        }
+
+    def _run_polytope(self, classified: dict, encoded: Any, raw_signals: dict) -> dict:
+        """SafetyPolytopeEngine → returns polytope_result with coherence + refusal injected into raw_signals."""
         composite_hv = bind_slot_vectors(encoded.fillers)
         polytope_result = self.polytope.observe(
             classified, composite_hv, encoded.fillers
         )
 
-        # Step 3: Compute Signal B (coherence) and Signal D (refusal)
+        # Compute Signal B (coherence) and Signal D (refusal)
         # and inject into raw_signals BEFORE verdict computation.
         task_coherence_data = (
             polytope_result.get("signatures", {})
@@ -212,7 +213,14 @@ class ProprioceptiveWrapper:
         refusal_scores = self.refusal_signal.score()
         raw_signals["refusal"] = refusal_scores.get("refusal_score", 0.0)
 
-        # Step 4: Run verdict engine with enriched raw_signals
+        return {
+            "polytope_result": polytope_result,
+            "task_coherence_data": task_coherence_data,
+            "refusal_scores": refusal_scores,
+        }
+
+    def _compute_verdict(self, raw_signals: dict, signal_meta: dict, encoded: Any, polytope_result: dict) -> dict:
+        """TieredVerdictEngine → returns verdict_result with polytope escalation applied."""
         verdict_meta = self.validator.verdict_engine.observe(raw_signals, encoded.raw)
         verdict_result = {
             "action": encoded.raw,
@@ -233,6 +241,12 @@ class ProprioceptiveWrapper:
                 "firing_signatures", []
             )
 
+        return verdict_result
+
+    def _run_auxiliary(self, tool_name: str, parameters: Dict[str, Any],
+                       classified: dict, verdict_result: dict,
+                       polytope_result: dict, hmm_result: dict) -> dict:
+        """HMM, paralysis, taint, cold-start, timing, proprioception → updates verdict_result in place, returns timing/hmm results."""
         # Run timing signal engine
         now = time.time()
         start_ts = getattr(self, "_event_start_ts", None) or (now - 0.1)
@@ -252,7 +266,8 @@ class ProprioceptiveWrapper:
             timing_anomaly=timing_anomaly,
             context_alignment=float(classified.get("context_alignment", 0.8)),
         )
-        hmm_result = self.hmm.forward_step(obs_vector)
+        hmm_result_local = self.hmm.forward_step(obs_vector)
+        hmm_result.update(hmm_result_local)
 
         # Run paralysis detector
         paralysis_state = self.paralysis.observe(
@@ -266,8 +281,6 @@ class ProprioceptiveWrapper:
             "pattern": paralysis_state.pattern,
             "detail": paralysis_state.detail,
         }
-
-        # (refusal_signal.push already called above before verdict)
 
         # Run taint tracker
         taint_state = self.taint.observe(tool_name, parameters)
@@ -324,6 +337,7 @@ class ProprioceptiveWrapper:
         }
 
         # Attach polytope data to verdict result
+        polytope_verdict = polytope_result.get("composite_verdict", "PASS")
         verdict_result["polytope"] = {
             "composite_signal": polytope_result.get("composite_signal", 0.0),
             "composite_verdict": polytope_verdict,
@@ -334,7 +348,39 @@ class ProprioceptiveWrapper:
             ),
         }
 
-        # Update proprioceptive state
+        return {"timing_result": timing_result, "timing_anomaly": timing_anomaly}
+
+    # ── Main entry point ─────────────────────────────────────────────
+
+    def on_tool_call(
+        self, tool_name: str, parameters: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Process a single tool call event.
+
+        Returns the proprioceptive state dict (for optional injection).
+        """
+        # Step 1: Classify + encode
+        enc = self._encode_action(tool_name, parameters)
+        classified = enc["classified"]
+        encoded = enc["encoded"]
+        raw_signals = enc["raw_signals"]
+        signal_meta = enc["signal_meta"]
+
+        # Step 2: Safety Polytope + coherence/refusal signal injection
+        poly = self._run_polytope(classified, encoded, raw_signals)
+        polytope_result = poly["polytope_result"]
+        task_coherence_data = poly["task_coherence_data"]
+        refusal_scores = poly["refusal_scores"]
+
+        # Step 3: Compute verdict (tiered engine + polytope escalation)
+        verdict_result = self._compute_verdict(raw_signals, signal_meta, encoded, polytope_result)
+
+        # Step 4: Auxiliary subsystems (HMM, paralysis, taint, cold-start, timing)
+        hmm_result: Dict[str, Any] = {}
+        self._run_auxiliary(tool_name, parameters, classified, verdict_result, polytope_result, hmm_result)
+
+        # Step 5: Update proprioceptive state
         state = self.proprio.update(
             step=self.step,
             tool_name=tool_name,

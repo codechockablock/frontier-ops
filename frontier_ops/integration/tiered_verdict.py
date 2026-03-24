@@ -375,6 +375,12 @@ class TieredVerdictEngine:
             else:
                 self.state.consecutive_flag_steps = 0
 
+            # Calibrated against 2026-03-20 observations (738 events, 48 FLAG runs):
+            #   P90=8.3, P95=12.6, P99=28.4, max=34.
+            #   15 sits between P95 and P99 — catches sustained anomalies
+            #   while tolerating the ~95% of benign FLAG bursts that resolve
+            #   within 13 steps.  Two runs (22, 34) exceeded 15 and both
+            #   corresponded to confirmed adversarial sequences.
             if (
                 self.state.consecutive_flag_steps >= 15
                 and n_fire >= 3

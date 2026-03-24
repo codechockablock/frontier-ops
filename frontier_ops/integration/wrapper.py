@@ -52,6 +52,7 @@ from frontier_ops.integration.hmm_task_state import AgentHMM, build_observation_
 from frontier_ops.integration.paralysis_detector import ParalysisDetector
 from frontier_ops.integration.timing_signals import TimingSignalEngine
 from frontier_ops.integration.taint_tracker import TaintTracker
+from frontier_ops.integration.refusal_detector import RefusalDetectionSignal
 
 
 class ProprioceptiveWrapper:
@@ -118,6 +119,9 @@ class ProprioceptiveWrapper:
         self.paralysis = ParalysisDetector()
         self.taint = TaintTracker()
 
+        # Refusal detection signal (Signal D)
+        self.refusal_signal = RefusalDetectionSignal()
+
         # Proprioception manager
         ws = os.path.expanduser("~/.openclaw/workspace")
         self.proprio = ProprioceptionManager(
@@ -167,15 +171,43 @@ class ProprioceptiveWrapper:
             user_message_age=user_age,
         )
 
-        # Run through Phase 15 validation
-        verdict_result = self.validator.observe(classified)
-
-        # Run Safety Polytope signature detectors
+        # --- Phase 15 validation (decomposed to inject Signal B + D) ---
+        # Step 1: Encode action and compute base detection signals
         encoded = self.validator.encoder.encode_action(classified)
+        signal_meta = self.validator.signals.observe(encoded.fillers)
+        raw_signals = dict(signal_meta["raw_signals"])
+
+        # Step 2: Run Safety Polytope (includes TaskCoherenceScorer)
         composite_hv = bind_slot_vectors(encoded.fillers)
         polytope_result = self.polytope.observe(
             classified, composite_hv, encoded.fillers
         )
+
+        # Step 3: Compute Signal B (coherence) and Signal D (refusal)
+        # and inject into raw_signals BEFORE verdict computation.
+        task_coherence_data = (
+            polytope_result.get("signatures", {})
+            .get("trajectory_coherence_fracture", {})
+            .get("task_coherence", {})
+        )
+        # Invert: TaskCoherenceScorer outputs coherence∈[0,1] where 1=good.
+        # All verdict signals use higher=more anomalous, so pass incoherence.
+        raw_signals["coherence"] = 1.0 - task_coherence_data.get("coherence", 1.0)
+
+        # Push to refusal signal and score (must happen before verdict)
+        self.refusal_signal.push(classified)
+        refusal_scores = self.refusal_signal.score()
+        raw_signals["refusal"] = refusal_scores.get("refusal_score", 0.0)
+
+        # Step 4: Run verdict engine with enriched raw_signals
+        verdict_meta = self.validator.verdict_engine.observe(raw_signals, encoded.raw)
+        verdict_result = {
+            "action": encoded.raw,
+            "raw_signals": raw_signals,
+            "per_slot": signal_meta["per_slot"],
+            "cross_slot": signal_meta["cross_slot"],
+            **verdict_meta,
+        }
 
         # Merge polytope verdict with base verdict (escalate only)
         base_verdict = verdict_result.get("verdict", "PASS")
@@ -221,6 +253,8 @@ class ProprioceptiveWrapper:
             "pattern": paralysis_state.pattern,
             "detail": paralysis_state.detail,
         }
+
+        # (refusal_signal.push already called above before verdict)
 
         # Run taint tracker
         taint_state = self.taint.observe(tool_name, parameters)
@@ -285,15 +319,23 @@ class ProprioceptiveWrapper:
             poly_sigs = polytope_result.get("firing_signatures", [])
             hmm_state = hmm_result.get("state", "?")
             hmm_anomaly = hmm_result.get("anomaly_score", 0.0)
+            task_coh = (
+                polytope_result.get("signatures", {})
+                .get("trajectory_coherence_fracture", {})
+                .get("task_coherence_score", 0.0)
+            )
             print(
                 f"[proprio] step={self.step - 1} tool={tool_name} "
                 f"type={classified['action_type']} scope={classified['scope']} "
                 f"verdict={verdict} regime={state.regime} health={state.health_score:.2f} "
-                f"hmm={hmm_state}({hmm_anomaly:.2f}) "
-                f"signals=[{sig_str}] polytope={poly_firing}/{poly_sigs}",
+                f"hmm={hmm_state}({hmm_anomaly:.2f}) task_coh={task_coh:.2f} "
+                f"signals=[{sig_str}] polytope={poly_firing}/{poly_sigs} "
+                f"refusal={refusal_scores.get('refusal_score', 0.0):.2f}/{refusal_scores.get('pattern', 'none')}",
                 file=sys.stderr,
             )
 
+        # refusal_scores and task_coherence_data already computed above
+        task_coherence = task_coherence_data
         return {
             "step": self.step - 1,
             "verdict": verdict_result.get("verdict", "PASS"),
@@ -304,6 +346,10 @@ class ProprioceptiveWrapper:
             "polytope_signatures": polytope_result.get("firing_signatures", []),
             "hmm_state": hmm_result.get("state", "INITIALIZING"),
             "hmm_anomaly": hmm_result.get("anomaly_score", 0.0),
+            "task_coherence_score": task_coherence.get("coherence", 0.0),
+            "task_coherence_pattern": task_coherence.get("phase", "warmup"),
+            "refusal_score": refusal_scores.get("refusal_score", 0.0),
+            "refusal_pattern": refusal_scores.get("pattern", "none"),
         }
 
     def process_event(self, event: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -336,6 +382,7 @@ class ProprioceptiveWrapper:
             self.polytope.reset()
             self.hmm = AgentHMM()  # re-instantiate: cleanest reset for HMM priors
             self.timing_engine = TimingSignalEngine()
+            self.refusal_signal.clear()
             self.step = 0
             self.steps_since_user = 0
             self.last_user_message_time = time.time()

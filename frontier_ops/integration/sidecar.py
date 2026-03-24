@@ -139,10 +139,16 @@ class ProprioceptiveSidecar:
             health = result.get("health", 0)
             hmm_state = result.get("hmm_state", "?")
             hmm_anom = result.get("hmm_anomaly", 0)
+            task_coh = result.get("task_coherence_score", 0.0)
+            task_pattern = result.get("task_coherence_pattern", "?")
+            refusal_sc = result.get("refusal_score", 0.0)
+            refusal_pat = result.get("refusal_pattern", "none")
             print(
                 f"[sidecar] tool={tool} dur={duration_ms:.0f}ms "
                 f"verdict={verdict} regime={regime} health={health:.2f} "
-                f"hmm={hmm_state}({hmm_anom:.2f})",
+                f"hmm={hmm_state}({hmm_anom:.2f}) "
+                f"task_coh={task_coh:.2f}/{task_pattern} "
+                f"refusal={refusal_sc:.2f}/{refusal_pat}",
                 file=sys.stderr,
             )
 

@@ -23,6 +23,8 @@ DEFAULT_THRESHOLDS = {
     "cross_slot": {"fire": 0.20, "strong": 0.42},
     "persistence": {"fire": 0.65, "strong": 0.85},
     "cusum": {"fire": 5.5, "strong": 9.0},
+    "coherence": {"fire": 0.65, "strong": 0.80},   # incoherence score: 1-coherence
+    "refusal": {"fire": 0.40, "strong": 0.65},
 }
 
 # Relaxed thresholds for log-tail mode where tool params aren't available.
@@ -46,6 +48,8 @@ LOG_TAIL_THRESHOLDS = {
     "cross_slot": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "persistence": {"fire": 100.0, "strong": 100.0},  # fully disabled
     "cusum": {"fire": 15.0, "strong": 25.0},
+    "coherence": {"fire": 0.65, "strong": 0.80},   # incoherence score: 1-coherence
+    "refusal": {"fire": 0.40, "strong": 0.65},
 }
 
 
@@ -97,12 +101,18 @@ class TieredVerdictEngine:
             fire = self.thresholds[name]["fire"]
             return float(np.clip(value / max(fire, 1e-6), 0.0, 6.0))
 
+        # Weights recalibrated 2026-03-24 to incorporate Signal B (coherence)
+        # and Signal D (refusal).  Coherence gets 0.20 (highest individual
+        # AUC=0.947 per trajectory ROC eval).  Original 5 signals scaled
+        # down proportionally to make room; total sums to 1.00.
         weighted = (
-            0.22 * normalize("error", raw_signals["error"])
-            + 0.12 * normalize("fisher", raw_signals["fisher"])
-            + 0.31 * normalize("cross_slot", raw_signals["cross_slot"])
-            + 0.10 * normalize("persistence", raw_signals["persistence"])
-            + 0.25 * normalize("cusum", raw_signals["cusum"])
+            0.15 * normalize("error", raw_signals["error"])
+            + 0.08 * normalize("fisher", raw_signals["fisher"])
+            + 0.21 * normalize("cross_slot", raw_signals["cross_slot"])
+            + 0.07 * normalize("persistence", raw_signals["persistence"])
+            + 0.17 * normalize("cusum", raw_signals["cusum"])
+            + 0.20 * normalize("coherence", raw_signals.get("coherence", 0.0))
+            + 0.12 * normalize("refusal", raw_signals.get("refusal", 0.0))
         )
         n_strong = sum(1 for lv in levels.values() if lv >= 2)
         n_fire = sum(1 for lv in levels.values() if lv >= 1)

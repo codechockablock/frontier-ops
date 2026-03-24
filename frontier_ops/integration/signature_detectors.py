@@ -621,8 +621,10 @@ class TrajectoryCoherenceFractureDetector:
     def __init__(self, window: int = 12, dim: int = 512, config: Dict | None = None):
         # Import here to avoid circular imports
         from frontier_ops.integration.trajectory_buffer import PhasorTrajectoryBuffer
+        from frontier_ops.integration.task_coherence import TaskCoherenceScorer
 
         self.buffer = PhasorTrajectoryBuffer(window=window, dim=dim)
+        self.coherence_scorer = TaskCoherenceScorer(window=20, dim=dim)
         self.config: Dict = config or {}
 
     def observe(self, composite_hv: np.ndarray) -> Dict[str, Any]:
@@ -633,7 +635,9 @@ class TrajectoryCoherenceFractureDetector:
             Dict with fracture signal, pattern, and verdict contribution.
         """
         self.buffer.push(composite_hv)
+        self.coherence_scorer.push(composite_hv)
         fracture = self.buffer.fracture_signal()
+        task_coherence = self.coherence_scorer.score()
 
         # Require a full buffer window before producing verdicts.
         # With < window entries, the baseline is unreliable and normal
@@ -681,6 +685,9 @@ class TrajectoryCoherenceFractureDetector:
             "verdict_contribution": verdict_contribution,
             "holonomy": holonomy.get("holonomy", 0.0),
             "holonomy_exceeds_budget": holonomy.get("exceeds_autonomous", False),
+            "task_coherence": task_coherence,
+            "task_coherence_score": task_coherence.get("coherence", 0.0),
+            "task_coherence_pattern": task_coherence.get("phase", "warmup"),
         }
 
 
@@ -1026,9 +1033,11 @@ class SafetyPolytopeEngine:
         # would make the manifold detector blind for the next 100+ observations.
         # sig3 has no runtime accumulator state that bleeds across sessions.
 
-        # Reset trajectory coherence fracture detector (trajectory buffer)
+        # Reset trajectory coherence fracture detector (trajectory buffer + coherence scorer)
         if hasattr(self.sig4_coherence, "buffer"):
             self.sig4_coherence.buffer.clear()
+        if hasattr(self.sig4_coherence, "coherence_scorer"):
+            self.sig4_coherence.coherence_scorer.clear()
         if hasattr(self.sig4_coherence, "trajectory"):
             self.sig4_coherence.trajectory.clear()
 

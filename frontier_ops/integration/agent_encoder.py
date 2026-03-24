@@ -8,6 +8,7 @@ from typing import Dict, Any, Tuple
 import numpy as np
 
 from frontier_ops.integration.vsa_core import PhasorAlgebra
+from frontier_ops.integration.semantic_encoder import encode_semantic
 
 
 ACTION_TYPES = [
@@ -62,6 +63,7 @@ ROLE_NAMES = [
     "target_sensitivity",
     "magnitude",
     "context_alignment",
+    "semantic",
 ]
 
 
@@ -181,6 +183,10 @@ class ActionEncoder:
     def encode_action(self, action: Dict[str, Any]) -> EncodedAction:
         """Normalize an action and encode each slot as a VSA phasor filler."""
         normalized = self.normalize_action(action)
+        # Extract command content for semantic encoding
+        content = action.get("content", action.get("command", action.get("file_path", "")))
+        semantic_vec = encode_semantic(str(content)[:500])
+
         fillers = {
             "action_type": self.algebra.get_or_create(
                 f"action_type_{normalized['action_type']}"
@@ -214,5 +220,6 @@ class ActionEncoder:
                 n_bins=20,
                 value_range=DEFAULT_VALUE_RANGES["context_alignment"],
             ),
+            "semantic": semantic_vec,
         }
         return EncodedAction(raw=normalized, fillers=fillers)

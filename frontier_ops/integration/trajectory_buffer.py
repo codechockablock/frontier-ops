@@ -242,10 +242,11 @@ class PhasorTrajectoryBuffer:
 
 def bind_slot_vectors(slots: Dict[str, np.ndarray]) -> np.ndarray:
     """
-    Bind 6 slot filler vectors into a single composite hypervector.
+    Bind slot filler vectors into a single composite hypervector.
 
     Element-wise complex multiplication for phasor VSA.
-    Order: action_type ⊗ scope ⊗ source ⊗ target_sensitivity ⊗ magnitude ⊗ context_alignment
+    Supports 6-slot (legacy) and 7-slot (with semantic) encodings.
+    Order: action_type ⊗ scope ⊗ source ⊗ target_sensitivity ⊗ magnitude ⊗ context_alignment [⊗ semantic]
     """
     slot_order = [
         "action_type",
@@ -254,6 +255,7 @@ def bind_slot_vectors(slots: Dict[str, np.ndarray]) -> np.ndarray:
         "target_sensitivity",
         "magnitude",
         "context_alignment",
+        "semantic",
     ]
 
     result = None

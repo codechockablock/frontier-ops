@@ -265,16 +265,17 @@ class TestAuthorizationState:
         self.metric = ConstitutionalMetric(constitution, dim_names=CONCEPTS)
         self.state = AuthorizationState(metric=self.metric)
 
-    def test_no_goal_needs_clarification(self):
-        """After grace period, no goal still produces needs_clarification."""
+    def test_no_goal_fallback_permissive(self):
+        """After grace period, no goal falls back to permissive (no auth loop)."""
         action = np.array([0.5, 0.1, 0.0, 0.1, 0.0, 0.0])
         # Exhaust grace period (5 actions)
         for _ in range(5):
             self.state.check_action(action)
-        # 6th action should need clarification
+        # 6th action should be permissive with no_goal marker
         result = self.state.check_action(action)
-        assert result["needs_clarification"]
-        assert not result["authorized"]
+        assert not result["needs_clarification"]
+        assert result["authorized"]
+        assert result.get("no_goal", False)
 
     def test_grace_period_suppresses_needs_clarification(self):
         """First 5 actions before goal should NOT emit needs_clarification."""
@@ -288,9 +289,10 @@ class TestAuthorizationState:
                 f"Action {i+1} during grace period should be permissive"
             )
 
-        # 6th action: grace period exhausted
+        # 6th action: grace period exhausted, falls back to permissive
         result = self.state.check_action(action)
-        assert result["needs_clarification"]
+        assert not result["needs_clarification"]
+        assert result["authorized"]
 
     def test_grace_period_resets_on_goal(self):
         """Grace period counter resets when a goal is established."""

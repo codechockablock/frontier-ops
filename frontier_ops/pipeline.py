@@ -287,7 +287,9 @@ class FullPipeline:
 
         # Record action in provenance graph
         auth_verdict = "no_goal"
-        if auth_result["needs_clarification"]:
+        if auth_result.get("no_goal"):
+            auth_verdict = "no_goal"
+        elif auth_result["needs_clarification"]:
             auth_verdict = "needs_clarification"
         elif auth_result["needs_escalation"]:
             auth_verdict = "escalate"

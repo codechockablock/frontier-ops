@@ -647,13 +647,19 @@ class AuthorizationState:
                     "needs_clarification": False,
                 }
 
+            # No goal set and grace period expired. Rather than returning
+            # d=inf on every action (creating a noisy auth loop in the daemon),
+            # return authorized=True with a sentinel distance. The auth system
+            # is advisory-only; blocking all actions because no user message
+            # arrived is worse than permitting with a warning.
             return {
-                "authorized": False,
-                "geodesic_distance": float("inf"),
+                "authorized": True,
+                "geodesic_distance": 0.0,
                 "radius": self.radius.radius,
                 "goal_confidence": 0.0,
                 "needs_escalation": False,
-                "needs_clarification": True,
+                "needs_clarification": False,
+                "no_goal": True,  # signal to daemon that auth is in fallback mode
             }
 
         # Compute goal-conditioned geodesic distance

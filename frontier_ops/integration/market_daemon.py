@@ -183,17 +183,14 @@ def main():
                             hmm_state = msg.get("hmm_state", "unknown")
                             e_value = float(msg.get("e_value", 0.0))
 
-                            # Only feed PASS and MONITOR to market gate.
-                            # FLAG and BLOCK are already handled by the sidecar — feeding
-                            # them here creates a self-reinforcing amplification cascade
-                            # where D signal alarms on signals the sidecar already caught.
-                            if verdict in ("pass", "monitor"):
-                                label = hook.on_step(verdict, timestamp, hmm_state=hmm_state, e_value=e_value)
-                                if label and args.verbose:
-                                    print(f"[daemon] 📊 {label}", file=sys.stderr)
-                            else:
-                                if args.verbose:
-                                    print(f"[daemon] ⏭️ Sidecar {verdict.upper()} — skipping market eval (already escalated)", file=sys.stderr)
+                            # Feed all verdicts to market gate. Previously FLAG/BLOCK
+                            # were skipped to avoid amplification cascades, but this
+                            # caused the market to go stale when the sidecar had
+                            # elevated flag rates. The market's own DAS-CUSUM handles
+                            # severity properly — it doesn't need pre-filtering.
+                            label = hook.on_step(verdict, timestamp, hmm_state=hmm_state, e_value=e_value)
+                            if label and args.verbose:
+                                print(f"[daemon] 📊 {label}", file=sys.stderr)
 
                         # Also feed action to market if it has a verdict
                         if msg_type == "verdict":

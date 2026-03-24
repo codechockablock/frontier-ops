@@ -1,113 +1,61 @@
 """
-Scope Reclassification for System Diagnostics
-===============================================
+Scope Reclassification for Known-Benign System Patterns
+=========================================================
 
-Corrects scope misclassification for known-benign system diagnostic patterns.
-This is NOT an allowlist — it doesn't suppress detection. It corrects the
-scope field so the encoder produces appropriate feature vectors.
+Corrects scope misclassification BEFORE encoding. NOT an allowlist —
+detection is not suppressed, just the scope feature is corrected so the
+encoder produces appropriate vectors.
 
-Added 2026-03-24 to address confirmed FPs:
-  - nvidia-smi / nvcc / cuda → GPU diagnostics, not credential_access
-  - pip install torch → package management, not destructive
-  - ssh desktop / scp / rsync → network_write, not credential_access
-  - pytest / py.test → testing, not destructive
+⚠️  Keep this list SHORT. Each entry is a special case that trades
+    generality for a known FP. If this grows beyond ~8 patterns,
+    the real fix is a better encoder, not more entries here.
+
+Confirmed-problematic patterns (from calibration-audit-2026-03-24):
+  - nvidia-smi → GPU diagnostics, not credential_access
+  - pip install → package management, not destructive
+  - pytest      → testing, not destructive
+  - ssh/scp     → remote admin, not credential_access
 """
 
 from __future__ import annotations
 
-import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 __all__ = ["reclassify_scope"]
 
-# Patterns and their correct scope when misclassified.
-# Each entry: (pattern, correct_scope_for_credential_access, correct_scope_for_destructive)
-_SYSTEM_DIAG_PATTERNS: list[tuple[str, str, str]] = [
-    # GPU diagnostics
-    ("nvidia-smi", "read_only", "read_only"),
-    ("nvcc", "read_only", "read_only"),
-    # CUDA/GPU context — but only when combined with diagnostic/install actions
-    # "gpu" and "cuda" are broad; only reclassify when scope is clearly wrong
-    # Package management (not skill_install)
-    ("pip install", "write_system", "write_system"),
-    ("pip3 install", "write_system", "write_system"),
-    ("uv install", "write_system", "write_system"),
-    # Testing
-    ("pytest", "read_only", "read_only"),
-    ("python -m pytest", "read_only", "read_only"),
-    ("py.test", "read_only", "read_only"),
-    # Remote admin (scope: network_write, not credential_access)
-    ("ssh ", "network_write", "network_write"),
-    ("scp ", "network_write", "network_write"),
-    ("rsync ", "network_write", "network_write"),
+# (pattern, corrected_scope) — only fires when current scope is
+# credential_access or destructive (both clearly wrong for these patterns)
+_CORRECTIONS: list[tuple[str, str]] = [
+    ("nvidia-smi", "read_only"),
+    ("nvcc",        "read_only"),
+    ("pip install", "write_system"),
+    ("pip3 install","write_system"),
+    ("pytest",      "read_only"),
+    ("py.test",     "read_only"),
+    ("ssh ",        "network_write"),
+    ("scp ",        "network_write"),
+    ("rsync ",      "network_write"),
 ]
 
-# Scopes that are candidates for reclassification
 _OVER_SCOPED = {"credential_access", "destructive"}
 
 
 def reclassify_scope(action: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Check if the action's scope was misclassified for a known-benign pattern.
-
-    If the action content matches a system diagnostic pattern AND the scope
-    was inferred as credential_access or destructive, downgrade the scope
-    to the appropriate level.
-
-    Args:
-        action: classified action dict (must have 'scope' and typically
-                'content' or action parameters that contain the command)
-
-    Returns:
-        The action dict, potentially with scope corrected and
-        'scope_reclassified_from' added for observability.
-    """
-    scope = action.get("scope", "")
-    if scope not in _OVER_SCOPED:
+    """Correct scope for known-benign patterns. Returns action dict (shallow copy if changed)."""
+    if action.get("scope") not in _OVER_SCOPED:
         return action
 
-    # Build a content string from available fields
-    content = _extract_content(action)
-    if not content:
-        return action
+    content = " ".join(filter(None, [
+        str(action.get("content", "")),
+        str(action.get("tool", "")),
+        str((action.get("params") or {}).get("command", "")),
+    ])).lower()
 
-    content_lower = content.lower()
-
-    for pattern, scope_for_cred, scope_for_destr in _SYSTEM_DIAG_PATTERNS:
-        if pattern.lower() in content_lower:
-            original_scope = scope
-            new_scope = scope_for_cred if scope == "credential_access" else scope_for_destr
-            action = dict(action)  # shallow copy to avoid mutating caller's dict
-            action["scope"] = new_scope
-            action["scope_reclassified_from"] = original_scope
-            action["scope_reclassification_pattern"] = pattern
-            return action
+    for pattern, new_scope in _CORRECTIONS:
+        if pattern in content:
+            result = dict(action)
+            result["scope"] = new_scope
+            result["scope_reclassified_from"] = action["scope"]
+            return result
 
     return action
-
-
-def _extract_content(action: Dict[str, Any]) -> str:
-    """Extract searchable content from the action dict."""
-    parts = []
-
-    # Direct content field
-    if "content" in action:
-        parts.append(str(action["content"]))
-
-    # Command from params
-    params = action.get("params", action.get("parameters", {}))
-    if isinstance(params, dict):
-        if "command" in params:
-            parts.append(str(params["command"]))
-        if "path" in params:
-            parts.append(str(params["path"]))
-        if "file_path" in params:
-            parts.append(str(params["file_path"]))
-        if "url" in params:
-            parts.append(str(params["url"]))
-
-    # Tool name itself can be informative
-    if "tool" in action:
-        parts.append(str(action["tool"]))
-
-    return " ".join(parts)

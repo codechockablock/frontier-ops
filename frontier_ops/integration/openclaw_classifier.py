@@ -158,6 +158,88 @@ def _matches_any(text: str, patterns: list) -> bool:
     return False
 
 
+# ── Source classification ────────────────────────────────────────────────
+
+_SKILL_TOOLS = frozenset({"sessions_spawn"})
+_WEB_TOOLS = frozenset({"web_fetch", "web_search"})
+_API_TOOLS = frozenset({"tts", "image", "nodes", "canvas", "cron"})
+_MEMORY_TOOLS = frozenset({"memory_search", "memory_get"})
+_READ_TOOLS = frozenset({"Read", "read", "memory_get", "memory_search"})
+
+# Simple substring checks (no regex) for hot-path performance
+_SKILL_PATH_MARKERS = ("SKILL.md", "skills/", ".skill", ".openclaw/workspace/skills/")
+_MEMORY_PATH_MARKERS = ("memory/", "MEMORY.md")
+
+# Pipe-to-shell patterns: check tool presence + pipe-to-shell separately
+# e.g. "curl https://example.com | bash" — curl and | bash aren't adjacent
+_PIPE_TO_SHELL = ("| bash", "|bash", "| sh", "|sh")
+_WEB_FETCH_CMDS = ("curl", "wget")
+
+
+def _is_web_pipe_exec(cmd: str) -> bool:
+    """Return True if cmd pipes a web fetch tool into a shell (curl|bash etc.)."""
+    has_pipe_to_shell = any(marker in cmd for marker in _PIPE_TO_SHELL)
+    has_web_cmd = any(cmd.startswith(c) or f" {c} " in cmd or f"\n{c} " in cmd for c in _WEB_FETCH_CMDS)
+    return has_pipe_to_shell and has_web_cmd
+
+
+def _classify_source(
+    tool_name: str,
+    parameters: Dict[str, Any],
+    step_in_chain: int,
+) -> str:
+    """
+    Stateless multi-class source classification.
+
+    Returns one of:
+        user_direct   — first action after user message (step 0)
+        user_prior    — second action, closely following user intent (step 1)
+        skill_file    — acting on a loaded skill/workspace file
+        web_content   — web fetch/search, or exec piping web content to shell
+        api_response  — calling an external API
+        agent_memory  — acting on stored agent memory
+        agent_reasoning — everything else
+    """
+    # ── Memory tools (check before generic read tools) ───────────────
+    if tool_name in _MEMORY_TOOLS:
+        return "agent_memory"
+
+    # ── API tools ────────────────────────────────────────────────────
+    if tool_name in _API_TOOLS:
+        return "api_response"
+
+    # ── Web tools ────────────────────────────────────────────────────
+    if tool_name in _WEB_TOOLS:
+        return "web_content"
+
+    # ── Skill-spawning tools ─────────────────────────────────────────
+    if tool_name in _SKILL_TOOLS:
+        return "skill_file"
+
+    # ── Read tools — check path for memory or skill markers ──────────
+    if tool_name in _READ_TOOLS:
+        path = str(parameters.get("file_path", parameters.get("path", "")))
+        for marker in _MEMORY_PATH_MARKERS:
+            if marker in path:
+                return "agent_memory"
+        for marker in _SKILL_PATH_MARKERS:
+            if marker in path:
+                return "skill_file"
+
+    # ── Exec — check for web-content pipe patterns ───────────────────
+    if tool_name in ("exec", "process"):
+        cmd = str(parameters.get("command", ""))
+        if _is_web_pipe_exec(cmd):
+            return "web_content"
+
+    # ── Step-based fallbacks ─────────────────────────────────────────
+    if step_in_chain == 0:
+        return "user_direct"
+    if step_in_chain == 1:
+        return "user_prior"
+    return "agent_reasoning"
+
+
 _LOCAL_NETWORK_PATTERNS = [
     r"localhost",
     r"127\.0\.0\.\d+",
@@ -194,7 +276,7 @@ def classify_tool_call(
     """
     action_type = TOOL_ACTION_MAP.get(tool_name, "api_call")
     scope = "read_only"
-    source = "user_direct" if step_in_chain == 0 else "agent_reasoning"
+    source = _classify_source(tool_name, parameters, step_in_chain)
     magnitude = 0.15
     target_sensitivity = None  # let encoder infer
     metadata: Dict[str, Any] = {}

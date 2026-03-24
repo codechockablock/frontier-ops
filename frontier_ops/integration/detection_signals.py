@@ -336,6 +336,13 @@ class SlotPredictor:
             )
             if max_sim > novelty_threshold:
                 is_novel = False
+        # Compute semantic novelty: 1 - max_sim(actual_filler, codebook).
+        # Renamed to semantic_novelty: 1 - max_sim(actual_filler, codebook). See calibration note 2026-03-24.
+        novelty_score = 0.0
+        if self.codebook:
+            max_sim = max(self.algebra.similarity(item, actual_filler) for item in self.codebook)
+            novelty_score = float(np.clip(1.0 - max_sim, 0.0, 1.0))
+
         if is_novel:
             self.codebook.append(actual_filler.copy())
 
@@ -351,6 +358,7 @@ class SlotPredictor:
             "persistence": persistence_meta,
             "cusum": cusum_meta,
             "codebook_size": len(self.codebook),
+            "novelty_score": novelty_score,
         }
 
 
@@ -476,12 +484,12 @@ class DetectionSignalEngine:
         mean_error = (
             float(np.mean(list(per_slot_errors.values()))) if per_slot_errors else 0.0
         )
-        fisher_vals = [
-            v
-            for role, v in per_slot_fisher.items()
-            if slot_meta[role]["trajectory"] and len(slot_meta[role]["trajectory"]) >= 2
-        ]
-        fisher_signal = 1.0 - min(fisher_vals) if fisher_vals else 0.0
+        # Renamed to semantic_novelty: 1 - max_sim(actual_filler, codebook). See calibration note 2026-03-24.
+        # Uses per-slot novelty_score instead of fisher trajectory health.
+        novelty_vals = [float(slot_meta[role].get("novelty_score", 0.0)) for role in slot_meta]
+        # Use the semantic slot's novelty if available; fall back to max across all slots
+        semantic_novelty = float(slot_meta.get("semantic", {}).get("novelty_score", 0.0))
+        fisher_signal = semantic_novelty if semantic_novelty > 0.0 else (max(novelty_vals) if novelty_vals else 0.0)
 
         persistence_vals = []
         for role, meta in slot_meta.items():

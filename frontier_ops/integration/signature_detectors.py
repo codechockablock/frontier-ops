@@ -803,13 +803,15 @@ class SafetyPolytopeEngine:
         sig4 = self.sig4_coherence.observe(composite_hv)
         sig5 = self.sig5_grounding.observe(composite_hv, magnitude, context_alignment)
 
-        # sig4 advisory — in thresholds for monitoring but excluded from contributions
-        # until calibrated with semantic slot encoding.
+        # sig4 advisory with calibrated thresholds (P95=0.92) — 2026-03-24.
+        # Included in firing count for monitoring but excluded from verdict
+        # escalation: adversarial signal values (0.26, 0.28) are within
+        # benign range, so sig4 verdicts would only add FPs, not TPs.
         contributions = [
             sig1["verdict_contribution"],
             sig2["verdict_contribution"],
             sig3["verdict_contribution"],
-            # sig4 excluded from verdict path — advisory until calibrated
+            # sig4 excluded from verdict path — doesn't discriminate adversarial
             sig5["verdict_contribution"],
         ]
 
@@ -820,7 +822,9 @@ class SafetyPolytopeEngine:
         # Count how many signatures are firing
         firing_count = sum(1 for c in contributions if c != "PASS")
 
-        # Weighted composite (sig4 excluded — advisory)
+        # Weighted composite (sig4 advisory — weight 0.00 until discriminative)
+        # 2026-03-24 calibration: coherence signal doesn't separate adversarial
+        # from benign in current TaskCoherenceScorer formulation.
         base_composite = (
             0.25 * sig1["signal"]
             + 0.30 * sig2["signal"]

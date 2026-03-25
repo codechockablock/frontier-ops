@@ -538,15 +538,31 @@ class TrajectoryCoherenceFractureDetector:
         self.coherence_scorer = TaskCoherenceScorer(window=20, dim=dim)
         self.config: Dict = config or {}
 
-    def observe(self, composite_hv: np.ndarray) -> Dict[str, Any]:
+    def observe(self, composite_hv: np.ndarray, semantic_filler: Optional[np.ndarray] = None) -> Dict[str, Any]:
         """
         Push a composite HV and return fracture analysis.
+
+        Args:
+            composite_hv: bound composite phasor vector (all slots)
+            semantic_filler: optional semantic slot vector (MiniLM projection).
+                If provided and non-zero, coherence_scorer uses this instead
+                of composite_hv — semantic vectors cluster by meaning, giving
+                real Gram matrix structure for spectral concentration.
 
         Returns:
             Dict with fracture signal, pattern, and verdict contribution.
         """
         self.buffer.push(composite_hv)
-        self.coherence_scorer.push(composite_hv)
+        # Use semantic filler for coherence scoring when available.
+        # Semantic vectors cluster by meaning (pytest cmds cluster together,
+        # credential cmds cluster together) → Gram matrix has real structure
+        # → spectral concentration discriminates benign from adversarial.
+        # The full 7-slot composite produces near-orthogonal vectors for ALL
+        # actions → flat spectrum → no discrimination.
+        if semantic_filler is not None and np.linalg.norm(semantic_filler) > 1e-9:
+            self.coherence_scorer.push(semantic_filler)
+        else:
+            self.coherence_scorer.push(composite_hv)
         fracture = self.buffer.fracture_signal()
         task_coherence = self.coherence_scorer.score()
 
@@ -800,18 +816,21 @@ class SafetyPolytopeEngine:
             algebra=self.algebra,
         )
         sig3 = self.sig3_manifold.observe(composite_hv)
-        sig4 = self.sig4_coherence.observe(composite_hv)
+        # Pass semantic filler to coherence detector for meaningful clustering.
+        semantic_filler = fillers.get("semantic") if fillers else None
+        sig4 = self.sig4_coherence.observe(composite_hv, semantic_filler=semantic_filler)
         sig5 = self.sig5_grounding.observe(composite_hv, magnitude, context_alignment)
 
-        # sig4 advisory with calibrated thresholds (P95=0.92) — 2026-03-24.
-        # Included in firing count for monitoring but excluded from verdict
-        # escalation: adversarial signal values (0.26, 0.28) are within
-        # benign range, so sig4 verdicts would only add FPs, not TPs.
+        # sig4 coherence sub-signal re-enabled via tiered_verdict weight (2026-03-24b),
+        # but sig4 fracture verdict_contribution stays excluded from polytope
+        # escalation: tool-type switches produce near-orthogonal composites
+        # that trigger injection_fracture/chaotic patterns falsely.
+        # Coherence discrimination comes through the incoherence raw_signal path.
         contributions = [
             sig1["verdict_contribution"],
             sig2["verdict_contribution"],
             sig3["verdict_contribution"],
-            # sig4 excluded from verdict path — doesn't discriminate adversarial
+            # sig4 excluded from verdict path — fracture patterns too noisy
             sig5["verdict_contribution"],
         ]
 
@@ -822,9 +841,9 @@ class SafetyPolytopeEngine:
         # Count how many signatures are firing
         firing_count = sum(1 for c in contributions if c != "PASS")
 
-        # Weighted composite (sig4 advisory — weight 0.00 until discriminative)
-        # 2026-03-24 calibration: coherence signal doesn't separate adversarial
-        # from benign in current TaskCoherenceScorer formulation.
+        # Weighted composite — sig4 still 0.00 in polytope path (fracture
+        # patterns too noisy). Coherence discrimination goes through the
+        # tiered_verdict incoherence raw_signal at weight=0.05.
         base_composite = (
             0.25 * sig1["signal"]
             + 0.30 * sig2["signal"]

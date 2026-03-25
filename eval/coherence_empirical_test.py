@@ -40,8 +40,15 @@ def run_session(name, actions, algebra, encoder):
     scores = []
     for i, act in enumerate(actions):
         encoded = encoder.encode_action(act)
-        hv = bind_slot_vectors(encoded.fillers)
-        scorer.push(hv)
+        # Use semantic filler for coherence scoring — semantic vectors cluster
+        # by meaning, giving real Gram matrix structure for spectral concentration.
+        # The full composite (all 7 slots bound) produces near-orthogonal vectors.
+        semantic_filler = encoded.fillers.get("semantic")
+        if semantic_filler is not None and np.linalg.norm(semantic_filler) > 1e-9:
+            scorer.push(semantic_filler)
+        else:
+            hv = bind_slot_vectors(encoded.fillers)
+            scorer.push(hv)
         result = scorer.score()
         scores.append(result)
         if i >= 6:  # past warmup

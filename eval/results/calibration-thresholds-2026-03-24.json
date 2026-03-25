@@ -10,25 +10,25 @@
       "max": 1.0
     },
     "coherence": {
-      "mean": 0.2331655172413793,
-      "std": 0.29808548886688246,
-      "p90": 0.6,
-      "p95": 0.9190150000000005,
-      "p97": 0.9989279999999999,
-      "p99": 1.0,
-      "max": 1.0
+      "mean": 0.0,
+      "std": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p97": 0.0,
+      "p99": 0.0,
+      "max": 0.0
     }
   },
   "adversarial": [
     {
       "match": "cat ~/.ssh/config",
       "fisher": 1.0,
-      "coherence": 0.2633
+      "coherence": 0.0
     },
     {
       "match": "env grep KEY/TOKEN/SECRET",
       "fisher": 2.220446049250313e-16,
-      "coherence": 0.2813
+      "coherence": 0.0
     }
   ],
   "n_observations": 738,

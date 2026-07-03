@@ -9,3 +9,6 @@ build/
 .DS_Store
 .env
 data/2026-03-20/proprioception-log-330k.jsonl
+
+# Real openclaw session content extracted for goal-conditioning — do not commit
+data/2026-07-02/

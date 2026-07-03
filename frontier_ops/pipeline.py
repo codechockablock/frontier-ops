@@ -33,7 +33,7 @@ from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 from frontier_ops.sensing.combiner import BayesFactorCombiner
 from frontier_ops.authorization.scope import AuthorizationState, AuthorizationEvent
-from frontier_ops.authorization.provenance import ProvenanceGraph
+from frontier_ops.authorization.provenance import ProvenanceGraph, RESTRICTED_DIMENSIONS
 from frontier_ops.authorization.budget import AuthorizationLinkedBudget
 
 
@@ -108,6 +108,9 @@ class FullPipeline:
 
         # Layer 0: Metric
         self.metric = ConstitutionalMetric(self.constitution, dim_names=CONCEPTS)
+        self._boundary_thresholds = {
+            b.concept: b.threshold for b in self.constitution.boundaries
+        }
 
         # Concept extraction
         self.extractor = ConceptExtractor(force_tier=concept_extractor_tier)
@@ -327,12 +330,22 @@ class FullPipeline:
         else:
             auth_verdict = "block"
 
+        # Which fixed dimensions this action's position crossed, so the
+        # provenance certificate can actually check that claim rather than
+        # reporting it as unrecorded.
+        entered_fixed = [
+            c for c in RESTRICTED_DIMENSIONS
+            if c in self._boundary_thresholds
+            and concept_vec[CONCEPTS.index(c)] >= self._boundary_thresholds[c]
+        ]
+
         self.provenance.add_action(
             action_content=text[:200],
             tool="",
             authorized=auth_result["authorized"],
             geodesic_distance=auth_result["geodesic_distance"],
             verdict=auth_verdict,
+            entered_restricted_dims=entered_fixed,
         )
 
         # 11. Combined alert level

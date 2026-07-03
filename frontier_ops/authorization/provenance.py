@@ -31,6 +31,16 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 
+# Dimensions the constitution keeps fixed (an action that enters one is not
+# relaxable by a goal). Mirror of scope.LOCKED_DIMS; kept here so the
+# certificate has no import dependency on the authorization envelope.
+RESTRICTED_DIMENSIONS = (
+    "credential_adjacent",
+    "self_modification_reasoning",
+    "goal_displacement",
+)
+
+
 class NodeType(Enum):
     DIRECTIVE = "directive"    # User message that establishes/modifies authorization
     ACTION = "action"          # Agent action authorized by a directive
@@ -163,9 +173,15 @@ class ProvenanceGraph:
         authorized: bool = True,
         geodesic_distance: float = 0.0,
         verdict: str = "pass",
+        entered_restricted_dims: Optional[List[str]] = None,
     ) -> ProvenanceNode:
         """
         Record an agent action linked to the current directive.
+
+        entered_restricted_dims: the fixed dimensions this action's position
+        crossed, if the caller computed them. Left as None when the caller did
+        not record dimension data — the certificate keeps "recorded none" and
+        "not recorded" distinct so it never reads a missing check as a clean one.
 
         Returns the provenance node for the action.
         """
@@ -183,6 +199,11 @@ class ProvenanceGraph:
                 "authorized": authorized,
                 "geodesic_distance": geodesic_distance,
                 "verdict": verdict,
+                "entered_restricted_dims": (
+                    list(entered_restricted_dims)
+                    if entered_restricted_dims is not None
+                    else None
+                ),
             },
         )
         self._nodes[node_id] = node
@@ -231,6 +252,128 @@ class ProvenanceGraph:
         """Get all actions authorized by a specific directive."""
         action_ids = self._authorization_index.get(directive_id, [])
         return [self._nodes[aid] for aid in action_ids if aid in self._nodes]
+
+    def certificate(
+        self, restricted_dimensions=RESTRICTED_DIMENSIONS
+    ) -> Dict[str, Any]:
+        """
+        Build a scoped attestation over the recorded graph.
+
+        Rule of the object: state only what the recorded nodes and edges
+        support, name explicitly what was not checkable from the recorded data,
+        and never collapse to a single "safe"/"clean" summary. The reader is
+        meant to read the itemized `established` and `not_established` lists,
+        not a headline. Two things this graph deliberately does not claim on its
+        own — that directives were cryptographically signed (that lives in the
+        governance chain) and that each action stayed within budget (that lives
+        in the authorization-linked budget) — are always listed under
+        `not_established` so their absence here is never mistaken for a pass.
+        """
+        actions = [n for n in self._nodes.values() if n.node_type == NodeType.ACTION]
+        directives = [
+            n for n in self._nodes.values() if n.node_type == NodeType.DIRECTIVE
+        ]
+
+        linked_ids = {
+            aid for ids in self._authorization_index.values() for aid in ids
+        }
+        action_ids = {a.id for a in actions}
+        unlinked = sorted(action_ids - linked_ids)
+
+        verdicts: Dict[str, int] = {}
+        flagged: List[str] = []
+        for a in actions:
+            v = a.metadata.get("verdict", "unknown")
+            verdicts[v] = verdicts.get(v, 0) + 1
+            if a.metadata.get("authorized") is False:
+                flagged.append(a.id)
+
+        # Restricted-dimension entries are only checkable when the caller
+        # recorded them per action (None means "not recorded", not "none").
+        recorded = [
+            a for a in actions
+            if a.metadata.get("entered_restricted_dims") is not None
+        ]
+        entries: List[Dict[str, Any]] = []
+        for a in recorded:
+            hits = [
+                d for d in a.metadata["entered_restricted_dims"]
+                if d in restricted_dimensions
+            ]
+            if hits:
+                entries.append({"action_id": a.id, "dimensions": hits})
+
+        established: List[str] = []
+        not_established: List[str] = []
+
+        # 1. Linkage to a recorded directive.
+        if actions and not unlinked:
+            established.append(
+                f"All {len(actions)} recorded actions link to a recorded directive."
+            )
+        elif unlinked:
+            not_established.append(
+                f"{len(unlinked)} of {len(actions)} actions have no linking directive."
+            )
+
+        # 2. Recorded authorization outcome.
+        if actions and not flagged:
+            established.append(
+                f"No recorded action was marked outside its authorization "
+                f"envelope ({len(actions)} actions)."
+            )
+        elif flagged:
+            not_established.append(
+                f"{len(flagged)} actions were recorded as outside their "
+                f"authorization envelope."
+            )
+
+        # 3. Entry into a fixed dimension.
+        if not recorded:
+            not_established.append(
+                "Entry into fixed dimensions was not recorded per action, so "
+                "this attestation cannot speak to it."
+            )
+        elif not entries:
+            established.append(
+                f"None of the {len(recorded)} actions with recorded dimension "
+                f"data entered a fixed dimension {tuple(restricted_dimensions)}."
+            )
+        else:
+            not_established.append(
+                f"{len(entries)} actions entered a fixed dimension."
+            )
+
+        # Always-deferred claims (belong to other objects).
+        not_established.append(
+            "Directive signing is asserted by the governance chain, not "
+            "verified here."
+        )
+        not_established.append(
+            "Per-action budget adherence is tracked by the authorization-linked "
+            "budget, not verified here."
+        )
+
+        return {
+            "n_directives": len(directives),
+            "n_actions": len(actions),
+            "linkage": {
+                "linked": len(action_ids & linked_ids),
+                "unlinked": len(unlinked),
+                "unlinked_action_ids": unlinked,
+            },
+            "authorization": {
+                "flagged_action_ids": flagged,
+                "verdict_breakdown": verdicts,
+            },
+            "fixed_dimensions": {
+                "checked_against": tuple(restricted_dimensions),
+                "actions_with_dimension_data": len(recorded),
+                "entries": entries,
+            },
+            "established": established,
+            "not_established": not_established,
+        }
 
     def export(self) -> Dict[str, Any]:
         """Export the full provenance graph for audit."""

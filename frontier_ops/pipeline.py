@@ -61,6 +61,9 @@ class StepResult:
     newma_divergence: float
     newma_alarm: bool
     drift_classification: str
+    # Cross-terms evaluated at the trajectory-smoothed position (temporal
+    # conjunction: e.g. cred probe a few steps after an enum sweep)
+    trajectory_cross_terms: Dict[str, float]
     # Trend
     trend_alerts: List[Any]
     # Budget
@@ -99,6 +102,7 @@ class FullPipeline:
         concept_extractor_tier: Optional[int] = 1,
         enable_governance: bool = True,
         enable_memory: bool = True,
+        newma_threshold: float = 0.65,
     ):
         self.constitution = constitution or ConstitutionSpec.agent_safety_default()
 
@@ -114,12 +118,17 @@ class FullPipeline:
             dim_names=CONCEPTS,
         )
 
-        # NEWMA
+        # NEWMA. Threshold calibrated to the benign p95 of the metric-weighted
+        # divergence on the 2026-03-20 real traces (679 benign steps: p95=0.65
+        # for both tier-1 and blended vectors; drift-replay experiment). The
+        # previous default of 0.15 alarmed on ~16% of benign steps, so alarms
+        # carried almost no evidence. Recalibrate per deployment via the
+        # newma_threshold constructor arg.
         self.newma = DualEWMA(
             n_dims=len(CONCEPTS),
             alpha_fast=0.5,
             alpha_slow=0.05,
-            threshold=0.15,
+            threshold=newma_threshold,
         )
 
         # Drift classifier (disambiguates NEWMA signal)
@@ -180,6 +189,17 @@ class FullPipeline:
         self._enable_governance = enable_governance
         if enable_governance:
             self.governance = GovernanceChain()
+
+        # Trajectory-smoothed position for temporal cross-term conjunction.
+        # Pointwise cross-terms only fire when ONE action is jointly elevated
+        # (e.g. cat ~/.ssh/config is both cred and scope). A probe sequence
+        # that alternates dimensions (enum, then cred, then recon) never has
+        # a jointly-elevated single action — the conjunction exists across
+        # steps. alpha=0.2 (~5-step memory) captures that window; on the
+        # 2026-03-20 real traces it activates only inside the probe burst
+        # (0 of 679 benign steps).
+        self.traj_alpha = 0.2
+        self._traj_mu: Optional[np.ndarray] = None
 
         # State
         self._step = 0
@@ -256,6 +276,15 @@ class FullPipeline:
         if drift_result["suppress_alert"]:
             newma_alarm = False
 
+        # 5c. Trajectory cross-terms: conjunction across recent steps
+        if self._traj_mu is None:
+            self._traj_mu = concept_vec.copy()
+        else:
+            self._traj_mu = (
+                self.traj_alpha * concept_vec + (1 - self.traj_alpha) * self._traj_mu
+            )
+        traj_cross_acts = self.metric.cross_term_activations(self._traj_mu)
+
         # 6. Trend
         self.trend.observe(concept_vec)
         trend_alerts = self.trend.detect()
@@ -309,7 +338,7 @@ class FullPipeline:
         # 11. Combined alert level
         alert_level, alert_reasons = self._compute_alert(
             pred_error, proximities, cross_acts, newma_alarm, newma_div,
-            trend_alerts, ewma_alarm,
+            trend_alerts, ewma_alarm, traj_cross_acts,
         )
 
         # Escalate alert if action is outside authorization envelope
@@ -353,6 +382,7 @@ class FullPipeline:
             newma_divergence=newma_div,
             newma_alarm=newma_alarm,
             drift_classification=drift_classification,
+            trajectory_cross_terms=traj_cross_acts,
             trend_alerts=trend_alerts,
             lambda_value=lam,
             budget_remaining=self.lagrangian.budget_remaining,
@@ -370,7 +400,8 @@ class FullPipeline:
         )
 
     def _compute_alert(self, pred_error, proximities, cross_acts,
-                       newma_alarm, newma_div, trend_alerts, ewma_alarm) -> tuple:
+                       newma_alarm, newma_div, trend_alerts, ewma_alarm,
+                       traj_cross_acts=None) -> tuple:
         """Combine detector signals via Bayes factor evidence combination.
 
         Each detector's continuous signal is converted to a p-value via
@@ -412,6 +443,18 @@ class FullPipeline:
             if max_cross > 0.1:
                 reasons.append(f"cross_term:{max_cross:.2f}")
 
+        # Trajectory cross-terms (temporal conjunction across recent steps).
+        # At traj_alpha=0.2 this is zero on all 679 benign steps of the
+        # 2026-03-20 real traces, so any positive activation is strong
+        # evidence; k=20 maps the observed probe-burst range (~0.02-0.08)
+        # to meaningful-but-not-decisive p-values.
+        max_traj_cross = max(traj_cross_acts.values()) if traj_cross_acts else 0.0
+        if max_traj_cross > 0.01:
+            p = math.exp(-20.0 * max_traj_cross)
+            p_values["traj_cross"] = p
+            worst = max(traj_cross_acts, key=traj_cross_acts.get)
+            reasons.append(f"traj_cross:{worst}={max_traj_cross:.3f}")
+
         # NEWMA (only when alarm fires, drift classifier hasn't suppressed)
         if newma_alarm:
             p = math.exp(-10.0 * newma_div)
@@ -447,6 +490,7 @@ class FullPipeline:
         self._prev_concept = None
         self._angular_disp_acc = 0.0
         self._trajectory = []
+        self._traj_mu = None
         self.predictor = EfferenceCopyPredictor(n_dims=len(CONCEPTS), dim_names=CONCEPTS)
         self.newma.clear()
         self.drift_classifier.clear()

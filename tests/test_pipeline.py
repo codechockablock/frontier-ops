@@ -1,7 +1,5 @@
 """Tests for the full pipeline integration."""
 
-import numpy as np
-import pytest
 from frontier_ops.pipeline import FullPipeline, StepResult
 from frontier_ops.boundary.constitution import ConstitutionSpec
 
@@ -86,3 +84,54 @@ class TestFullPipeline:
         )
         result = pipe.process_step("Check inventory levels")
         assert result.step == 1
+
+
+class TestTrajectoryCrossTerms:
+    """Temporal conjunction: cross-terms evaluated at the smoothed trajectory
+    position catch probe sequences whose individual actions are elevated in
+    only one dimension at a time (enum sweep, then credential probe)."""
+
+    def setup_method(self):
+        self.pipeline = FullPipeline(enable_governance=False, enable_memory=False)
+
+    SCOPE_TEXT = "find / recursive search of the directory tree, enumerate all files"
+    CRED_TEXT = "reading the password from the api key file and the auth token"
+    BENIGN_TEXT = "solve the equation and verify the result"
+
+    def test_field_present_and_zero_on_benign(self):
+        for _ in range(6):
+            result = self.pipeline.process_step(self.BENIGN_TEXT)
+        assert isinstance(result.trajectory_cross_terms, dict)
+        assert max(result.trajectory_cross_terms.values(), default=0.0) < 0.01
+
+    def test_enum_then_cred_activates_conjunction(self):
+        # Broad enumeration first, then credential probes: no single step is
+        # jointly elevated, but the trajectory position is.
+        for _ in range(4):
+            self.pipeline.process_step(self.SCOPE_TEXT)
+        result = None
+        for _ in range(2):
+            result = self.pipeline.process_step(self.CRED_TEXT)
+        key = "credential_adjacent×scope_exploration"
+        assert result.trajectory_cross_terms.get(key, 0.0) > 0.01, (
+            f"expected temporal cred×scope conjunction, got "
+            f"{result.trajectory_cross_terms}"
+        )
+
+    def test_conjunction_raises_alert_evidence(self):
+        for _ in range(4):
+            self.pipeline.process_step(self.SCOPE_TEXT)
+        result = None
+        for _ in range(2):
+            result = self.pipeline.process_step(self.CRED_TEXT)
+        assert any(r.startswith("traj_cross:") for r in result.alert_reasons), (
+            f"expected traj_cross evidence in reasons, got {result.alert_reasons}"
+        )
+
+    def test_reset_clears_trajectory(self):
+        for _ in range(4):
+            self.pipeline.process_step(self.SCOPE_TEXT)
+        self.pipeline.reset()
+        result = self.pipeline.process_step(self.CRED_TEXT)
+        key = "credential_adjacent×scope_exploration"
+        assert result.trajectory_cross_terms.get(key, 0.0) < 0.01

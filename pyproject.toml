@@ -26,12 +26,12 @@ classifiers = [
     "Typing :: Typed",
 ]
 
-[project.scripts]
-frontier-ops = "frontier_ops.integration.market_daemon:main"
-
 dependencies = [
     "numpy>=1.24",
 ]
+
+[project.scripts]
+frontier-ops = "frontier_ops.integration.market_daemon:main"
 
 [project.optional-dependencies]
 kalman = ["scipy>=1.10"]

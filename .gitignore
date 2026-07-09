@@ -12,3 +12,7 @@ data/2026-03-20/proprioception-log-330k.jsonl
 
 # Real openclaw session content extracted for goal-conditioning — do not commit
 data/2026-07-02/
+
+# Apollo deception-detection checkout + battery encoding caches. Download at
+# runtime only: their repo has no LICENSE file, so nothing may be vendored.
+eval/data/

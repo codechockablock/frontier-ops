@@ -60,3 +60,6 @@ packages = ["frontier_ops"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: long-running eval battery checks (need Apollo data + sentence-transformers)",
+]

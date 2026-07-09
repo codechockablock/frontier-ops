@@ -1,14 +1,28 @@
-from frontier_ops.governance.chain import (
-    GovernanceChain as GovernanceChain,
-    GovernanceAuditor as GovernanceAuditor,
-    ChainEntry as ChainEntry,
-    VerificationResult as VerificationResult,
-    observe_agent_step as observe_agent_step,
-)
 from frontier_ops.governance.ledger import (
     CrossSessionAngularDisplacement as CrossSessionAngularDisplacement,
     SessionSummary as SessionSummary,
     LedgerEntry as LedgerEntry,
 )
 from frontier_ops.governance.budget import AdaptiveLagrangian as AdaptiveLagrangian
-from frontier_ops.governance.market_audit import MarketAuditChain as MarketAuditChain, MarketChainEntry as MarketChainEntry
+
+# chain / market_audit need the optional [governance] extra (cryptography).
+# Re-export lazily (PEP 562) so `import frontier_ops` works on numpy-only
+# installs; a missing extra only surfaces when one of these names is used.
+_CRYPTO_EXPORTS = {
+    "GovernanceChain": "frontier_ops.governance.chain",
+    "GovernanceAuditor": "frontier_ops.governance.chain",
+    "ChainEntry": "frontier_ops.governance.chain",
+    "VerificationResult": "frontier_ops.governance.chain",
+    "observe_agent_step": "frontier_ops.governance.chain",
+    "MarketAuditChain": "frontier_ops.governance.market_audit",
+    "MarketChainEntry": "frontier_ops.governance.market_audit",
+}
+
+
+def __getattr__(name: str):
+    if name in _CRYPTO_EXPORTS:
+        import importlib
+
+        module = importlib.import_module(_CRYPTO_EXPORTS[name])
+        return getattr(module, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

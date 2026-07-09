@@ -29,7 +29,6 @@ from frontier_ops.sensing.newma import DualEWMA
 from frontier_ops.sensing.trend import ScopeCreepDetector, MetricAdaptiveEWMA
 from frontier_ops.memory.activation import MemoryEventBus, MemoryEventType, AutoActivator
 from frontier_ops.memory.vsa import VSAMemory, phasor_encode
-from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 from frontier_ops.sensing.combiner import BayesFactorCombiner
 from frontier_ops.authorization.scope import AuthorizationState, AuthorizationEvent
@@ -188,9 +187,13 @@ class FullPipeline:
                 event_types={MemoryEventType.NOVELTY},
             )
 
-        # Governance
+        # Governance. Imported lazily: chain.py needs the optional
+        # [governance] extra (cryptography), and importing it at module
+        # level broke `import frontier_ops` on numpy-only installs.
         self._enable_governance = enable_governance
         if enable_governance:
+            from frontier_ops.governance.chain import GovernanceChain
+
             self.governance = GovernanceChain()
 
         # Trajectory-smoothed position for temporal cross-term conjunction.

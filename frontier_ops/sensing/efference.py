@@ -48,7 +48,13 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 import numpy as np
-from scipy.linalg import inv as scipy_inv
+
+try:
+    from scipy.linalg import inv as scipy_inv
+except ImportError:
+    # scipy is an optional extra ([kalman]); numpy's inverse is a drop-in
+    # for the single Kalman-gain solve below.
+    from numpy.linalg import inv as scipy_inv
 
 logger = logging.getLogger(__name__)
 

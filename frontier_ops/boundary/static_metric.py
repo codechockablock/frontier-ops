@@ -67,7 +67,7 @@ def _make_spd(G: np.ndarray, ridge: float = 1e-6) -> np.ndarray:
 CONSTITUTIONAL_G = _make_spd(_G_RAW)
 
 
-class ConstitutionalMetric:
+class CalibratedMetric:
     """
     Static SPD metric tensor over behavioral feature space.
 
@@ -81,11 +81,15 @@ class ConstitutionalMetric:
     consequences, not covariances). The asserted-G construction remains
     available behind `asserted=True` with a DeprecationWarning.
 
+    Renamed from ConstitutionalMetric in 0.3.0 to resolve the collision with
+    boundary.constitution.ConstitutionalMetric (the position-dependent
+    curvature metric); the old name stays importable as an alias.
+
     Usage::
 
-        metric = ConstitutionalMetric.from_labeled(X, y)   # estimated (default path)
-        metric = ConstitutionalMetric(G=my_spd_matrix)     # explicit G
-        metric = ConstitutionalMetric(asserted=True)       # deprecated expert G
+        metric = CalibratedMetric.from_labeled(X, y)   # estimated (default path)
+        metric = CalibratedMetric(G=my_spd_matrix)     # explicit G
+        metric = CalibratedMetric(asserted=True)       # deprecated expert G
     """
 
     def __init__(self, G: Optional[np.ndarray] = None, *, asserted: bool = False):
@@ -96,7 +100,7 @@ class ConstitutionalMetric:
                 "Expert-asserted G is deprecated: it lost to the identity "
                 "metric on the Apollo benchmarks (v2 handoff §1 — experts "
                 "encode consequences, not covariances). Calibrate an "
-                "estimated metric with ConstitutionalMetric.from_labeled(X, y) "
+                "estimated metric with CalibratedMetric.from_labeled(X, y) "
                 "or pass an explicit G; asserted=True keeps the expert matrix "
                 "but stays deprecated.",
                 DeprecationWarning,
@@ -115,7 +119,7 @@ class ConstitutionalMetric:
         y: np.ndarray,
         ridge: float = 1e-3,
         ledoit_wolf: bool = False,
-    ) -> "ConstitutionalMetric":
+    ) -> "CalibratedMetric":
         """Estimated shrinkage metric: inverse pooled within-class covariance.
 
         The v2 campaign's ridge of 1e-3 is kept as the reproducibility
@@ -148,7 +152,7 @@ class ConstitutionalMetric:
         y: np.ndarray,
         ridge: float = 1e-3,
         ledoit_wolf: bool = False,
-    ) -> "ConstitutionalMetric":
+    ) -> "CalibratedMetric":
         """Re-fit this metric in place from labeled vectors (see from_labeled)."""
         fitted = type(self).from_labeled(X, y, ridge=ridge, ledoit_wolf=ledoit_wolf)
         self.G = fitted.G
@@ -183,6 +187,12 @@ class ConstitutionalMetric:
         return float(v @ self.G @ v) / (norm_sq * float(self._eigvals.max()))
 
 
+# Backward-compatible alias. The name collided with
+# boundary.constitution.ConstitutionalMetric (v2 handoff §2); CalibratedMetric
+# is the canonical name as of 0.3.0.
+ConstitutionalMetric = CalibratedMetric
+
+
 # --- Mahalanobis Step Detector -------------------------------------------
 
 class MahalanobisStepDetector:
@@ -197,9 +207,9 @@ class MahalanobisStepDetector:
     Does NOT catch: slow drift (use EWMADriftDetector for that).
     """
 
-    def __init__(self, metric: Optional[ConstitutionalMetric] = None,
+    def __init__(self, metric: Optional[CalibratedMetric] = None,
                  z_threshold: float = 3.0):
-        self.metric = metric or ConstitutionalMetric()
+        self.metric = metric or CalibratedMetric(asserted=True)
         self.z_threshold = z_threshold
         self._mean: float = 0.0
         self._sigma: float = 1.0
@@ -262,10 +272,10 @@ class EWMADriftDetector:
     """
 
     def __init__(self, alpha: float = 0.3, z_threshold: float = 3.0,
-                 metric: Optional[ConstitutionalMetric] = None):
+                 metric: Optional[CalibratedMetric] = None):
         self.alpha = alpha
         self.z_threshold = z_threshold
-        self.metric = metric or ConstitutionalMetric()
+        self.metric = metric or CalibratedMetric(asserted=True)
         self._ewma: Optional[np.ndarray] = None
         self._baseline: Optional[np.ndarray] = None   # benign center of mass
         self._mean: float = 0.0
@@ -354,11 +364,11 @@ class SurpriseRatioDetector:
 
     def __init__(self, alpha: float = 0.05, warmup: int = 30,
                  z_threshold: float = 4.0,
-                 metric: Optional[ConstitutionalMetric] = None):
+                 metric: Optional[CalibratedMetric] = None):
         self.alpha = alpha
         self.warmup = warmup
         self.z_threshold = z_threshold
-        self.metric = metric or ConstitutionalMetric()
+        self.metric = metric or CalibratedMetric(asserted=True)
         self._pred: Optional[np.ndarray] = None
         self._var: float = 1.0
         self._step: int = 0

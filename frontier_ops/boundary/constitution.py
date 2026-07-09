@@ -37,6 +37,7 @@ Usage::
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -240,19 +241,53 @@ class ConstitutionalMetric:
         Compute metric-weighted distance between two concept vectors.
 
         Uses midpoint metric: G((x1+x2)/2).
+
+        .. deprecated:: 0.3.0
+            Curvature walls inside a distance are not a metric (v2 handoff
+            §1): the wall magnitude has no habitat on real trajectories
+            (coefficient of variation 0.03–0.04), and softplus costs belong
+            in the decision layer (boundary.decision.DecisionCosts) applied
+            to calibrated scores. For ranking, estimate the metric instead
+            (static_metric.CalibratedMetric.from_labeled).
         """
+        warnings.warn(
+            "metric_weighted_distance is deprecated: position-dependent "
+            "curvature inside a distance lost its pre-registered kill test "
+            "(v2 handoff §1). Use an estimated static metric "
+            "(CalibratedMetric.from_labeled) for ranking and DecisionCosts "
+            "for expert costs.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         midpoint = (x1 + x2) / 2
         G = self.tensor_at(midpoint)
         diff = x2 - x1
         return float(np.sqrt(max(0, diff @ G @ diff)))
 
     def metric_weighted_path_length(self, trajectory: List[np.ndarray]) -> float:
-        """Total metric-weighted path length along a trajectory."""
+        """Total metric-weighted path length along a trajectory.
+
+        .. deprecated:: 0.3.0
+            Path-energy trajectory features scored at or below chance on the
+            Apollo benchmarks (all variants ≤ 0.635 AUROC, whitened 0.452 —
+            v2 handoff §1). Aggregate positions instead: chart-space step
+            mean via boundary.step_mean.StepMeanScorer (0.790 on the same
+            data).
+        """
+        warnings.warn(
+            "metric_weighted_path_length is deprecated: path-energy features "
+            "carried no signal on the Apollo benchmarks (v2 handoff §1). Use "
+            "StepMeanScorer's chart-space mean instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         if len(trajectory) < 2:
             return 0.0
         total = 0.0
-        for i in range(1, len(trajectory)):
-            total += self.metric_weighted_distance(trajectory[i-1], trajectory[i])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            for i in range(1, len(trajectory)):
+                total += self.metric_weighted_distance(trajectory[i - 1], trajectory[i])
         return total
 
     def boundary_proximity(self, x: np.ndarray) -> Dict[str, float]:

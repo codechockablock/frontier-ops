@@ -84,21 +84,28 @@ class TestConstitutionalMetric:
                     assert G[i, j] == pytest.approx(0.0, abs=0.01)
 
     def test_metric_weighted_distance(self):
+        # Deprecated in v2 (handoff §1: curvature-in-distance lost its
+        # pre-registered kill test); behavior kept, so keep asserting it.
         x1 = np.array([0.3, 0.1, 0.1, 0.1, 0.1, 0.3])
         x2 = np.array([0.3, 0.1, 0.5, 0.1, 0.1, 0.3])  # Credential spike
-        d = self.metric.metric_weighted_distance(x1, x2)
+        with pytest.warns(DeprecationWarning):
+            d = self.metric.metric_weighted_distance(x1, x2)
         # Compare to unweighted
         d_raw = np.linalg.norm(x2 - x1)
         # Metric should amplify credential direction
         assert d > d_raw
 
     def test_path_length(self):
+        # Deprecated in v2 (handoff §1: path-energy features carried no
+        # signal); behavior kept, so keep asserting it.
         traj = [np.array([0.5, 0.1, 0.1, 0.1, 0.1, 0.1]) for _ in range(5)]
-        length = self.metric.metric_weighted_path_length(traj)
+        with pytest.warns(DeprecationWarning):
+            length = self.metric.metric_weighted_path_length(traj)
         assert length == 0.0  # Stationary trajectory
 
         traj2 = [np.array([0.5 - i*0.1, 0.1 + i*0.1, 0.1, 0.1, 0.1, 0.1]) for i in range(5)]
-        length2 = self.metric.metric_weighted_path_length(traj2)
+        with pytest.warns(DeprecationWarning):
+            length2 = self.metric.metric_weighted_path_length(traj2)
         assert length2 > 0
 
     def test_boundary_proximity(self):

@@ -10,6 +10,12 @@ preserves memory of the starting baseline.
 
 Detection statistic: ||mu_fast - mu_slow||_G (metric-weighted divergence)
 
+VALIDATION REGIME (v2 note, 2026-07): this detector's design regime is
+long-running live sessions. The Apollo deception campaign only ever
+exercised it on 8-23-step response-internal paths, where it was
+uninformative -- that is out-of-regime evidence, not a negative result.
+Untested in its design regime; do not deprecate on that data.
+
 Under no drift: both converge to same mean, statistic → 0
 Under monotonic drift: fast leads slow, gap grows linearly with time
 After T steps of drift rate ε: gap ≈ ε · T · (1/α_slow - 1/α_fast)

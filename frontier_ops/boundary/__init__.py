@@ -9,6 +9,7 @@ from frontier_ops.boundary.constitution import (
 from frontier_ops.boundary.static_metric import (
     CONSTITUTIONAL_G as CONSTITUTIONAL_G,
     FEATURE_NAMES as FEATURE_NAMES,
+    CalibratedMetric as CalibratedMetric,
     MahalanobisStepDetector as MahalanobisStepDetector,
     EWMADriftDetector as EWMADriftDetector,
     SurpriseRatioDetector as SurpriseRatioDetector,

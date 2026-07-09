@@ -38,7 +38,15 @@ from frontier_ops.authorization.budget import AuthorizationLinkedBudget
 
 @dataclass
 class StepResult:
-    """Complete diagnostic result for one pipeline step."""
+    """Complete diagnostic result for one pipeline step.
+
+    Ranking vs alerting (v2 note): `alert_level` is a saturating,
+    threshold-gated decision signal for live monitoring. Never rank or
+    evaluate (AUROC etc.) on it — gating destroys ranking information
+    (alert AUROC 0.502 on a signal that scored 0.647 raw in the Apollo
+    campaign). Rank on the raw fields (concept_vec, concept_scores,
+    geodesic_distance, ...) or use boundary.step_mean.StepMeanScorer.
+    """
     step: int
     text: str
     # Concept extraction

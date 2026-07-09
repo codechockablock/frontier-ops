@@ -3,8 +3,8 @@ Decision layer — expert softplus costs over calibrated scores (v2).
 
 The Apollo campaign rehoused the constitution's softplus cost field: it is a
 valid *decision-layer* object, not a metric. Experts specify λ costs;
-geometry gets estimated (see ConstitutionalMetric.from_labeled in
-static_metric and StepMeanScorer). Costs therefore apply to CALIBRATED
+geometry gets estimated (see static_metric.CalibratedMetric.from_labeled
+and StepMeanScorer). Costs therefore apply to CALIBRATED
 scores AFTER ranking — never inside the distance/ranking computation, where
 saturating transforms destroy ranking information (pipeline alert AUROC
 0.502 on a signal that scored 0.647 raw).

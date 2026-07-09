@@ -8,6 +8,12 @@ nor point-wise EWMA catches this because each step is small.
 
 Solution: fit linear regression on sliding windows of each concept
 dimension. Flag when the slope exceeds a threshold.
+
+VALIDATION REGIME (v2 note, 2026-07): this detector's design regime is
+long-running live sessions. The Apollo deception campaign only ever
+exercised it on 8-23-step response-internal paths, where it was
+uninformative -- that is out-of-regime evidence, not a negative result.
+Untested in its design regime; do not deprecate on that data.
 """
 
 from __future__ import annotations

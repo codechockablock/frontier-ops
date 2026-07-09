@@ -15,7 +15,7 @@ from frontier_ops.boundary.decision import DecisionCosts
 from frontier_ops.boundary.constitution import Boundary, ConstitutionSpec, CrossTerm
 from frontier_ops.boundary.static_metric import (
     CONSTITUTIONAL_G,
-    ConstitutionalMetric as StaticMetric,
+    CalibratedMetric as StaticMetric,
 )
 from frontier_ops.boundary.step_mean import (
     MIN_STEPS,

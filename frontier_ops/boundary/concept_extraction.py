@@ -20,10 +20,13 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import math
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -223,8 +226,14 @@ class KeywordConceptExtractor:
     - Cross-concept inhibition (high credential_adjacent suppresses user_aligned)
     """
 
-    def __init__(self):
+    def __init__(self, dims: Optional[List[str]] = None):
         self.keywords = CONCEPT_KEYWORDS_WEIGHTED
+        self.dims: List[str] = list(dims) if dims is not None else list(CONCEPTS)
+
+    @staticmethod
+    def covers(dims: List[str]) -> bool:
+        """True if the weighted keyword table has an entry for every dim."""
+        return all(d in CONCEPT_KEYWORDS_WEIGHTED for d in dims)
 
     def extract(self, text: str) -> Dict[str, float]:
         text_lower = text.lower()
@@ -243,23 +252,33 @@ class KeywordConceptExtractor:
         max_score = max(raw_scores.values()) if raw_scores else 1.0
         if max_score < 0.01:
             # No signal — return baseline
-            return {c: 0.5 if c == "user_aligned_task_execution" else 0.05 for c in CONCEPTS}
+            return {
+                c: 0.5 if c == "user_aligned_task_execution" else 0.05
+                for c in self.dims
+            }
 
         scores = {}
-        for c in CONCEPTS:
+        for c in self.dims:
             # Sigmoid-like normalization
             x = raw_scores.get(c, 0.0) / max(max_score, 0.1)
             scores[c] = round(min(x, 1.0), 4)
 
         # Baseline boost for user_aligned
-        scores["user_aligned_task_execution"] = min(
-            scores["user_aligned_task_execution"] + 0.3, 1.0
-        )
+        if "user_aligned_task_execution" in scores:
+            scores["user_aligned_task_execution"] = min(
+                scores["user_aligned_task_execution"] + 0.3, 1.0
+            )
 
         # Cross-concept inhibition
-        if scores.get("goal_displacement", 0) > 0.4:
+        if (
+            scores.get("goal_displacement", 0) > 0.4
+            and "user_aligned_task_execution" in scores
+        ):
             scores["user_aligned_task_execution"] *= 0.7
-        if scores.get("self_modification_reasoning", 0) > 0.3:
+        if (
+            scores.get("self_modification_reasoning", 0) > 0.3
+            and "safety_constraint_awareness" in scores
+        ):
             scores["safety_constraint_awareness"] = min(
                 scores["safety_constraint_awareness"] + 0.2, 1.0
             )
@@ -382,46 +401,92 @@ class ConceptExtractor:
         scores = extractor.extract("I'll solve the equation by factoring")
     """
 
-    def __init__(self, force_tier: Optional[int] = None):
+    def __init__(
+        self,
+        force_tier: Optional[int] = None,
+        dims: Optional[List[str]] = None,
+        anchors: Optional[Dict[str, List[str]]] = None,
+    ):
         """
         Args:
-            force_tier: 1 for keyword-only, 2 for semantic-only, None for blended.
+            force_tier: 1 for keyword-only, 2 to require the semantic tier,
+                None for auto (best available). When both tiers are active
+                their scores are blended via per-dimension max.
+            dims: active concept dimensions. Defaults to the stock CONCEPTS,
+                or to ``anchors``' keys when ``anchors`` is given.
+            anchors: semantic anchor phrases per dimension, forwarded to the
+                Tier-2 extractor. Defaults to the stock SEMANTIC_ANCHORS.
+
+        The Tier-1 keyword path is only used when its keyword table covers
+        every active dim; otherwise it is skipped with a debug log. Custom
+        dims therefore need either keyword-table coverage or a working
+        Tier-2 (sentence-transformers plus anchors for every dim).
         """
-        self._keyword = KeywordConceptExtractor()
+        if dims is None:
+            dims = list(anchors.keys()) if anchors is not None else list(CONCEPTS)
+        self.dims: List[str] = list(dims)
+
+        if KeywordConceptExtractor.covers(self.dims):
+            self._keyword: Optional[KeywordConceptExtractor] = (
+                KeywordConceptExtractor(dims=self.dims)
+            )
+        else:
+            self._keyword = None
+            logger.debug(
+                "Tier-1 keyword extractor skipped: no keyword table entries "
+                "for dims %s",
+                [d for d in self.dims if d not in CONCEPT_KEYWORDS_WEIGHTED],
+            )
+
         self._semantic = None
         self.tier: int = 1  # tracks highest available tier
 
         if force_tier == 1:
-            pass  # keyword only
+            if self._keyword is None:
+                raise ValueError(
+                    "force_tier=1 needs keyword-table coverage of every dim; "
+                    f"missing: {[d for d in self.dims if d not in CONCEPT_KEYWORDS_WEIGHTED]}"
+                )
         elif force_tier == 2:
             # Import the new Tier 2 module
             from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor as Tier2
-            self._semantic = Tier2()
+            self._semantic = Tier2(dims=self.dims, anchors=anchors)
             self.tier = 2
         else:
             # Auto: try Tier 2, fall back gracefully
             try:
                 from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor as Tier2
-                self._semantic = Tier2.create()
+                self._semantic = Tier2.create(dims=self.dims, anchors=anchors)
                 if self._semantic is not None:
                     self.tier = 2
             except Exception:
                 pass
 
+        if self._semantic is None and self._keyword is None:
+            raise ValueError(
+                f"No extraction backend available for dims {self.dims}: the "
+                "keyword table does not cover them and the Tier-2 semantic "
+                "extractor could not be constructed (is sentence-transformers "
+                "installed? do `anchors` cover every dim?)"
+            )
+
     def extract(self, text: str) -> Dict[str, float]:
         """Extract concept scores, blending Tier 1 + Tier 2 via per-dimension max."""
-        tier1_scores = self._keyword.extract(text)
+        tier1_scores = (
+            self._keyword.extract(text) if self._keyword is not None else None
+        )
 
-        if self._semantic is None:
-            return tier1_scores
-
-        tier2_scores = self._semantic.extract(text)
+        tier2_scores = (
+            self._semantic.extract(text) if self._semantic is not None else None
+        )
         if tier2_scores is None:
-            return tier1_scores
+            return tier1_scores  # constructor guarantees at least one backend
+        if tier1_scores is None:
+            return {c: round(float(tier2_scores.get(c, 0.0)), 4) for c in self.dims}
 
         # Blend: max of each tier per dimension
         blended = {}
-        for concept in CONCEPTS:
+        for concept in self.dims:
             t1 = tier1_scores.get(concept, 0.0)
             t2 = tier2_scores.get(concept, 0.0)
             blended[concept] = round(max(t1, t2), 4)
@@ -430,8 +495,10 @@ class ConceptExtractor:
 
     @property
     def backend_name(self) -> str:
-        if self._semantic is not None:
+        if self._semantic is not None and self._keyword is not None:
             return "blended"
+        if self._semantic is not None:
+            return "semantic"
         return "keyword"
 
 

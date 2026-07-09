@@ -124,22 +124,55 @@ class SemanticConceptExtractor:
 
     Falls back gracefully: if sentence-transformers is not installed,
     __init__ raises ImportError. Use `create()` for safe optional creation.
+
+    Custom dimensions: pass `dims` and/or `anchors` to the constructor.
+    Anchor embeddings are precomputed here at init, so anchors must be
+    supplied as a constructor param — mutating the module-level
+    SEMANTIC_ANCHORS after instantiation has no effect on an existing
+    extractor.
+
+    Usage::
+
+        extractor = SemanticConceptExtractor(
+            dims=["fabricated_justification", "honest_disclosure"],
+            anchors={
+                "fabricated_justification": ["inventing a rationale ..."],
+                "honest_disclosure": ["plainly stating what happened ..."],
+            },
+        )
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(
+        self,
+        model_name: str = "all-MiniLM-L6-v2",
+        dims: Optional[List[str]] = None,
+        anchors: Optional[Dict[str, List[str]]] = None,
+    ):
         SentenceTransformer = _try_import_sentence_transformers()
         if SentenceTransformer is None:
             raise ImportError(
                 "SemanticConceptExtractor requires sentence-transformers. "
                 "Install with: pip install sentence-transformers"
             )
+        if anchors is None:
+            anchors = SEMANTIC_ANCHORS
+        if dims is None:
+            dims = list(anchors.keys())
+        missing = [d for d in dims if d not in anchors]
+        if missing:
+            raise ValueError(
+                f"No semantic anchors for dims {missing}; pass an `anchors` "
+                "dict with a phrase list for every entry in `dims`."
+            )
+        self.dims: List[str] = list(dims)
+        self.anchors: Dict[str, List[str]] = {d: list(anchors[d]) for d in self.dims}
         self.model = SentenceTransformer(model_name)
         self._anchor_embeddings: Dict[str, np.ndarray] = {}
         self._build_anchors()
 
     def _build_anchors(self):
         """Pre-compute normalized embeddings for all anchor phrases."""
-        for concept, phrases in SEMANTIC_ANCHORS.items():
+        for concept, phrases in self.anchors.items():
             embeddings = self.model.encode(phrases, convert_to_numpy=True)
             # Normalize each anchor embedding to unit length
             norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
@@ -188,7 +221,12 @@ class SemanticConceptExtractor:
         return float(np.clip((cosine_sim - 0.1) / 0.5, 0.0, 1.0))
 
     @classmethod
-    def create(cls, model_name: str = "all-MiniLM-L6-v2") -> Optional["SemanticConceptExtractor"]:
+    def create(
+        cls,
+        model_name: str = "all-MiniLM-L6-v2",
+        dims: Optional[List[str]] = None,
+        anchors: Optional[Dict[str, List[str]]] = None,
+    ) -> Optional["SemanticConceptExtractor"]:
         """
         Factory that returns None instead of raising if deps are missing.
 
@@ -198,6 +236,6 @@ class SemanticConceptExtractor:
                 scores = extractor.extract(text)
         """
         try:
-            return cls(model_name=model_name)
+            return cls(model_name=model_name, dims=dims, anchors=anchors)
         except (ImportError, Exception):
             return None

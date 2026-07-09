@@ -102,22 +102,45 @@ class FullPipeline:
         enable_governance: bool = True,
         enable_memory: bool = True,
         newma_threshold: float = 0.65,
+        dim_names: Optional[List[str]] = None,
+        semantic_anchors: Optional[Dict[str, List[str]]] = None,
     ):
+        """
+        Args:
+            dim_names: active concept dimensions, threaded through metric,
+                predictor, and extractor construction. Defaults to the stock
+                CONCEPTS, or to ``semantic_anchors``' keys when those are given.
+            semantic_anchors: anchor phrases per dimension for the Tier-2
+                extractor; required for custom dims the Tier-1 keyword table
+                does not cover.
+        """
+        if dim_names is None:
+            dim_names = (
+                list(semantic_anchors.keys())
+                if semantic_anchors is not None
+                else list(CONCEPTS)
+            )
+        self.dim_names: List[str] = list(dim_names)
+
         self.constitution = constitution or ConstitutionSpec.agent_safety_default()
 
         # Layer 0: Metric
-        self.metric = ConstitutionalMetric(self.constitution, dim_names=CONCEPTS)
+        self.metric = ConstitutionalMetric(self.constitution, dim_names=self.dim_names)
         self._boundary_thresholds = {
             b.concept: b.threshold for b in self.constitution.boundaries
         }
 
         # Concept extraction
-        self.extractor = ConceptExtractor(force_tier=concept_extractor_tier)
+        self.extractor = ConceptExtractor(
+            force_tier=concept_extractor_tier,
+            dims=self.dim_names,
+            anchors=semantic_anchors,
+        )
 
         # Efference copy
         self.predictor = EfferenceCopyPredictor(
-            n_dims=len(CONCEPTS),
-            dim_names=CONCEPTS,
+            n_dims=len(self.dim_names),
+            dim_names=self.dim_names,
         )
 
         # NEWMA. Threshold calibrated to the benign p95 of the metric-weighted
@@ -127,7 +150,7 @@ class FullPipeline:
         # carried almost no evidence. Recalibrate per deployment via the
         # newma_threshold constructor arg.
         self.newma = DualEWMA(
-            n_dims=len(CONCEPTS),
+            n_dims=len(self.dim_names),
             alpha_fast=0.5,
             alpha_slow=0.05,
             threshold=newma_threshold,
@@ -141,7 +164,7 @@ class FullPipeline:
 
         # Trend detector
         self.trend = ScopeCreepDetector(
-            dim_names=CONCEPTS,
+            dim_names=self.dim_names,
             window_size=8,
             slope_threshold=0.012,
             r2_threshold=0.5,
@@ -150,7 +173,7 @@ class FullPipeline:
 
         # Metric-adaptive EWMA
         self.ewma = MetricAdaptiveEWMA(
-            n_dims=len(CONCEPTS),
+            n_dims=len(self.dim_names),
             alpha=0.3,
             base_threshold=0.15,
         )
@@ -250,7 +273,7 @@ class FullPipeline:
 
         # 1. Concept extraction
         concept_scores = self.extractor.extract(text)
-        concept_vec = np.array([concept_scores.get(c, 0.0) for c in CONCEPTS])
+        concept_vec = np.array([concept_scores.get(c, 0.0) for c in self.dim_names])
 
         # 2. Metric at current position
         G = self.metric.tensor_at(concept_vec)
@@ -262,7 +285,7 @@ class FullPipeline:
         self.predictor.set_metric_tensor(G)
         predicted = self.predictor.predict_next()
         pred_error = self.predictor.compute_error(predicted, concept_vec)
-        proprio_context = pred_error.to_proprioceptive_context(CONCEPTS)
+        proprio_context = pred_error.to_proprioceptive_context(self.dim_names)
         self.predictor.update(concept_vec)
 
         # 4. Angular displacement delta
@@ -339,7 +362,8 @@ class FullPipeline:
         entered_fixed = [
             c for c in RESTRICTED_DIMENSIONS
             if c in self._boundary_thresholds
-            and concept_vec[CONCEPTS.index(c)] >= self._boundary_thresholds[c]
+            and c in self.dim_names
+            and concept_vec[self.dim_names.index(c)] >= self._boundary_thresholds[c]
         ]
 
         self.provenance.add_action(
@@ -507,7 +531,9 @@ class FullPipeline:
         self._angular_disp_acc = 0.0
         self._trajectory = []
         self._traj_mu = None
-        self.predictor = EfferenceCopyPredictor(n_dims=len(CONCEPTS), dim_names=CONCEPTS)
+        self.predictor = EfferenceCopyPredictor(
+            n_dims=len(self.dim_names), dim_names=self.dim_names
+        )
         self.newma.clear()
         self.drift_classifier.clear()
         self.trend.clear()

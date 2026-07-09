@@ -252,7 +252,13 @@ def check_metric_ordering(
 
 def check_step_mean(expected: Dict, tol: float, log: Callable = print) -> CheckResult:
     """F4 (chart-space step mean, nearest-centroid under calibrated metric)
-    vs F0 (whole-text single point), 5-fold CV rng(11), insider episodes."""
+    vs F0 (whole-text single point), 5-fold CV rng(11), insider episodes.
+
+    F4 runs through the promoted public API (StepMeanScorer, Phase 3): its
+    fit()/score_vector() are the campaign formula, so this check doubles as
+    the acceptance test that the public API reproduces AUROC 0.790."""
+    from frontier_ops.boundary.step_mean import StepMeanScorer
+
     res = CheckResult("step_mean_insider")
     STEP_X, FULL_X, Y = encoders.insider_step_encodings(log=log)
     n = len(Y)
@@ -279,18 +285,19 @@ def check_step_mean(expected: Dict, tol: float, log: Callable = print) -> CheckR
         mu_h = Xf_tr[Yf_tr == 0].mean(0)
         mu_d = Xf_tr[Yf_tr == 1].mean(0)
         mean_tr = np.stack([STEP_X[i].mean(0) for i in tr])
-        muh_m = mean_tr[Yf_tr == 0].mean(0)
-        mud_m = mean_tr[Yf_tr == 1].mean(0)
+
+        # F4 via the public API: centroids from train step-means, estimated
+        # metric from train whole-text vectors (campaign protocol).
+        scorer = StepMeanScorer(ridge=1e-3).fit(
+            mean_tr, Yf_tr, metric_X=Xf_tr, metric_y=Yf_tr
+        )
 
         s0 = [
             float((x - mu_h) @ Mf @ (x - mu_h) - (x - mu_d) @ Mf @ (x - mu_d))
             for x in Xf_tr
         ]
         sign0 = 1.0 if auroc(np.array(s0), Yf_tr) >= 0.5 else -1.0
-        s4 = [
-            float((m - muh_m) @ Mf @ (m - muh_m) - (m - mud_m) @ Mf @ (m - mud_m))
-            for m in mean_tr
-        ]
+        s4 = [scorer.score_vector(m) for m in mean_tr]
         sign4 = 1.0 if auroc(np.array(s4), Yf_tr) >= 0.5 else -1.0
 
         for i in te:
@@ -298,10 +305,7 @@ def check_step_mean(expected: Dict, tol: float, log: Callable = print) -> CheckR
             S["F0_single"][i] = sign0 * float(
                 (x - mu_h) @ Mf @ (x - mu_h) - (x - mu_d) @ Mf @ (x - mu_d)
             )
-            m = STEP_X[i].mean(0)
-            S["F4_mean_pos"][i] = sign4 * float(
-                (m - muh_m) @ Mf @ (m - muh_m) - (m - mud_m) @ Mf @ (m - mud_m)
-            )
+            S["F4_mean_pos"][i] = sign4 * scorer.score_vector(STEP_X[i].mean(0))
 
     res.values["step_mean_auroc"] = auroc(S["F4_mean_pos"], Y)
     res.values["step_mean_tpr_at_fpr02"] = tpr_at_fpr(S["F4_mean_pos"], Y)

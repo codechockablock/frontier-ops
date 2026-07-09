@@ -12,12 +12,13 @@ string grades "honest"/"deceptive", everything else dropped).
 from __future__ import annotations
 
 import json
-import re
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 import numpy as np
+
+from frontier_ops.boundary.step_mean import StepMeanScorer
 
 REPO_URL = "https://github.com/ApolloResearch/deception-detection"
 PINNED_COMMIT = "f8ec4010e74927394709dffa22b97bdf8cd5a62f"
@@ -155,15 +156,9 @@ def load_roleplaying_rows() -> List[Dict]:
     return rows
 
 
-STEP_SPLIT_RE = r"(?<=[.!?])\s+|\n+"
-MIN_STEP_CHARS = 15
-
-
-def split_steps(text: str) -> List[str]:
-    """Sentence/line steps (curvature_kill_test.py protocol)."""
-    return [
-        x.strip() for x in re.split(STEP_SPLIT_RE, text) if len(x.strip()) > MIN_STEP_CHARS
-    ]
+# Canonical splitter lives on the promoted public API (Phase 3); the regex and
+# min-length there are the curvature_kill_test.py protocol values.
+split_steps = StepMeanScorer.split_steps
 
 
 def load_insider_episodes() -> Tuple[List[Dict], np.ndarray]:

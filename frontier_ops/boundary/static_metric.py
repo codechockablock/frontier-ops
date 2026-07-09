@@ -14,6 +14,8 @@ These three detectors are empirically orthogonal — each catches violations the
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 from typing import List, Optional
 
@@ -67,15 +69,91 @@ CONSTITUTIONAL_G = _make_spd(_G_RAW)
 
 class ConstitutionalMetric:
     """
-    Expert-specified Riemannian metric tensor over behavioral feature space.
+    Static SPD metric tensor over behavioral feature space.
 
     score(v) = sqrt(v @ G @ v) -- the G-weighted norm of a feature vector.
-    This is the Mahalanobis distance from the origin under the constitutional metric.
+
+    v2 default: the metric is ESTIMATED from labeled data — pooled
+    within-class covariance inverse with ridge 1e-3 (`calibrate()` /
+    `from_labeled()`). It beat both identity and the expert-asserted G
+    everywhere it ran on the Apollo benchmarks (paired bootstrap
+    identity−asserted = +0.011, CI [+0.002, +0.020] — experts encode
+    consequences, not covariances). The asserted-G construction remains
+    available behind `asserted=True` with a DeprecationWarning.
+
+    Usage::
+
+        metric = ConstitutionalMetric.from_labeled(X, y)   # estimated (default path)
+        metric = ConstitutionalMetric(G=my_spd_matrix)     # explicit G
+        metric = ConstitutionalMetric(asserted=True)       # deprecated expert G
     """
 
-    def __init__(self, G: Optional[np.ndarray] = None):
-        self.G = _make_spd(G if G is not None else CONSTITUTIONAL_G)
+    def __init__(self, G: Optional[np.ndarray] = None, *, asserted: bool = False):
+        if G is None:
+            # Both the explicit flag and the legacy bare construction land on
+            # the expert-asserted G — deprecated per the v2 post-mortem.
+            warnings.warn(
+                "Expert-asserted G is deprecated: it lost to the identity "
+                "metric on the Apollo benchmarks (v2 handoff §1 — experts "
+                "encode consequences, not covariances). Calibrate an "
+                "estimated metric with ConstitutionalMetric.from_labeled(X, y) "
+                "or pass an explicit G; asserted=True keeps the expert matrix "
+                "but stays deprecated.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            G = CONSTITUTIONAL_G
+        elif asserted:
+            raise ValueError("pass either G or asserted=True, not both")
+        self.G = _make_spd(G)
         self._eigvals = np.linalg.eigvalsh(self.G)
+
+    @classmethod
+    def from_labeled(
+        cls,
+        X: np.ndarray,
+        y: np.ndarray,
+        ridge: float = 1e-3,
+        ledoit_wolf: bool = False,
+    ) -> "ConstitutionalMetric":
+        """Estimated shrinkage metric: inverse pooled within-class covariance.
+
+        The v2 campaign's ridge of 1e-3 is kept as the reproducibility
+        default; `ledoit_wolf=True` uses scikit-learn's Ledoit-Wolf
+        shrinkage on the pooled residuals instead (optional dependency).
+        """
+        X = np.asarray(X, float)
+        y = np.asarray(y, int)
+        d = X.shape[1]
+        residuals = []
+        dof = 0
+        for c in np.unique(y):
+            Z = X[y == c] - X[y == c].mean(0)
+            residuals.append(Z)
+            dof += max((y == c).sum() - 1, 0)
+        R = np.vstack(residuals)
+        if ledoit_wolf:
+            from sklearn.covariance import LedoitWolf
+
+            cov = LedoitWolf().fit(R).covariance_
+            G = np.linalg.inv(cov)
+        else:
+            Sw = R.T @ R
+            G = np.linalg.inv(Sw / max(dof, 1) + ridge * np.eye(d))
+        return cls(G=G)
+
+    def calibrate(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        ridge: float = 1e-3,
+        ledoit_wolf: bool = False,
+    ) -> "ConstitutionalMetric":
+        """Re-fit this metric in place from labeled vectors (see from_labeled)."""
+        fitted = type(self).from_labeled(X, y, ridge=ridge, ledoit_wolf=ledoit_wolf)
+        self.G = fitted.G
+        self._eigvals = np.linalg.eigvalsh(self.G)
+        return self
 
     def score(self, v: np.ndarray) -> float:
         """G-weighted norm: sqrt(v @ G @ v)."""

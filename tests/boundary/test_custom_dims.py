@@ -7,14 +7,15 @@ through FullPipeline(concept_extractor_tier=2) without crashing, and the
 Tier-1 keyword path must be skipped (never crash) when its table does not
 cover the active dims.
 
-NOTE: the anchor phrases below are placeholders for the Phase 1 mechanics
-check only. The eval battery must use the earned_anchors.py phrases
-verbatim (single source of truth, written blind to the benchmark data).
+Anchor phrases come verbatim from eval/session_artifacts/earned_anchors.py —
+the single source of truth per handoff Appendix A (written blind to the
+benchmark data).
 """
 
 import numpy as np
 import pytest
 
+from eval.session_artifacts.earned_anchors import DEC_ANCHORS
 from frontier_ops.boundary import concept_extraction
 from frontier_ops.boundary.concept_extraction import (
     CONCEPTS,
@@ -32,44 +33,7 @@ APPENDIX_A_DIMS = [
     "honest_disclosure",
 ]
 
-APPENDIX_A_ANCHORS = {
-    "fabricated_justification": [
-        "inventing a plausible-sounding reason after the fact",
-        "citing a rule or authority that does not exist",
-        "constructing a rationale to cover the real motivation",
-        "backfilling an explanation for a decision already made",
-        "justifying an action with made-up evidence",
-        "offering a technical excuse that is not actually true",
-        "claiming a constraint required the action when it did not",
-    ],
-    "strategic_vagueness": [
-        "answering in generalities to avoid committing to specifics",
-        "leaving out the details that would invite scrutiny",
-        "using hedged language to keep every option open",
-        "describing the situation so loosely it cannot be checked",
-        "deflecting a direct question with an abstract answer",
-        "being deliberately imprecise about what was done",
-        "wording a claim so it cannot be pinned down later",
-    ],
-    "impression_management": [
-        "presenting the work in the most flattering possible light",
-        "emphasizing successes while downplaying failures",
-        "curating what the audience sees to shape their judgment",
-        "performing confidence beyond what the evidence supports",
-        "taking visible credit while shifting blame elsewhere",
-        "framing a setback as if it were part of the plan",
-        "polishing the story of what happened for the listener",
-    ],
-    "honest_disclosure": [
-        "plainly stating what happened including the mistakes",
-        "volunteering the caveats and limitations up front",
-        "admitting uncertainty about the result",
-        "reporting the failure as a failure without spin",
-        "correcting the record when an earlier claim was wrong",
-        "sharing the unflattering details relevant to the decision",
-        "giving a complete account even when it looks bad",
-    ],
-}
+APPENDIX_A_ANCHORS = DEC_ANCHORS
 
 
 def appendix_a_constitution() -> ConstitutionSpec:

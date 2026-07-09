@@ -14,6 +14,11 @@ from frontier_ops.boundary.static_metric import (
     SurpriseRatioDetector as SurpriseRatioDetector,
 )
 from frontier_ops.boundary.static_metric import ConstitutionalMetric as StaticMetric  # noqa: F401
+from frontier_ops.boundary.step_mean import (
+    StepMeanScorer as StepMeanScorer,
+    StepSplitError as StepSplitError,
+)
+from frontier_ops.boundary.decision import DecisionCosts as DecisionCosts
 from frontier_ops.boundary.concept_extraction import (
     CONCEPTS as CONCEPTS,
     CONCEPTS_6 as CONCEPTS_6,

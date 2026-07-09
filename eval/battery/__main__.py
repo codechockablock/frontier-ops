@@ -26,7 +26,24 @@ def main() -> int:
     ap.add_argument(
         "--no-network", action="store_true", help="fail instead of fetching"
     )
+    ap.add_argument(
+        "--encoder",
+        default=None,
+        help="Phase 5 experiment: run under an alternative sentence-transformers "
+        "encoder and report deltas vs the §6 baselines (informational — the "
+        "default encoder never changes)",
+    )
     args = ap.parse_args()
+
+    from eval.battery import encoders
+
+    experiment = args.encoder is not None and args.encoder != encoders.MODEL_NAME
+    if experiment:
+        encoders.set_model(args.encoder)
+        print(
+            f"PHASE 5 ENCODER EXPERIMENT: {args.encoder} (informational; "
+            f"baselines assume {encoders.MODEL_NAME})"
+        )
 
     try:
         path = fetch_dataset(allow_network=not args.no_network)
@@ -59,6 +76,11 @@ def main() -> int:
         status = "PASS" if r.passed else "FAIL"
         all_ok &= r.passed
         print(f"{status}  {r.name}")
+        exp = expected["checks"][r.name]
+        for k, v in r.values.items():
+            base = exp.get(k)
+            delta = f"  (baseline {base:.3f}, Δ{v - base:+.3f})" if isinstance(base, (int, float)) else ""
+            print(f"      {k}: {v:.3f}{delta}")
         for fail in r.tol_failures:
             print(f"      tolerance: {fail}")
         for fail in r.invariant_failures:
@@ -66,6 +88,12 @@ def main() -> int:
         for note in r.notes:
             print(f"      note: {note}")
     print("=" * 72)
+    if experiment:
+        print(
+            f"encoder experiment ({args.encoder}): informational only — "
+            "pass/fail above is relative to the MiniLM baselines"
+        )
+        return 0
     print("battery:", "PASS" if all_ok else "FAIL")
     return 0 if all_ok else 1
 

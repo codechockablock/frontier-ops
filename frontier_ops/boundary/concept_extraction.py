@@ -406,6 +406,7 @@ class ConceptExtractor:
         force_tier: Optional[int] = None,
         dims: Optional[List[str]] = None,
         anchors: Optional[Dict[str, List[str]]] = None,
+        model_name: str = "all-MiniLM-L6-v2",
     ):
         """
         Args:
@@ -416,6 +417,8 @@ class ConceptExtractor:
                 or to ``anchors``' keys when ``anchors`` is given.
             anchors: semantic anchor phrases per dimension, forwarded to the
                 Tier-2 extractor. Defaults to the stock SEMANTIC_ANCHORS.
+            model_name: sentence-transformers model for the Tier-2 extractor
+                (experiment flag; the default encoder is the supported one).
 
         The Tier-1 keyword path is only used when its keyword table covers
         every active dim; otherwise it is skipped with a debug log. Custom
@@ -450,13 +453,15 @@ class ConceptExtractor:
         elif force_tier == 2:
             # Import the new Tier 2 module
             from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor as Tier2
-            self._semantic = Tier2(dims=self.dims, anchors=anchors)
+            self._semantic = Tier2(model_name=model_name, dims=self.dims, anchors=anchors)
             self.tier = 2
         else:
             # Auto: try Tier 2, fall back gracefully
             try:
                 from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor as Tier2
-                self._semantic = Tier2.create(dims=self.dims, anchors=anchors)
+                self._semantic = Tier2.create(
+                    model_name=model_name, dims=self.dims, anchors=anchors
+                )
                 if self._semantic is not None:
                     self.tier = 2
             except Exception:

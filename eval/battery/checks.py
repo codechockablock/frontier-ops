@@ -79,9 +79,11 @@ def check_zero_shot(expected: Dict, tol: float, log: Callable = print) -> CheckR
     )
 
     # RUN A — stock constitution control, per-step context, alert_level score.
+    from frontier_ops.boundary.concept_extraction import ConceptExtractor
+
     encoders.install_st_cache()
     a_scores: List[float] = []
-    shared = None
+    shared = ConceptExtractor(force_tier=2, model_name=encoders.active_model())
     for r in rows:
         pipe = FullPipeline(
             constitution=ConstitutionSpec.agent_safety_default(),
@@ -89,10 +91,7 @@ def check_zero_shot(expected: Dict, tol: float, log: Callable = print) -> CheckR
             enable_governance=False,
             enable_memory=False,
         )
-        if shared is None:
-            shared = pipe.extractor
-        else:
-            pipe.extractor = shared  # fresh pipeline per episode, one encoder
+        pipe.extractor = shared  # fresh pipeline per episode, one encoder
         last = None
         for step_text in (r["sys"], r["user"], r["out"]):
             if step_text:

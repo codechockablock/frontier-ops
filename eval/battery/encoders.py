@@ -30,10 +30,36 @@ DEC_DIMS: List[str] = [
     "honest_disclosure",
 ]
 
-MODEL_NAME = "all-MiniLM-L6-v2"
+MODEL_NAME = "all-MiniLM-L6-v2"  # campaign default — do not change (§6)
+
+# Phase 5 (stretch): the battery can run under an alternative encoder via
+# `python -m eval.battery --encoder NAME`. Alternative-encoder runs are
+# informational (deltas vs the §6 baselines); the default stays MiniLM.
+_ACTIVE_MODEL = MODEL_NAME
 
 _ST_CACHE: Dict[str, object] = {}
 _ST_PATCHED = False
+
+
+def set_model(name: str) -> None:
+    """Switch the battery's encoder (Phase 5 experiment flag)."""
+    global _ACTIVE_MODEL, _CHART_EXTRACTOR
+    if name != _ACTIVE_MODEL:
+        _ACTIVE_MODEL = name
+        _CHART_EXTRACTOR = None
+
+
+def active_model() -> str:
+    return _ACTIVE_MODEL
+
+
+def _cache_name(base: str) -> str:
+    """Cache filename, suffixed with a model slug for non-default encoders
+    so alternative-encoder runs never poison the baseline caches."""
+    if _ACTIVE_MODEL == MODEL_NAME:
+        return f"{base}.npz"
+    slug = _ACTIVE_MODEL.split("/")[-1]
+    return f"{base}--{slug}.npz"
 
 
 def install_st_cache() -> None:
@@ -66,7 +92,7 @@ def chart_extractor():
         from frontier_ops.boundary.semantic_extraction import SemanticConceptExtractor
 
         _CHART_EXTRACTOR = SemanticConceptExtractor(
-            model_name=MODEL_NAME, dims=DEC_DIMS, anchors=DEC_ANCHORS
+            model_name=_ACTIVE_MODEL, dims=DEC_DIMS, anchors=DEC_ANCHORS
         )
     return _CHART_EXTRACTOR
 
@@ -77,7 +103,7 @@ def chart_vec(scores: Dict[str, float]) -> np.ndarray:
 
 def chart_encodings(task: str, log=print) -> Tuple[np.ndarray, np.ndarray]:
     """4-D chart encodings of response texts, cached (encode_cache.py port)."""
-    cache = cache_dir() / f"enc_{task}.npz"
+    cache = cache_dir() / _cache_name(f"enc_{task}")
     if cache.exists():
         z = np.load(cache)
         return z["X"], z["Y"]
@@ -97,7 +123,7 @@ def chart_encodings(task: str, log=print) -> Tuple[np.ndarray, np.ndarray]:
 
 def raw_encodings(task: str, log=print) -> Tuple[np.ndarray, np.ndarray]:
     """Raw 384-D normalized MiniLM encodings, cached (encode_raw.py port)."""
-    cache = cache_dir() / f"raw_{task}.npz"
+    cache = cache_dir() / _cache_name(f"raw_{task}")
     if cache.exists():
         z = np.load(cache)
         return z["E"], z["Y"]
@@ -117,7 +143,7 @@ def insider_step_encodings(
 ) -> Tuple[List[np.ndarray], np.ndarray, np.ndarray]:
     """Per-step + full-response chart encodings for insider episodes, cached
     (curvature_kill_test.py port). Returns (STEP_X, FULL_X, Y)."""
-    cache = cache_dir() / "enc_insider_steps.npz"
+    cache = cache_dir() / _cache_name("enc_insider_steps")
     if cache.exists():
         z = np.load(cache, allow_pickle=True)
         return list(z["step_x"]), z["full_x"], z["Y"]

@@ -75,6 +75,8 @@ class CalibratedDetector:
         # held-out benign scores from calibrate_conformal, kept so the
         # threshold can be re-derived at another alpha (persisted by save)
         self.conformal_scores: Optional[np.ndarray] = None
+        # optional adaptive threshold source (see attach_rolling_threshold)
+        self._rolling = None
 
     # -- embedding ---------------------------------------------------------
 
@@ -194,11 +196,33 @@ class CalibratedDetector:
             raise RuntimeError("calibrate() before score()")
         return self.embed(texts) @ self.direction
 
+    def attach_rolling_threshold(self, rolling) -> None:
+        """Let :meth:`flag` consult a
+        :class:`~frontier_ops.adaptive_threshold.RollingThreshold` so the
+        operating point tracks benign distribution shift without relabeling.
+
+        Once ``rolling.ready`` (warmup complete), its adaptive quantile takes
+        precedence over the static ``threshold``; before that, the static
+        threshold (if any) is used. Pass ``None`` to detach. The caller owns
+        feeding confirmed-benign scores into ``rolling.update``.
+        """
+        self._rolling = rolling
+
+    @property
+    def effective_threshold(self) -> Optional[float]:
+        """The threshold :meth:`flag` currently applies: the attached rolling
+        threshold when warmed up, else the static calibrated one."""
+        if self._rolling is not None and self._rolling.ready:
+            return float(self._rolling.threshold)
+        return self.threshold
+
     def flag(self, text: str) -> bool:
-        """True if the action scores above the calibrated threshold."""
-        if self.threshold is None:
+        """True if the action scores above the effective threshold (the
+        attached rolling threshold when ready, else the static one)."""
+        threshold = self.effective_threshold
+        if threshold is None:
             raise RuntimeError("set a threshold (calibrate(fpr=...) or set_threshold)")
-        return self.score(text) > self.threshold
+        return self.score(text) > threshold
 
     @property
     def calibrated(self) -> bool:

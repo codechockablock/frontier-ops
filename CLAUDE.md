@@ -15,9 +15,12 @@ legacy shell around two good signals (prototype + NEWMA) — read
 `docs/LEGACY.md` before touching anything that looks deprecated; it defines
 what is validated, what is infrastructure, and what is quarantined.
 
-**Relationship to unified-stack:** frontier-ops is the upstream library.
-unified-stack is the production pipeline that builds on it. When making
-changes here, consider whether unified-stack tests need to be re-run.
+**Relationship to unified-stack:** `~/unified-stack` is a *diverged fork*,
+not a consumer (verified 2026-07-11): it vendors its own `frontier_ops`
+package at version 2.0.0 with a different architecture and imports nothing
+from this repo, so changes here cannot break it and its tests need no
+re-run. One live coupling remains: both claim the distribution name
+`frontier-ops` — resolve before any PyPI publish.
 
 ## Repo Structure
 

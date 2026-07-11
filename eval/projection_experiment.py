@@ -291,7 +291,7 @@ def main():
     print("\n" + "=" * 65)
     print("=== Verdict ===")
     print("Does random projection preserve separation?")
-    print(f"Separation ratio (credential within / credential↔testing):")
+    print("Separation ratio (credential within / credential↔testing):")
     print(f"  MiniLM:  {raw_ratio:.3f}")
     print(f"  Phasor:  {ph_ratio:.3f}")
 

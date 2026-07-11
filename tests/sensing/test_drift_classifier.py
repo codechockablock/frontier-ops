@@ -1,7 +1,6 @@
 """Tests for DriftClassifier."""
 
 import numpy as np
-import pytest
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 
 

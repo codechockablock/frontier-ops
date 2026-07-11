@@ -1,9 +1,8 @@
 """Tests for Bayes factor evidence combiner."""
 
 import numpy as np
-import pytest
 from frontier_ops.sensing.combiner import (
-    BayesFactorCombiner, vovk_sellke_bf, interpret_bf, EvidenceResult,
+    BayesFactorCombiner, vovk_sellke_bf, interpret_bf,
 )
 
 

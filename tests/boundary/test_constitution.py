@@ -3,8 +3,7 @@
 import numpy as np
 import pytest
 from frontier_ops.boundary.constitution import (
-    ConstitutionSpec, ConstitutionalMetric, Boundary, CrossTerm,
-    softplus, softplus_derivative,
+    ConstitutionSpec, ConstitutionalMetric, Boundary, softplus, softplus_derivative,
 )
 from frontier_ops.boundary.concept_extraction import CONCEPTS
 

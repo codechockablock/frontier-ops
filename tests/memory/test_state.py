@@ -1,7 +1,6 @@
 """Tests for AgentState and ConceptTrajectory."""
 
 import numpy as np
-import pytest
 from frontier_ops.memory.state import AgentState, ConceptTrajectory, ConceptTrajectoryPoint
 
 

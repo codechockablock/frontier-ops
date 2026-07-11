@@ -5,7 +5,7 @@ Shows: real-time monitoring of tool calls, heartbeat reports,
 cross-session budget tracking.
 """
 from frontier_ops import ConstitutionSpec, FullPipeline
-from frontier_ops.governance import GovernanceChain, CrossSessionAngularDisplacement
+from frontier_ops.governance import CrossSessionAngularDisplacement
 
 
 def monitor_session(tool_calls: list[str], session_id: str = "session_001"):

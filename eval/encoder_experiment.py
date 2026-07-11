@@ -9,8 +9,6 @@ distance from the benign baseline than typical benign actions?
 """
 
 import json
-import os
-import sys
 import numpy as np
 from pathlib import Path
 
@@ -270,7 +268,7 @@ with open(OUT_FILE, "w") as f:
 print("\n" + "="*70)
 print("ENCODER EXPERIMENT RESULTS — 2026-03-24")
 print("="*70)
-print(f"\nMethod A: all-MiniLM-L6-v2 + PCA(50) + Mahalanobis")
+print("\nMethod A: all-MiniLM-L6-v2 + PCA(50) + Mahalanobis")
 print(f"  {'Verdict':<10} {'N':>5}  {'Mean':>8}  {'Std':>8}  {'Min':>8}  {'Max':>8}")
 print(f"  {'pass':<10} {benign_mask.sum():>5}  {pass_mean:>8.4f}  {pass_std:>8.4f}  {pass_min:>8.4f}  {pass_max:>8.4f}")
 print(f"  {'monitor':<10} {monitor_mask.sum():>5}  {monitor_mean:>8.4f}  {monitor_std:>8.4f}  {monitor_min:>8.4f}  {monitor_max:>8.4f}")
@@ -278,7 +276,7 @@ print(f"  {'flag':<10} {(verdicts_arr=='flag').sum():>5}  {flag_mean:>8.4f}  {fl
 print(f"  {'block':<10} {(verdicts_arr=='block').sum():>5}  {block_mean:>8.4f}  {block_std:>8.4f}  {block_min:>8.4f}  {block_max:>8.4f}")
 print(f"  AUC={auc_maha:.4f}  Cohen's d={cohens_d_maha:.4f}")
 
-print(f"\n  TRUE POSITIVES (adversarial):")
+print("\n  TRUE POSITIVES (adversarial):")
 if tp_indices:
     for i, idx in enumerate(tp_indices):
         marker = "🚨" if maha_distances[idx] > pass_mean + pass_std else "⚠️ "
@@ -286,14 +284,14 @@ if tp_indices:
 else:
     print("    [no exact matches found in dataset]")
 
-print(f"\n  FALSE POSITIVES (benign, wrongly flagged):")
+print("\n  FALSE POSITIVES (benign, wrongly flagged):")
 if fp_indices:
     for i, idx in enumerate(fp_indices):
         print(f"    FP{i+1} dist={maha_distances[idx]:.4f}  ({texts[idx][:70]!r})")
 else:
     print("    [no exact matches found in dataset]")
 
-print(f"\nMethod B: TF-IDF char(3-5) + Cosine")
+print("\nMethod B: TF-IDF char(3-5) + Cosine")
 print(f"  {'Verdict':<10} {'Mean':>8}  {'Std':>8}")
 print(f"  {'pass':<10} {tp_pass_mean:>8.4f}  {tp_pass_std:>8.4f}")
 print(f"  {'monitor':<10} {tp_monitor_mean:>8.4f}  {tp_monitor_std:>8.4f}")
@@ -301,7 +299,7 @@ print(f"  {'flag':<10} {tp_flag_mean:>8.4f}  {tp_flag_std:>8.4f}")
 print(f"  {'block':<10} {tp_block_mean:>8.4f}  {tp_block_std:>8.4f}")
 print(f"  AUC={auc_tfidf:.4f}  Cohen's d={cohens_d_tfidf:.4f}")
 
-print(f"\n  TRUE POSITIVES:")
+print("\n  TRUE POSITIVES:")
 if tp_indices:
     for i, idx in enumerate(tp_indices):
         print(f"    TP{i+1} dist={distances_tfidf[idx]:.4f}")

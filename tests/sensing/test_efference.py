@@ -1,7 +1,6 @@
 """Tests for efference copy predictor."""
 
 import numpy as np
-import pytest
 from frontier_ops.sensing.efference import EfferenceCopyPredictor, PredictionError
 
 
@@ -65,7 +64,7 @@ class TestEfferenceCopyPredictor:
     def test_prediction_source_transitions(self):
         # Start with ewma
         self.pred.update(np.ones(6) / 6)
-        p = self.pred.predict_next()
+        self.pred.predict_next()
 
         # After 3 steps, should use linear
         for _ in range(3):
@@ -140,7 +139,7 @@ class TestEfferenceCopyPredictor:
             self.pred.update(np.random.dirichlet(np.ones(6)))
         s = self.pred.stats
         assert s["step"] == 6
-        assert s["kalman_initialized"] == True
+        assert s["kalman_initialized"]
         assert 0 <= s["stability"] <= 1
 
     def test_set_metric_tensor(self):

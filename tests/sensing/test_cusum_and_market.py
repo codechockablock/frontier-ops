@@ -11,20 +11,17 @@ Test categories (per CORRECTNESS_SPEC.md §7):
   7.7 Performance tests — latency ceiling
 """
 
-import math
-import re
 import time
 
 import numpy as np
 import pytest
 
-from frontier_ops.sensing.cusum import CUSUMAlert, DASCUSUM, SPRTDecision, SPRTWrapper
+from frontier_ops.sensing.cusum import DASCUSUM, SPRTDecision, SPRTWrapper
 from frontier_ops.sensing.market_signals import (
     SeveritySignal,
     IntervalAnomalySignal,
     DSignalResult,
     SSignalResult,
-    VERDICT_SEVERITY,
 )
 from frontier_ops.sensing.market_gate import (
     MarketGate,
@@ -654,10 +651,7 @@ class TestIntegration:
             result = gate.evaluate(verdict, t)
             results.append(result)
 
-        # Should have some labels during FLAG/BLOCK phase
-        flag_block_results = results[15:]
-        labels = [r for r in flag_block_results if r is not None]
-        # At minimum, the state should reflect the escalation
+        # The state should reflect the escalation during FLAG/BLOCK phase
         state = gate.get_state()
         assert state.d_raw > 1.0, "D_raw should be elevated after FLAG/BLOCK"
 

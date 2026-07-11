@@ -22,7 +22,7 @@ import re
 import sys
 import time
 from datetime import date
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -595,7 +595,7 @@ def main():
         lo = sp_stats.beta.ppf(alpha/2, k, n-k+1) if k > 0 else 0.0
         hi = sp_stats.beta.ppf(1-alpha/2, k+1, n-k) if k < n else 1.0
         return lo, hi
-    
+
     tpr_lo, tpr_hi = clopper_pearson(tp, tp + fn)
     fpr_lo, fpr_hi = clopper_pearson(fp, fp + tn)
 

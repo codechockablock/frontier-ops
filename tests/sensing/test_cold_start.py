@@ -15,7 +15,7 @@ import time
 
 import pytest
 
-from frontier_ops.sensing.cold_start import ColdStartDetector, ColdStartEvent
+from frontier_ops.sensing.cold_start import ColdStartDetector
 from frontier_ops.sensing.market_gate import MarketGate
 from frontier_ops.sensing.market_signals import SeveritySignal, IntervalAnomalySignal
 

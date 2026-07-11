@@ -5,13 +5,10 @@ Tests for the enterprise workflow classifier.
 import pytest
 
 from frontier_ops.integration.workflow_classifier import (
-    ClassificationResult,
     RiskLevel,
     WorkflowClassifier,
-    WorkflowTransition,
     WorkflowType,
     WORKFLOW_RISK,
-    NOTABLE_TRANSITIONS,
 )
 
 

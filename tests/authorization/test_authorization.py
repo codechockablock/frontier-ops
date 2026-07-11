@@ -7,7 +7,6 @@ Layer 3: AGM scope operators + budget linkage
 """
 
 import numpy as np
-import pytest
 
 from frontier_ops.boundary.concept_extraction import CONCEPTS
 from frontier_ops.boundary.constitution import ConstitutionSpec, ConstitutionalMetric
@@ -23,7 +22,6 @@ from frontier_ops.authorization.scope import (
 )
 from frontier_ops.authorization.provenance import (
     ProvenanceGraph,
-    ProvenanceNode,
     NodeType,
     EdgeType,
 )
@@ -482,7 +480,7 @@ class TestAuthorizationLinkedBudget:
 
     def test_budget_never_exceeds_total(self):
         # Try to over-replenish
-        event = self.budget.on_authorization_event(
+        self.budget.on_authorization_event(
             operator="establish", directive_node_id="dir-x", goal_confidence=1.0
         )
         assert self.budget.budget_remaining <= self.budget.total_budget

@@ -27,7 +27,7 @@ Numpy-only; usable standalone with any score stream.
 from __future__ import annotations
 
 from collections import deque
-from typing import Deque, Optional
+from typing import Deque
 
 import numpy as np
 

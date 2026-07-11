@@ -14,7 +14,6 @@ Output: eval/results/trajectory-roc-{date}.md
 from __future__ import annotations
 import os, sys
 from datetime import date
-from typing import Dict, List, Tuple
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

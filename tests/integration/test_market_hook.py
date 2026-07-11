@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 from frontier_ops.integration.market_hook import MarketHook
-from frontier_ops.sensing.market_signals import SeveritySignal, IntervalAnomalySignal
+from frontier_ops.sensing.market_signals import SeveritySignal
 from frontier_ops.sensing.market_gate import SIGNAL_LABEL_VARIANTS
 
 
@@ -374,7 +374,6 @@ class TestCUSUMRecovery:
         # Fill window with BLOCKs
         for _ in range(10):
             sig.step("block")
-        stat_before = sig.statistic
 
         # One PASS — window is now 9 BLOCKs + 1 PASS, not all-PASS
         sig.step("pass")

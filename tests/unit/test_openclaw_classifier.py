@@ -1,7 +1,6 @@
 """
 Unit tests for _classify_source() in openclaw_classifier.
 """
-import pytest
 from frontier_ops.integration.openclaw_classifier import classify_tool_call
 
 

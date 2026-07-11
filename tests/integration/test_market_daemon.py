@@ -2,8 +2,7 @@
 
 import os
 import stat
-import tempfile
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -53,8 +52,7 @@ class TestWriteAuthStateLogging:
 
     def test_logs_on_write_failure(self, tmp_path, monkeypatch, caplog):
         import logging
-        from unittest.mock import MagicMock
-        from frontier_ops.integration.market_daemon import write_auth_state, AUTH_STATE_PATH
+        from frontier_ops.integration.market_daemon import write_auth_state
 
         # Point AUTH_STATE_PATH to an impossible location
         bad_path = str(tmp_path / "no" / "such" / "dir" / "state.json")

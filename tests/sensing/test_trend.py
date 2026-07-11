@@ -1,7 +1,6 @@
 """Tests for trend-based detectors."""
 
 import numpy as np
-import pytest
 from frontier_ops.sensing.trend import ScopeCreepDetector, MetricAdaptiveEWMA
 
 

@@ -26,10 +26,10 @@ import stat
 import sys
 import time
 
-logger = logging.getLogger(__name__)
-
 from frontier_ops.integration.market_hook import MarketHook
 from frontier_ops import FullPipeline
+
+logger = logging.getLogger(__name__)
 
 AUTH_STATE_PATH = os.path.expanduser("~/.openclaw/workspace/authorization_state.json")
 

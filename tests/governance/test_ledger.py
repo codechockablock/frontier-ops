@@ -1,7 +1,6 @@
 """Tests for cross-session angular displacement management."""
 
 import numpy as np
-import pytest
 from frontier_ops.governance.ledger import CrossSessionAngularDisplacement, SessionSummary
 
 
@@ -38,7 +37,6 @@ class TestCrossSessionAngularDisplacement:
             governance_hash="def456",
         ))
         # Session 2 starts far from where session 1 ended
-        budget_before = cs.budget_remaining
         result = cs.start_session("s2", np.array([0.8, 0.1, 0.0, 0.0, 0.0, 0.1]))
         # Displacement should cost something
         assert result["displacement_cost"] > 0

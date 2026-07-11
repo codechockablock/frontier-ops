@@ -17,17 +17,16 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 
 from frontier_ops.sensing.market_signals import (
     IntervalAnomalySignal,
     SeveritySignal,
-    VERDICT_SEVERITY,
 )
 
 

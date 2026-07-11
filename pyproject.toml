@@ -58,6 +58,15 @@ Documentation = "https://github.com/codechockablock/frontier-ops#readme"
 [tool.hatch.build.targets.wheel]
 packages = ["frontier_ops"]
 
+[tool.ruff]
+# Verbatim provenance records from live sessions — never reformat or lint.
+extend-exclude = ["eval/session_artifacts"]
+
+[tool.ruff.lint.per-file-ignores]
+# Eval scripts are intentionally terse (compound statements, inline
+# experiment state); lint them for real errors only, not style.
+"eval/**" = ["E401", "E402", "E701", "E702", "E741", "F841"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [

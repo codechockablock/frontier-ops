@@ -11,7 +11,6 @@ import json
 import sys
 
 from frontier_ops import ConstitutionSpec, FullPipeline
-from frontier_ops.governance import GovernanceChain
 
 
 def main():

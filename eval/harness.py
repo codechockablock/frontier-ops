@@ -21,12 +21,11 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import math
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 
 import numpy as np
 
@@ -347,7 +346,7 @@ def run_evaluation(
 
     # 6. Orthogonality
     if verbose:
-        print(f"\n[6/8] Orthogonality analysis...")
+        print("\n[6/8] Orthogonality analysis...")
 
     spike_only = sum(1 for r in per_trace_results if r["spike"] and not r["drift"] and not r["surprise"])
     drift_only = sum(1 for r in per_trace_results if r["drift"] and not r["spike"] and not r["surprise"])

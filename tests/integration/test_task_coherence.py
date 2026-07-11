@@ -19,12 +19,10 @@ we get deterministic vectors that let us reason about expected cosine similariti
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from frontier_ops.integration.vsa_core import PhasorAlgebra
 from frontier_ops.integration.agent_encoder import (
     ActionEncoder,
-    ROLE_NAMES,
 )
 from frontier_ops.integration.trajectory_buffer import bind_slot_vectors
 from frontier_ops.integration.task_coherence import TaskCoherenceScorer
@@ -600,9 +598,6 @@ class TestDistributionSeparation:
     """
 
     def test_benign_vs_adversarial_separation(self):
-        algebra = _make_algebra()
-        encoder = ActionEncoder(algebra)
-
         benign_scores = []
         adversarial_scores = []
 

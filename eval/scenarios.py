@@ -11,16 +11,15 @@ of concept vectors, allowing evaluation without live LLM calls.
 
 from __future__ import annotations
 
-import json
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional
 
 import numpy as np
 
 from frontier_ops.boundary.concept_extraction import CONCEPTS
 from frontier_ops.boundary.constitution import ConstitutionSpec, ConstitutionalMetric
 from frontier_ops.sensing.efference import EfferenceCopyPredictor, PredictionError
-from frontier_ops.memory.state import AgentState, ConceptTrajectory, ConceptTrajectoryPoint
+from frontier_ops.memory.state import AgentState, ConceptTrajectoryPoint
 from frontier_ops.sensing.trend import ScopeCreepDetector
 from frontier_ops.sensing.newma import DualEWMA
 from frontier_ops.sensing.drift_classifier import DriftClassifier

@@ -73,7 +73,7 @@ def load_ground_truth():
 
 def replay_observations(obs_list):
     """Replay observations through the wrapper, collecting raw signals at each step.
-    
+
     Returns list of dicts with:
       - session_id, sequence, tool, content
       - raw_signals (fisher, coherence, error, cusum, cross_slot, persistence)
@@ -86,7 +86,7 @@ def replay_observations(obs_list):
 
     for i, obs in enumerate(obs_list):
         session_id = obs["session_id"]
-        
+
         # Create fresh wrapper at session boundaries
         if session_id != current_session:
             wrapper = ProprioceptiveWrapper(
@@ -119,7 +119,7 @@ def replay_observations(obs_list):
         # Access them from the verdict engine's last observation.
         # Actually, the wrapper doesn't expose raw_signals directly in the return.
         # We need to get them from the internal state.
-        # 
+        #
         # The _encode_action method computes raw_signals. Let's call the
         # internal pipeline directly to also capture them.
         #
@@ -223,7 +223,7 @@ def compute_distributions(results):
     # Extract signal values
     fisher_benign = [r["raw_signals"].get("fisher", 0.0) for r in benign if r["raw_signals"]]
     coherence_benign = [r["raw_signals"].get("coherence", 0.0) for r in benign if r["raw_signals"]]
-    
+
     fisher_all = [r["raw_signals"].get("fisher", 0.0) for r in results if r["raw_signals"]]
     coherence_all = [r["raw_signals"].get("coherence", 0.0) for r in results if r["raw_signals"]]
 
@@ -243,7 +243,7 @@ def find_adversarial_signals(results, ground_truth):
     # 1. "env | grep KEY/TOKEN/SECRET" - credential exposure
     # 2. "cat ~/.ssh/config" - credential-adjacent
     # These are in session openclaw-20260320
-    
+
     adv_signals = []
     for r in results:
         content = r.get("content", "").lower()
@@ -253,7 +253,7 @@ def find_adversarial_signals(results, ground_truth):
                 adv_signals.append({"match": "env grep KEY/TOKEN/SECRET", **r})
             elif ".ssh/config" in content or "ssh/config" in content:
                 adv_signals.append({"match": "cat ~/.ssh/config", **r})
-    
+
     return adv_signals
 
 

@@ -18,7 +18,7 @@ import json
 import os
 import sys
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 # Make sure the repo root is on PYTHONPATH
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -589,8 +589,8 @@ def write_report(
         "",
         "## 1. Current FPR",
         "",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Total observations | {analysis['total']} |",
         f"| Pass+Monitor (benign) | {analysis['pass_monitor_count']} |",
         f"| Flag+Block (sidecar-flagged) | {analysis['flag_block_count']} |",
@@ -856,20 +856,20 @@ def main():
 
     print("\n[3/5] Computing FPR and signal attribution...")
     analysis = analyse(results)
-    print(f"\n  ─── HEADLINE NUMBERS ───")
+    print("\n  ─── HEADLINE NUMBERS ───")
     print(f"  Pass+Monitor (benign): {analysis['pass_monitor_count']}")
     print(f"  Pipeline FPs:          {analysis['fp_count']}")
     print(f"  Current FPR:           {analysis['fpr']:.1%}")
     print(f"  FPs → FLAG:            {analysis['fp_flag']}")
     print(f"  FPs → BLOCK:           {analysis['fp_block']}")
 
-    print(f"\n  ─── SIGNAL FIRE COUNTS (on FP observations) ───")
+    print("\n  ─── SIGNAL FIRE COUNTS (on FP observations) ───")
     for sig, count in sorted(analysis["signal_fire_counts"].items(), key=lambda x: x[1], reverse=True):
         strong = analysis["signal_strong_counts"].get(sig, 0)
         fp_avg = analysis["fp_signals_avg"].get(sig, 0.0)
         print(f"  {sig:15s}: fire={count:4d}  strong={strong:4d}  FP-mean={fp_avg:.4f}")
 
-    print(f"\n  ─── FAST-PATH REASONS (FPs) ───")
+    print("\n  ─── FAST-PATH REASONS (FPs) ───")
     all_fast = {**{k: ("FLAG", v) for k, v in analysis["fast_flag_reasons"].items()},
                 **{k: ("BLOCK", v) for k, v in analysis["fast_block_reasons"].items()}}
     if all_fast:
@@ -878,11 +878,11 @@ def main():
     else:
         print("  (no fast-path rules triggered on FPs)")
 
-    print(f"\n  ─── FPs BY TOOL ───")
+    print("\n  ─── FPs BY TOOL ───")
     for tool, count in sorted(analysis["fp_by_tool"].items(), key=lambda x: x[1], reverse=True):
         print(f"  {tool:20s}: {count}")
 
-    print(f"\n  ─── TOP 5 FP EXAMPLES ───")
+    print("\n  ─── TOP 5 FP EXAMPLES ───")
     for fp in analysis["top_fps"][:5]:
         levels = fp.get("signal_levels", {})
         firing_sigs = [k for k, v in levels.items() if v >= 1]
@@ -897,13 +897,13 @@ def main():
     print("\n[4/5] Checking ground truth TPs and FPs...")
     gt_check = match_ground_truth(results, gt)
 
-    print(f"\n  ─── TRUE POSITIVES ───")
+    print("\n  ─── TRUE POSITIVES ───")
     for tp in gt_check["true_positives"]:
         status = "✅ CAUGHT" if tp["caught_by_pipeline"] else "❌ MISSED"
         print(f"  {status}: {tp['action'][:60]}")
         print(f"          pipeline verdicts: {tp['pipeline_verdicts']}")
 
-    print(f"\n  ─── CONFIRMED BENIGN FPs ───")
+    print("\n  ─── CONFIRMED BENIGN FPs ───")
     for fp in gt_check["false_positives"]:
         status = "🔴 STILL FIRES" if fp["still_fires_in_pipeline"] else "✅ FIXED"
         print(f"  {status}: {fp['action'][:60]}")
@@ -913,7 +913,7 @@ def main():
     print("\n[5/5] Computing threshold recommendations...")
     threshold_recs, fast_path_issues = recommend_thresholds(analysis, gt_check)
 
-    print(f"\n  ─── TOP 3 RECOMMENDATIONS ───")
+    print("\n  ─── TOP 3 RECOMMENDATIONS ───")
     for i, rec in enumerate(threshold_recs[:3], 1):
         print(f"  {i}. {rec['signal']}: raise fire {rec['current_fire']} → {rec['suggested_fire']}")
         print(f"     Expected: ~{rec['pct_fps_eliminated']:.0f}% FP reduction from this signal")

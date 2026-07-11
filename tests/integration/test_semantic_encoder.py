@@ -1,7 +1,6 @@
 """Tests for semantic_encoder: MiniLM → phasor projection."""
 
 import numpy as np
-import pytest
 
 from frontier_ops.integration.semantic_encoder import encode_semantic
 

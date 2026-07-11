@@ -28,7 +28,6 @@ import random
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-import numpy as np
 
 from frontier_ops.conformal import split_conformal_threshold
 

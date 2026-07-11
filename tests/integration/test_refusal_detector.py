@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from frontier_ops.integration.refusal_detector import (
     RefusalDetectionSignal,
     MIN_STEPS,
-    WINDOW_SIZE,
 )
 
 

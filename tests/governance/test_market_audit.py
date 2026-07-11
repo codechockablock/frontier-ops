@@ -14,7 +14,7 @@ import pytest
 
 from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.governance.market_audit import MarketAuditChain, MarketChainEntry
-from frontier_ops.sensing.market_gate import MarketGate, SIGNAL_LABELS
+from frontier_ops.sensing.market_gate import MarketGate
 from frontier_ops.sensing.market_signals import SeveritySignal, IntervalAnomalySignal
 
 
@@ -116,7 +116,7 @@ class TestAuditChainInvariants:
         gate = MarketGate(d, s)  # No audit chain
 
         for i in range(10):
-            result = gate.evaluate("pass", float(i))
+            gate.evaluate("pass", float(i))
         assert gate.n_evaluations == 10
 
     def test_a6_chain_length_equals_evaluations(self):

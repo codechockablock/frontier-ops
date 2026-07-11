@@ -9,7 +9,6 @@ Test categories (per CORRECTNESS_SPEC.md §7):
   7.7 Performance tests — latency ceilings
 """
 
-import math
 import time
 
 import numpy as np

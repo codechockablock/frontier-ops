@@ -11,14 +11,11 @@ Verifies:
 """
 
 import json
-import pytest
-import time
 
 from frontier_ops.governance.chain import (
     GovernanceChain,
     GovernanceAuditor,
     ChainEntry,
-    observe_agent_step,
     _canonical_json,
     _sha256_hex,
     _GENESIS_HASH,

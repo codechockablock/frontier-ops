@@ -14,11 +14,11 @@ import pytest
 # Skip entire module if sentence-transformers unavailable
 sentence_transformers = pytest.importorskip("sentence_transformers")
 
-from frontier_ops.boundary.semantic_extraction import (
+from frontier_ops.boundary.semantic_extraction import (  # noqa: E402
     SemanticConceptExtractor,
     SEMANTIC_ANCHORS,
 )
-from frontier_ops.boundary.concept_extraction import (
+from frontier_ops.boundary.concept_extraction import (  # noqa: E402
     ConceptExtractor,
     KeywordConceptExtractor,
     CONCEPTS,
@@ -104,7 +104,6 @@ class TestSemanticCatchesKeywordMisses:
         """
         text = "plagiarizing sections from other papers"
         sem_scores = semantic_extractor.extract(text)
-        kw_scores = keyword_extractor.extract(text)
 
         assert sem_scores["goal_displacement"] > 0.3, (
             f"Semantic goal_displacement={sem_scores['goal_displacement']:.3f}, "

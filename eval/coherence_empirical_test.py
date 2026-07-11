@@ -58,7 +58,7 @@ def run_session(name, actions, algebra, encoder):
                   f"spec_conc={result['spectral_concentration']:.4f} "
                   f"alt={result['alternation_index']:.4f} "
                   f"rec_asym={result['recurrence_asymmetry']:.4f}")
-    
+
     final = scores[-1]
     incoherence = 1.0 - final["coherence"]
     print(f"\n  FINAL: coherence={final['coherence']:.4f}, incoherence={incoherence:.4f}")
@@ -149,18 +149,18 @@ def main():
     print(f"  Session B (gradual drift):  coherence={b['coherence']:.4f}, incoherence={1-b['coherence']:.4f}")
     print(f"  Session C (sudden inject):  coherence={c['coherence']:.4f}, incoherence={1-c['coherence']:.4f}")
     print()
-    
+
     # Can we separate?
     sep_b = (1 - b['coherence']) - (1 - a['coherence'])
     sep_c = (1 - c['coherence']) - (1 - a['coherence'])
     print(f"  Separation B-A (drift):     {sep_b:+.4f}")
     print(f"  Separation C-A (injection): {sep_c:+.4f}")
-    
+
     if sep_b > 0.20:
         print("\n  ✅ Gradual drift is DETECTABLE by coherence signal")
     else:
         print(f"\n  ⚠️  Gradual drift separation only {sep_b:.4f} — may not be reliably detectable")
-    
+
     if sep_c > 0.20:
         print("  ✅ Sudden injection is DETECTABLE by coherence signal")
     else:

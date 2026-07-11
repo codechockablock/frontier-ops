@@ -18,8 +18,8 @@ Excluded: retail_vendor_cost_drift (outside safety-behavior concept space)
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import List
 
 # --- Benign action pools ------------------------------------------------------
 

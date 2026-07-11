@@ -4,11 +4,9 @@ Integration tests -- pipeline + memory + governance working together.
 These tests exercise realistic scenarios end-to-end, not individual components.
 """
 
-import numpy as np
-import pytest
-from frontier_ops.memory.vsa import VSAMemory, phasor_encode, bind, similarity
+from frontier_ops.memory.vsa import VSAMemory, phasor_encode
 from frontier_ops.memory.activation import (
-    MemoryEventBus, MemoryEventType, AutoActivator, ActivationBuffer,
+    MemoryEventBus, MemoryEventType, AutoActivator,
 )
 from frontier_ops.boundary.concept_extraction import KeywordConceptExtractor, CONCEPTS
 
@@ -19,7 +17,7 @@ class TestMemoryIntegration:
     def test_encode_activate_roundtrip_above_threshold(self):
         """Correctness invariant: encode->activate similarity > 0.85."""
         mem = VSAMemory(dim=512)
-        trace = mem.encode("testing round trip", "math_reasoning", "reasoning", 0, step=0)
+        mem.encode("testing round trip", "math_reasoning", "reasoning", 0, step=0)
         hits = mem.activate("math_reasoning", "reasoning", threshold=0.0)
         assert len(hits) > 0
         assert hits[0][0] > 0.85  # similarity > 0.85

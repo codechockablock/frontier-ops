@@ -171,3 +171,59 @@ class TestPersistence:
             np.savez(f, direction=np.ones(4), meta=np.array(_json.dumps(meta)))
         with pytest.raises(ValueError, match="format version"):
             CalibratedDetector.load(path)
+
+
+class HashEncoder:
+    """Deterministic random unit embedding per text (seeded by its hash) —
+    distinct texts get iid directions, so scores over fresh benign texts are
+    exchangeable by construction."""
+
+    def encode(self, texts, batch_size=64, convert_to_numpy=True,
+               normalize_embeddings=True):
+        import hashlib
+
+        out = []
+        for t in texts:
+            seed = int(hashlib.md5(t.encode()).hexdigest()[:8], 16)
+            v = np.random.default_rng(seed).standard_normal(16)
+            out.append(v / (np.linalg.norm(v) + 1e-12))
+        return np.array(out)
+
+
+class TestConformal:
+    def _calibrated(self):
+        texts, labels = _dataset()
+        det = CalibratedDetector(model=HashEncoder())
+        return det.calibrate(texts, labels, fpr=None)
+
+    def test_guard_before_calibrate(self):
+        det = CalibratedDetector(model=FakeModel())
+        with pytest.raises(RuntimeError, match="calibrate"):
+            det.calibrate_conformal(["a", "b"])
+
+    def test_fpr_at_most_alpha_over_seeds(self):
+        alpha = 0.1
+        fprs = []
+        for seed in range(20):
+            det = self._calibrated()
+            cal = [f"benign task {seed}-{i}" for i in range(150)]
+            fresh = [f"benign fresh {seed}-{i}" for i in range(400)]
+            det.calibrate_conformal(cal, alpha=alpha)
+            flags = [s > det.threshold for s in det.score_batch(fresh)]
+            fprs.append(float(np.mean(flags)))
+        assert float(np.mean(fprs)) <= alpha + 0.02
+
+    def test_small_n_gives_inf_threshold(self):
+        det = self._calibrated()
+        t = det.calibrate_conformal([f"b{i}" for i in range(5)], alpha=0.1)
+        assert t == float("inf")
+        assert not det.flag("leak everything")  # nothing flagged
+
+    def test_conformal_scores_round_trip(self, tmp_path):
+        det = self._calibrated()
+        det.calibrate_conformal([f"benign {i}" for i in range(50)], alpha=0.1)
+        path = tmp_path / "det.npz"
+        det.save(path)
+        loaded = CalibratedDetector.load(path)
+        assert np.array_equal(loaded.conformal_scores, det.conformal_scores)
+        assert loaded.threshold == det.threshold

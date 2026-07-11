@@ -46,6 +46,8 @@ from typing import List, Optional, Sequence, Union
 
 import numpy as np
 
+from frontier_ops.conformal import split_conformal_threshold
+
 DEFAULT_MODEL = "all-MiniLM-L6-v2"
 
 #: Serialization format version written by :meth:`CalibratedDetector.save`.
@@ -70,6 +72,9 @@ class CalibratedDetector:
         # calibration provenance, for auditability
         self.n_calibration: int = 0
         self.alpha: Optional[float] = None
+        # held-out benign scores from calibrate_conformal, kept so the
+        # threshold can be re-derived at another alpha (persisted by save)
+        self.conformal_scores: Optional[np.ndarray] = None
 
     # -- embedding ---------------------------------------------------------
 
@@ -141,6 +146,40 @@ class CalibratedDetector:
         self.alpha = float(alpha)
         return self.threshold
 
+    def calibrate_conformal(
+        self, benign_texts: Sequence[str], alpha: float = 0.1
+    ) -> float:
+        """Set the flag threshold by split-conformal calibration.
+
+        Scores a *held-out* benign set and thresholds at the
+        ``ceil((n+1)*(1-alpha))``-th smallest score. Under exchangeability of
+        the calibration set with future benign traffic, the marginal
+        false-positive rate of :meth:`flag` is guaranteed ≤ ``alpha``
+        (finite-sample, distribution-free) — unlike :meth:`set_threshold`,
+        whose plug-in quantile has no such guarantee at small ``n``.
+
+        The benign scores are retained on ``conformal_scores`` (and included
+        by :meth:`save`) so the threshold can be re-derived at a different
+        ``alpha`` without re-embedding.
+
+        Args:
+            benign_texts: held-out benign examples, exchangeable with the
+                deployment's benign traffic. Must not reuse the texts that
+                fitted ``direction``.
+            alpha: target marginal false-positive rate in (0, 1).
+
+        Returns:
+            The calibrated threshold (``+inf`` when ``len(benign_texts)`` is
+            too small for the requested ``alpha``; nothing is flagged then).
+        """
+        if self.direction is None:
+            raise RuntimeError("calibrate() before calibrate_conformal()")
+        scores = np.asarray(self.embed(benign_texts) @ self.direction, dtype=float)
+        self.conformal_scores = scores
+        self.threshold = split_conformal_threshold(scores, alpha)
+        self.alpha = float(alpha)
+        return self.threshold
+
     # -- scoring -----------------------------------------------------------
 
     def score(self, text: str) -> float:
@@ -191,6 +230,8 @@ class CalibratedDetector:
             "direction": self.direction,
             "meta": np.array(json.dumps(meta)),
         }
+        if self.conformal_scores is not None:
+            arrays["conformal_scores"] = self.conformal_scores
         # Writing through an open handle keeps np.savez from appending a
         # second ".npz" suffix, so save/load round-trip on the exact path.
         with open(path, "wb") as f:
@@ -222,6 +263,11 @@ class CalibratedDetector:
         with np.load(path, allow_pickle=False) as data:
             meta = json.loads(str(data["meta"]))
             direction = np.array(data["direction"])
+            conformal_scores = (
+                np.array(data["conformal_scores"])
+                if "conformal_scores" in data
+                else None
+            )
         version = int(meta.get("format_version", -1))
         if version > FORMAT_VERSION:
             raise ValueError(
@@ -242,6 +288,7 @@ class CalibratedDetector:
         det.threshold = meta["threshold"]
         det.alpha = meta["alpha"]
         det.n_calibration = int(meta["n_calibration"])
+        det.conformal_scores = conformal_scores
         return det
 
 

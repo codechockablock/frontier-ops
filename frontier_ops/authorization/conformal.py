@@ -24,12 +24,13 @@ References:
 
 from __future__ import annotations
 
-import math
 import random
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
+
+from frontier_ops.conformal import split_conformal_threshold
 
 
 @dataclass
@@ -218,12 +219,11 @@ class ConformalCalibrator:
         cal_distances = [r.geodesic_distance for r in cal_set]
         val_distances = [r.geodesic_distance for r in val_set]
 
-        # Conformal quantile: ceil((n+1)(1-alpha)) / n
-        n = len(cal_distances)
-        q_level = math.ceil((n + 1) * (1 - self.alpha)) / n
-        q_level = min(q_level, 1.0)
-
-        radius = float(np.quantile(cal_distances, q_level))
+        # Conformal quantile via the shared core; interpolate=True preserves
+        # the historical radius values (linear-interpolated, level capped at 1).
+        radius = split_conformal_threshold(
+            cal_distances, self.alpha, interpolate=True
+        )
 
         # Evaluate coverage on calibration set
         cal_contained = [d <= radius for d in cal_distances]

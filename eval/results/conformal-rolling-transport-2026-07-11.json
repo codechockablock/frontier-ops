@@ -1,0 +1,75 @@
+{
+  "R1_in_domain_validity": {
+    "alpha": 0.1,
+    "conformal_fpr_mean": 0.09438415991549214,
+    "conformal_fpr_max": 0.13028169014084506,
+    "plugin_fpr_mean": 0.10027609367057004,
+    "n_cal_benign_typical": 299
+  },
+  "R2_transport_decay": {
+    "fpr_on_directive_mean": 0.23908227848101266,
+    "fpr_on_fresh_benign_mean": 0.21536697247706424,
+    "reference_fixed_threshold": {
+      "directive": 0.274,
+      "fresh": 0.239
+    }
+  },
+  "R2b_directive_internal_and_reverse": {
+    "directive_internal_fpr_mean": 0.11637879318053763,
+    "reverse_D_to_A_fpr_mean": 0.06468120805369128
+  },
+  "R3_rolling_recovery": {
+    "frozen_conformal_fpr_on_D": 0.21112115732368897,
+    "band": [
+      0.05,
+      0.15000000000000002
+    ],
+    "windows": {
+      "window_32": {
+        "fpr_overall_mean": 0.1449367088607595,
+        "fpr_post_refill_mean": 0.14256880733944954,
+        "in_band": true
+      },
+      "window_64": {
+        "fpr_overall_mean": 0.13245931283905968,
+        "fpr_post_refill_mean": 0.1297020484171322,
+        "in_band": true
+      },
+      "window_128": {
+        "fpr_overall_mean": 0.12124773960216999,
+        "fpr_post_refill_mean": 0.11641074856046066,
+        "in_band": true
+      },
+      "window_256": {
+        "fpr_overall_mean": 0.11645569620253164,
+        "fpr_post_refill_mean": 0.10603271983640081,
+        "in_band": true
+      }
+    }
+  },
+  "R4_detection_cost_fresh": {
+    "frozen": {
+      "fpr": 0.1926605504587156,
+      "tpr": 0.9545454545454546,
+      "reference": {
+        "fpr": 0.239,
+        "tpr": 1.0
+      }
+    },
+    "window_32": {
+      "fpr_post_refill": 0.16129032258064516,
+      "tpr_at_final_threshold": 0.6363636363636364,
+      "final_threshold": 0.10133956596255303
+    },
+    "window_64": {
+      "fpr_post_refill": 0.11688311688311688,
+      "tpr_at_final_threshold": 0.5454545454545454,
+      "final_threshold": 0.13117150068283084
+    },
+    "window_128": {
+      "fpr_post_refill": 0.08888888888888889,
+      "tpr_at_final_threshold": 0.6363636363636364,
+      "final_threshold": 0.10389300510287283
+    }
+  }
+}

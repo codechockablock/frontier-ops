@@ -13,7 +13,7 @@ Five detectors for the Paper A orthogonal decomposition result:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -488,14 +488,14 @@ class IsolationForestDetector:
     def __init__(self, contamination: float = 0.05, n_estimators: int = 100):
         self.contamination = contamination
         self.n_estimators = n_estimators
-        self._model = None
+        self._model: Any = None  # sklearn model, lazily imported; _fitted guards use
         self._fitted = False
 
     def _trace_to_features(self, trace: ActionTrace) -> np.ndarray:
         """Convert a trace to a feature vector from concept score statistics."""
         from frontier_ops.integration.metric_detector import action_to_concept_scores
 
-        concept_trajectories = {
+        concept_trajectories: Dict[str, list] = {
             c: []
             for c in [
                 "user_aligned_task_execution",

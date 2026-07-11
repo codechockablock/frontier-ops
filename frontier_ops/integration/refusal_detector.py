@@ -6,8 +6,8 @@ Escalation-only (never downgrades). Weight=0.10 in TieredVerdictEngine.
 from __future__ import annotations
 
 from collections import deque
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import List
 
 import numpy as np
 
@@ -148,7 +148,7 @@ class RefusalDetectionSignal:
                 "post_refusal_escalation": esc,
                 "paralysis": para,
             }
-            pattern = max(scores, key=scores.get)
+            pattern = max(scores, key=lambda k: scores[k])
 
         return {
             "refusal_score": refusal_score,

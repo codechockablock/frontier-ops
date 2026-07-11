@@ -18,7 +18,7 @@ import os
 import time
 from collections import deque
 from dataclasses import dataclass, field, asdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -112,7 +112,7 @@ class ProprioceptionManager:
         self.action_type_counts: Dict[str, int] = {}
         self.source_counts: Dict[str, int] = {}
         self.last_anomaly_step: int = -1
-        self._log_handle = None  # persistent file handle for JSONL log
+        self._log_handle: Optional[Any] = None  # persistent file handle for JSONL log
 
     def update(
         self,
@@ -174,8 +174,8 @@ class ProprioceptionManager:
         ca_trend = self._compute_ca_trend()
 
         # Find dominants
-        dominant_action = max(self.action_type_counts, key=self.action_type_counts.get)
-        dominant_source = max(self.source_counts, key=self.source_counts.get)
+        dominant_action = max(self.action_type_counts, key=lambda k: self.action_type_counts[k])
+        dominant_source = max(self.source_counts, key=lambda k: self.source_counts[k])
 
         # Determine regime from recent trajectory health
         regime = self._compute_regime(raw_signals, verdict)

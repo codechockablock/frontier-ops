@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict, deque
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 
 class ExponentialMovingStats:
@@ -204,7 +204,7 @@ class TimingSignalEngine:
         tool_name: str,
         start_ts: float,
         end_ts: float,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Any]:
         """
         Process a completed tool call.
 

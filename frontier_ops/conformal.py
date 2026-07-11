@@ -19,7 +19,7 @@ References:
 from __future__ import annotations
 
 import math
-from typing import Sequence
+from typing import Sequence, Union
 
 import numpy as np
 
@@ -27,7 +27,7 @@ __all__ = ["split_conformal_threshold"]
 
 
 def split_conformal_threshold(
-    scores: Sequence[float],
+    scores: Union[Sequence[float], np.ndarray],
     alpha: float,
     *,
     interpolate: bool = False,

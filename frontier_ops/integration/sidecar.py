@@ -25,6 +25,7 @@ import os
 import signal
 import sys
 import time
+from typing import Any, Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -61,7 +62,7 @@ class ProprioceptiveSidecar:
         # Market architecture hook (non-invasive, advisory-only)
         try:
             from frontier_ops.integration.market_hook import MarketHook
-            self.market = MarketHook.from_telemetry(verbose=verbose)
+            self.market: Optional[Any] = MarketHook.from_telemetry(verbose=verbose)
             if verbose:
                 print("[sidecar] Market hook initialized", file=sys.stderr)
         except Exception as e:
@@ -86,7 +87,7 @@ class ProprioceptiveSidecar:
                         file=sys.stderr,
                     )
                 self.wrapper.on_session_start()
-            self._current_session_id = session_id
+            self._current_session_id: str = session_id
 
             self.wrapper.on_new_turn()
             if self.verbose:

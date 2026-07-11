@@ -119,19 +119,19 @@ class CalibratedDetector:
         (benign) examples; pass ``fpr=None`` and call ``set_threshold`` on a
         dedicated benign set instead.
         """
-        labels = np.asarray(labels, int)
-        if set(np.unique(labels).tolist()) - {0, 1}:
+        y = np.asarray(labels, int)
+        if set(np.unique(y).tolist()) - {0, 1}:
             raise ValueError("labels must be 0/1 (1 = flag-worthy)")
-        if labels.min() == labels.max():
+        if y.min() == y.max():
             raise ValueError("calibration needs both classes present")
         E = self.embed(texts)
-        pos = E[labels == 1].mean(0)
-        neg = E[labels == 0].mean(0)
+        pos = E[y == 1].mean(0)
+        neg = E[y == 0].mean(0)
         d = pos - neg
         self.direction = d / (np.linalg.norm(d) + 1e-12)
-        self.n_calibration = int(len(labels))
+        self.n_calibration = int(len(y))
         if fpr is not None:
-            self._set_threshold_from_scores(E[labels == 0] @ self.direction, fpr)
+            self._set_threshold_from_scores(E[y == 0] @ self.direction, fpr)
         return self
 
     def set_threshold(self, benign_texts: Sequence[str], alpha: float = 0.1) -> float:
@@ -259,7 +259,8 @@ class CalibratedDetector:
         # Writing through an open handle keeps np.savez from appending a
         # second ".npz" suffix, so save/load round-trip on the exact path.
         with open(path, "wb") as f:
-            np.savez(f, **arrays)
+            # dict-splat confuses the savez stub's allow_pickle overload
+            np.savez(f, **arrays)  # type: ignore[arg-type]
 
     @classmethod
     def load(

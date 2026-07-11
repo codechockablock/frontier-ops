@@ -104,7 +104,7 @@ def read_state() -> Optional[dict]:
 def read_recent_log(n: int = 8) -> list:
     """Read the last N log entries."""
     try:
-        entries = deque(maxlen=n)
+        entries: deque = deque(maxlen=n)
         with open(LOG_PATH) as f:
             for line in f:
                 line = line.strip()

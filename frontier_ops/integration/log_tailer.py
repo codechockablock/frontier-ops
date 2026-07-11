@@ -167,10 +167,10 @@ class OpenClawLogTailer:
 
     def __init__(
         self,
-        callback: Callable[[Dict[str, Any]], Any],
+        callback: Optional[Callable[[Dict[str, Any]], Any]] = None,
         poll_interval: float = 0.1,
     ):
-        self.callback = callback
+        self.callback: Any = callback
         self.poll_interval = poll_interval
         self._running = False
         self._current_path: Optional[Path] = None
@@ -278,7 +278,7 @@ class OpenClawLogTailer:
                     except Exception as e:
                         logger.warning("error callback failed: %s", e)
 
-    def tail_sync(self, log_path: str = None):
+    def tail_sync(self, log_path: Optional[str] = None):
         """
         Synchronous generator that yields completed tool call events.
         For use in the wrapper's log_tail mode (no asyncio).

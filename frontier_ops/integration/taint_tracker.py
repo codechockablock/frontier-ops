@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -92,7 +92,7 @@ class TaintTracker:
         self.history: deque = deque(maxlen=history_size)
         self.total_alerts = 0
 
-    def observe(self, tool: str, params: Dict[str, Any] = None) -> TaintState:
+    def observe(self, tool: str, params: Optional[Dict[str, Any]] = None) -> TaintState:
         """
         Observe a tool call and update taint state.
 

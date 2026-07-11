@@ -36,7 +36,7 @@ __all__ = [
 _EPSILON = 1e-12
 
 
-def _validate_signals(signals: np.ndarray) -> np.ndarray:
+def _validate_signals(signals: Union[Sequence[float], np.ndarray]) -> np.ndarray:
     """Validate and convert signals to a 1-D float array."""
     arr = np.asarray(signals, dtype=float)
     if arr.ndim == 0:

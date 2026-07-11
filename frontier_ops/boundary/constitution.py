@@ -220,19 +220,19 @@ class ConstitutionalMetric:
 
         # Cross-term contributions
         for ct in self.constitution.cross_terms:
-            a, b = [self._dim_index[c] for c in ct.concepts]
+            ia, ib = [self._dim_index[c] for c in ct.concepts]
             # Both concepts must be above activation threshold
-            act_a = max(0, x[a] - ct.activation_threshold)
-            act_b = max(0, x[b] - ct.activation_threshold)
+            act_a = max(0, x[ia] - ct.activation_threshold)
+            act_b = max(0, x[ib] - ct.activation_threshold)
             joint_activation = act_a * act_b * ct.weight
             if joint_activation > 0:
                 # Symmetric cross-term
                 cross_val = min(joint_activation, self.constitution.max_amplification)
-                G[a, b] += cross_val
-                G[b, a] += cross_val
+                G[ia, ib] += cross_val
+                G[ib, ia] += cross_val
                 # Also boost diagonals to maintain positive-definiteness
-                G[a, a] += cross_val * 0.5
-                G[b, b] += cross_val * 0.5
+                G[ia, ia] += cross_val * 0.5
+                G[ib, ib] += cross_val * 0.5
 
         return G
 

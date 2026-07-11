@@ -49,6 +49,7 @@ dev = [
     "scipy>=1.10",
     "scikit-learn>=1.2",
     "cryptography>=41.0",
+    "mypy>=1.8",
 ]
 
 [project.urls]
@@ -57,6 +58,30 @@ Documentation = "https://github.com/codechockablock/frontier-ops#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["frontier_ops"]
+
+[tool.mypy]
+# No python_version pin: numpy>=2 ships stubs that need >=3.12 parsing;
+# checking under the dev interpreter is fine for this lenient baseline.
+files = ["frontier_ops"]
+ignore_missing_imports = true
+# Lenient starting point: real type errors fail, unannotated code passes.
+check_untyped_defs = false
+warn_unused_ignores = true
+
+# Tracked typing baseline (2026-07-11): the only modules still excluded.
+# - sensing.modes: quarantined dead weight (docs/LEGACY.md), DeprecationWarning
+#   on import — not worth typing before removal.
+# - integration detection_signals / signature_detectors / tiered_verdict:
+#   ATBench glue with ~46 mechanical Optional/annotation debts; type when
+#   next touched. Everything else in frontier_ops/ checks clean.
+[[tool.mypy.overrides]]
+module = [
+    "frontier_ops.sensing.modes",
+    "frontier_ops.integration.detection_signals",
+    "frontier_ops.integration.signature_detectors",
+    "frontier_ops.integration.tiered_verdict",
+]
+ignore_errors = true
 
 [tool.ruff]
 # Verbatim provenance records from live sessions — never reformat or lint.

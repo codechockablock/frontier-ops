@@ -292,7 +292,7 @@ if __name__ == "__main__":
     gen = ExpandedTraceGenerator()
     suite = gen.generate_paper_a_suite(n_variants=10)
 
-    detectors = [
+    detectors: list = [
         ThresholdDetector(),
         EWMADetector(),
         MetricDetector(),

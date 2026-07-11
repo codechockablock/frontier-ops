@@ -503,7 +503,7 @@ if __name__ == "__main__":
     gen = SyntheticTraceGenerator()
     suite = gen.generate_calibration_suite(n_per_type=3)
 
-    violation_types = {}
+    violation_types: dict = {}
     benign_count = 0
     for trace in suite:
         t = trace.metadata.get("type", "unknown")

@@ -221,7 +221,7 @@ class FullPipeline:
             self.event_bus = MemoryEventBus()
             self.activator = AutoActivator(event_bus=self.event_bus)
             self.memory = VSAMemory(dim=vsa_dim)
-            self._primed = []
+            self._primed: list = []
             self._novelty = False
             self.event_bus.subscribe(
                 lambda e: self._primed.extend(e.activated_traces),

@@ -181,7 +181,7 @@ class ProprioceptiveWrapper:
 
         encoded = self.validator.encoder.encode_action(classified)
         signal_meta = self.validator.signals.observe(encoded.fillers)
-        raw_signals = dict(signal_meta["raw_signals"])
+        raw_signals = dict(signal_meta["raw_signals"])  # type: ignore[call-overload]  # meta dict is duck-typed
 
         return {
             "classified": classified,
@@ -248,8 +248,8 @@ class ProprioceptiveWrapper:
         now = time.time()
         start_ts = getattr(self, "_event_start_ts", None) or (now - 0.1)
         end_ts = getattr(self, "_event_end_ts", None) or now
-        self._event_start_ts = None
-        self._event_end_ts = None
+        self._event_start_ts: Optional[float] = None
+        self._event_end_ts: Optional[float] = None
         timing_result = self.timing_engine.on_tool_complete(
             tool_name=tool_name,
             start_ts=start_ts,

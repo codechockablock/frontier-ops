@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import math
 from collections import deque
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 
@@ -163,7 +163,7 @@ class TaskCoherenceScorer:
 
         # Check period-2 (A,B,A,B,...) and period-3 (A,B,C,A,B,C,...)
         for period in (2, 3):
-            groups = [[] for _ in range(period)]
+            groups: list = [[] for _ in range(period)]
             for i in range(n):
                 groups[i % period].append(i)
 

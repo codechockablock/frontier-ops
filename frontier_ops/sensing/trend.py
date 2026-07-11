@@ -188,7 +188,7 @@ class MetricAdaptiveEWMA:
 
         # Update EWMA
         self._mean = self.alpha * concept_vec + (1 - self.alpha) * self._mean
-        self._var = self.alpha * (deviation ** 2) + (1 - self.alpha) * self._var
+        self._var = self.alpha * (deviation ** 2) + (1 - self.alpha) * self._var  # type: ignore[operator]  # set with _mean
         self._step += 1
 
         # Adaptive threshold: scale by metric trace

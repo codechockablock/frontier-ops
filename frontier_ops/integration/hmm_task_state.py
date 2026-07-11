@@ -33,14 +33,14 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
 from frontier_ops.integration.proprio_logger import logger
 
 
-def _logsumexp(a: np.ndarray, axis: int = None) -> np.ndarray:
+def _logsumexp(a: np.ndarray, axis: Optional[int] = None) -> Union[np.ndarray, float]:
     """Numerically stable log-sum-exp (avoids scipy dependency)."""
     a_max = np.max(a, axis=axis, keepdims=True)
     # Replace -inf max with 0 to avoid nan in subtraction
@@ -490,7 +490,7 @@ class AgentHMM:
         # ── Gamma ──
         log_gamma = log_alpha + log_beta
         # Normalize each row
-        log_gamma -= _logsumexp(log_gamma, axis=1)[:, np.newaxis]
+        log_gamma -= np.asarray(_logsumexp(log_gamma, axis=1))[:, np.newaxis]
         gamma = np.exp(log_gamma)
         gamma = gamma / (gamma.sum(axis=1, keepdims=True) + 1e-10)
 

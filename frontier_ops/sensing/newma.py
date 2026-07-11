@@ -93,7 +93,7 @@ class DualEWMA:
 
         # Update both EWMAs
         self._mu_fast = self.alpha_fast * concept_vec + (1 - self.alpha_fast) * self._mu_fast
-        self._mu_slow = self.alpha_slow * concept_vec + (1 - self.alpha_slow) * self._mu_slow
+        self._mu_slow = self.alpha_slow * concept_vec + (1 - self.alpha_slow) * self._mu_slow  # type: ignore[operator]  # set with _mu_fast
         self._step += 1
 
         # Compute divergence

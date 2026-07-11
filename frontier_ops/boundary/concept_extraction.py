@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import logging
 import math
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -361,7 +361,7 @@ class SemanticConceptExtractor:
 
         return scores
 
-    def extract_with_detail(self, text: str) -> Dict[str, any]:
+    def extract_with_detail(self, text: str) -> Dict[str, Any]:
         """Extract with per-anchor similarity breakdown for debugging."""
         embedding = self.model.encode(text, convert_to_numpy=True)
         embedding = embedding / (np.linalg.norm(embedding) + 1e-10)
@@ -485,7 +485,8 @@ class ConceptExtractor:
             self._semantic.extract(text) if self._semantic is not None else None
         )
         if tier2_scores is None:
-            return tier1_scores  # constructor guarantees at least one backend
+            # constructor guarantees at least one backend
+            return tier1_scores  # type: ignore[return-value]
         if tier1_scores is None:
             return {c: round(float(tier2_scores.get(c, 0.0)), 4) for c in self.dims}
 
@@ -527,7 +528,7 @@ def compare_extractors(texts: List[str]) -> List[Dict]:
         has_semantic = False
 
     for text in texts:
-        entry = {
+        entry: Dict[str, Any] = {
             "text": text[:100],
             "keyword": kw.extract(text),
         }

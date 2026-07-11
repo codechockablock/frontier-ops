@@ -217,7 +217,7 @@ class EfferenceCopyPredictor:
 
         if self.error_history:
             historical_mean = np.mean(self.error_history[-20:])
-            surprise_ratio = weighted_magnitude / (historical_mean + 1e-8)
+            surprise_ratio = float(weighted_magnitude / (historical_mean + 1e-8))
         else:
             surprise_ratio = 1.0
 
@@ -320,7 +320,7 @@ class EfferenceCopyPredictor:
         alpha = self.ewma_alpha
         diff = actual - self._ewma_mean  # Compute diff BEFORE updating mean
         self._ewma_mean = alpha * actual + (1 - alpha) * self._ewma_mean
-        self._ewma_var = alpha * (diff ** 2) + (1 - alpha) * self._ewma_var
+        self._ewma_var = alpha * (diff ** 2) + (1 - alpha) * self._ewma_var  # type: ignore[operator]  # set with _ewma_mean
 
     # ─── Tier 3: Kalman Filter ────────────────────────────────────────
 

@@ -110,7 +110,7 @@ class ParalysisDetector:
     def observe(
         self,
         tool_name: str,
-        args: Dict[str, Any] = None,
+        args: Optional[Dict[str, Any]] = None,
         magnitude: float = 0.1,
         timestamp: Optional[float] = None,
     ) -> ParalysisState:
@@ -237,7 +237,7 @@ class ParalysisDetector:
             "low_magnitude": magnitude_score if magnitude_score > 0.8 else 0.0,
         }
 
-        dominant_pattern = max(scores, key=scores.get)
+        dominant_pattern = max(scores, key=lambda k: scores[k])
         dominant_score = scores[dominant_pattern]
 
         # Composite confidence: weighted combination

@@ -28,7 +28,7 @@ from __future__ import annotations
 import hashlib
 import re
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -190,7 +190,7 @@ class MarketGate:
         self,
         d_signal: SeveritySignal,
         s_signal: IntervalAnomalySignal,
-        audit_chain: Optional[object] = None,
+        audit_chain: Optional[Any] = None,  # duck-typed: needs .record(entry)
         cold_start_detector: Optional[ColdStartDetector] = None,
     ):
         self._d = d_signal

@@ -141,3 +141,9 @@ jobs:
 
     - name: Lint
       run: ruff check frontier_ops/ tests/ --select E,F,W --ignore E501
+
+    - name: Type check (non-blocking)
+      continue-on-error: true
+      run: |
+        pip install -e ".[dev]"
+        mypy frontier_ops/

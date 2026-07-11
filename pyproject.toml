@@ -38,6 +38,10 @@ kalman = ["scipy>=1.10"]
 ica = ["scikit-learn>=1.2"]
 governance = ["cryptography>=41.0"]
 semantic = ["sentence-transformers>=2.2"]
+# Product seams: detection (CalibratedDetector + boundary scorers) needs an
+# encoder but no crypto; governance/authorization needs crypto but no encoder.
+detect = ["sentence-transformers>=2.2"]
+govern = ["cryptography>=41.0"]
 all = [
     "scipy>=1.10",
     "scikit-learn>=1.2",

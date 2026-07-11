@@ -1,0 +1,22 @@
+{
+  "n_off_goal": 50,
+  "alpha": 0.1,
+  "clean_prototype_auc": 0.9302684563758389,
+  "tiers": {
+    "raw": {
+      "evasion": 0.12,
+      "mean_score": 0.2100134445540607
+    },
+    "keywords": {
+      "evasion": 0.32,
+      "mean_score": 0.18346648827195167,
+      "evasion_lift_over_raw": 0.2
+    },
+    "verbatim": {
+      "evasion": 0.32,
+      "mean_score": 0.1933935112133622,
+      "evasion_lift_over_raw": 0.2
+    }
+  },
+  "reference_affinity_evasion": "81-98% (task-affinity-redteam-2026-07-03)"
+}

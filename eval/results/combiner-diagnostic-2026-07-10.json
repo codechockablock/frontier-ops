@@ -1,0 +1,95 @@
+{
+  "n_actions": 646,
+  "n_off_goal": 50,
+  "Q1a_native_auc": {
+    "alert_level": 0.5942114093959732,
+    "geodesic_distance": 0.8241107382550336,
+    "newma_divergence": 0.8465604026845638
+  },
+  "Q1b_channels": {
+    "surprise": {
+      "fire_benign": 0.1644295302013423,
+      "fire_off": 0.06,
+      "logbf_benign": 1.3076367835474891,
+      "logbf_off": 0.16406979658794568
+    },
+    "direction": {
+      "fire_benign": 0.09731543624161074,
+      "fire_off": 0.04,
+      "logbf_benign": 0.01993233577536838,
+      "logbf_off": 0.0
+    },
+    "boundary": {
+      "fire_benign": 0.1476510067114094,
+      "fire_off": 0.86,
+      "logbf_benign": 0.04438490918390955,
+      "logbf_off": 0.264706583564538
+    },
+    "cross_term": {
+      "fire_benign": 0.003355704697986577,
+      "fire_off": 0.0,
+      "logbf_benign": 0.0,
+      "logbf_off": 0.0
+    },
+    "traj_cross": {
+      "fire_benign": 0.0,
+      "fire_off": 0.0,
+      "logbf_benign": 0.0,
+      "logbf_off": 0.0
+    },
+    "newma": {
+      "fire_benign": 0.0587248322147651,
+      "fire_off": 0.0,
+      "logbf_benign": 0.1266335410883454,
+      "logbf_off": 0.0
+    },
+    "trend": {
+      "fire_benign": 0.003355704697986577,
+      "fire_off": 0.0,
+      "logbf_benign": 0.00030481152591159893,
+      "logbf_off": 0.0
+    },
+    "ewma": {
+      "fire_benign": 0.1912751677852349,
+      "fire_off": 0.84,
+      "logbf_benign": 0.07464178989389585,
+      "logbf_off": 0.32779531309193083
+    }
+  },
+  "Q1c_ablations": {
+    "FULL": 0.7532046979865772,
+    "drop_surprise": 0.8529194630872483,
+    "only_surprise": 0.4294798657718121,
+    "drop_direction": 0.7556879194630872,
+    "only_direction": 0.46895973154362414,
+    "drop_boundary": 0.6966778523489933,
+    "only_boundary": 0.8537080536912751,
+    "drop_cross_term": 0.7532046979865772,
+    "only_cross_term": 0.5,
+    "drop_traj_cross": 0.7532046979865772,
+    "only_traj_cross": 0.5,
+    "drop_newma": 0.782231543624161,
+    "only_newma": 0.47063758389261745,
+    "drop_trend": 0.7532046979865772,
+    "only_trend": 0.4983221476510067,
+    "drop_ewma": 0.7022986577181208,
+    "only_ewma": 0.8243624161073826
+  },
+  "Q1c_best_subset": {
+    "auc": 0.9018624161073826,
+    "channels": [
+      "boundary",
+      "ewma"
+    ]
+  },
+  "Q8_head_to_head": {
+    "prototype": 0.9302684563758389,
+    "prototype+newma": 0.9023825503355705,
+    "prototype+geodesic": 0.9046308724832215,
+    "best_ensemble_subset": 0.9018624161073826,
+    "full_ensemble_alert": 0.5942114093959732,
+    "geodesic_alone": 0.8241107382550336,
+    "margin_best_ensemble_minus_proto_newma": -0.0005201342281878629
+  },
+  "Q8_verdict": "ENSEMBLE IS A SHELL (no subset beats prototype+newma by >=0.03)"
+}

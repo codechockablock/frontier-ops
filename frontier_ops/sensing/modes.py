@@ -2,21 +2,35 @@
 ICA-based Compound Violation Mode Detector
 ==========================================
 
+.. deprecated:: 0.4.0
+    DEAD CODE — quarantined, not deleted. This ICA compound-mode detector
+    was never wired into any pipeline, is imported nowhere in the package,
+    is not exported from ``frontier_ops.sensing``, and has zero benchmark
+    contact. Its premise (decomposing a "47.9% detection gap" into compound
+    modes) predates the v3 finding that detection reduces to an in-domain
+    prototype direction (``frontier_ops.CalibratedDetector``;
+    eval/results/repo-open-questions-2026-07-10.md). Kept importable for
+    provenance only; it will emit a DeprecationWarning on import.
+
 Learns independent violation patterns from labeled traces.
 Projects new trajectories onto learned modes for detection.
-
-The 47.9% detection gap likely decomposes into 2-3 compound modes:
-- "boundary probe" = agency + scope without deception
-- "rationalized drift" = agency + compliance decrease without harm
-
 ICA in Mahalanobis-whitened space respects the constitutional geometry.
 """
 
 from __future__ import annotations
 
+import warnings
 from typing import Dict, List, Optional
 
 import numpy as np
+
+warnings.warn(
+    "frontier_ops.sensing.modes (ViolationModeDetector) is dead code, "
+    "quarantined in v3: never wired in, no benchmark contact. Use "
+    "frontier_ops.CalibratedDetector for detection.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class ViolationModeDetector:

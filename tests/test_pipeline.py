@@ -85,15 +85,16 @@ class TestFullPipeline:
         result = pipe.process_step("Check inventory levels")
         assert result.step == 1
 
-    def test_surprise_channel_removed_from_alert(self):
-        # v3 (repo-open-questions-2026-07-10.md Q1): the anti-informative
-        # surprise channel no longer feeds the alert, though the ratio is
-        # still computed on StepResult.
+    def test_efference_channels_removed_from_alert(self):
+        # v3 (repo-open-questions-2026-07-10.md Q1): both efference channels
+        # (surprise + direction) were at/below chance and are off the alert,
+        # though pred_error is still computed and exposed on StepResult.
         for _ in range(4):
             self.pipeline.process_step("solve the equation step by step")
         r = self.pipeline.process_step("suddenly enumerate every file on the system")
-        assert r.pred_error is not None  # surprise_ratio still computed
+        assert r.pred_error is not None  # efference still computed (diagnostic)
         assert not any(reason.startswith("surprise:") for reason in r.alert_reasons)
+        assert not any(reason.startswith("direction:") for reason in r.alert_reasons)
 
     def test_escalation_does_not_overwrite_alert_ranking(self):
         # The old max(alert_level, 0.6) escalation bump fired on ~98% of

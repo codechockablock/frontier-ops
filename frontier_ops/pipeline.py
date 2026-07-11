@@ -478,21 +478,17 @@ class FullPipeline:
         p_values = {}
         reasons = []
 
-        # NOTE: the efference "surprise ratio" channel was REMOVED from the
-        # alert combination (v3). It was anti-informative on real drift
-        # (only-surprise AUROC 0.429, below chance) yet contributed the most
-        # benign-side evidence of any channel (+1.31 log10 BF per benign
-        # action), and dropping it lifted the recombined ensemble 0.75 ->
-        # 0.85 (eval/results/repo-open-questions-2026-07-10.md Q1).
-        # pred_error.surprise_ratio is still computed and exposed on
-        # StepResult; it just no longer feeds the alert.
-
-        # Direction error (radians; >0.3 notable, >1.0 alarming)
-        if pred_error and pred_error.direction_error > 0.1:
-            p = math.exp(-2.0 * pred_error.direction_error)
-            p_values["direction"] = p
-            if pred_error.direction_error > 0.3:
-                reasons.append(f"direction:{pred_error.direction_error:.2f}rad")
+        # NOTE: both efference-copy channels — "surprise ratio" and
+        # "direction error" — were REMOVED from the alert combination (v3).
+        # On real drift each was at or below chance as a standalone signal
+        # (only-surprise AUROC 0.429, only-direction 0.469) and surprise
+        # contributed the most benign-side evidence of any channel (+1.31
+        # log10 BF per benign action); removing them lifted the recombined
+        # ensemble 0.75 -> 0.85 (eval/results/repo-open-questions-2026-07-10.md
+        # Q1). The EfferenceCopyPredictor still runs and its outputs
+        # (surprise_ratio, direction_error, proprioceptive_context) remain on
+        # StepResult for diagnostics — efference is simply no longer a
+        # detection channel.
 
         # Boundary proximity (0-1; >0.5 notable)
         max_prox = max(proximities.values()) if proximities else 0.0

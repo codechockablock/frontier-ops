@@ -62,6 +62,18 @@ class TestAssertedGDeprecated:
             static_metric.CalibratedMetric.from_labeled(X, y)
 
 
+class TestQuarantinedDeadCode:
+    def test_modes_import_warns(self):
+        # v3: orphaned ICA detector, quarantined not deleted (importable,
+        # warns). Import fresh so the module-level warning re-fires.
+        import importlib
+        import sys
+
+        sys.modules.pop("frontier_ops.sensing.modes", None)
+        with pytest.warns(DeprecationWarning, match="dead code"):
+            importlib.import_module("frontier_ops.sensing.modes")
+
+
 class TestNameCollisionResolved:
     def test_alias_kept(self):
         assert static_metric.ConstitutionalMetric is static_metric.CalibratedMetric

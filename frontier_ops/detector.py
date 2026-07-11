@@ -40,11 +40,16 @@ Usage::
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+import json
+from pathlib import Path
+from typing import List, Optional, Sequence, Union
 
 import numpy as np
 
 DEFAULT_MODEL = "all-MiniLM-L6-v2"
+
+#: Serialization format version written by :meth:`CalibratedDetector.save`.
+FORMAT_VERSION = 1
 
 
 class CalibratedDetector:
@@ -159,6 +164,85 @@ class CalibratedDetector:
     @property
     def calibrated(self) -> bool:
         return self.direction is not None and self.threshold is not None
+
+    # -- persistence ---------------------------------------------------------
+
+    def save(self, path: Union[str, Path]) -> None:
+        """Serialize the calibrated state to a single ``.npz`` file at ``path``.
+
+        Writes the prototype ``direction`` array plus JSON metadata
+        (``model_name``, ``threshold``, ``alpha``, ``n_calibration``, format
+        version). The encoder itself is NOT serialized — only its name — so
+        the file is small and the encoder is re-resolved lazily on load.
+
+        Raises:
+            RuntimeError: if called before :meth:`calibrate`.
+        """
+        if self.direction is None:
+            raise RuntimeError("calibrate() before save()")
+        meta = {
+            "format_version": FORMAT_VERSION,
+            "model_name": self._model_name,
+            "threshold": self.threshold,
+            "alpha": self.alpha,
+            "n_calibration": self.n_calibration,
+        }
+        arrays = {
+            "direction": self.direction,
+            "meta": np.array(json.dumps(meta)),
+        }
+        # Writing through an open handle keeps np.savez from appending a
+        # second ".npz" suffix, so save/load round-trip on the exact path.
+        with open(path, "wb") as f:
+            np.savez(f, **arrays)
+
+    @classmethod
+    def load(
+        cls,
+        path: Union[str, Path],
+        model=None,
+        model_name: Optional[str] = None,
+    ) -> "CalibratedDetector":
+        """Restore a detector saved with :meth:`save`.
+
+        The encoder is not loaded here — scoring stays lazy, so ``load`` works
+        without sentence-transformers installed until the first
+        ``score``/``embed`` call.
+
+        Args:
+            path: file written by :meth:`save`.
+            model: a preloaded encoder to reuse (skips the lazy load).
+            model_name: if given, must match the ``model_name`` recorded in
+                the file — scores from a different encoder are not comparable.
+
+        Raises:
+            ValueError: on a ``model_name`` mismatch or an unknown (newer)
+                format version.
+        """
+        with np.load(path, allow_pickle=False) as data:
+            meta = json.loads(str(data["meta"]))
+            direction = np.array(data["direction"])
+        version = int(meta.get("format_version", -1))
+        if version > FORMAT_VERSION:
+            raise ValueError(
+                f"detector file {path!s} has format version {version}, newer "
+                f"than this library supports ({FORMAT_VERSION}); upgrade "
+                "frontier-ops to load it"
+            )
+        saved_name = meta["model_name"]
+        if model_name is not None and model_name != saved_name:
+            raise ValueError(
+                f"detector file {path!s} was calibrated with encoder "
+                f"'{saved_name}' but '{model_name}' was requested; scores "
+                "from different encoders are not comparable — load with the "
+                "matching model_name or recalibrate"
+            )
+        det = cls(model=model, model_name=saved_name)
+        det.direction = direction
+        det.threshold = meta["threshold"]
+        det.alpha = meta["alpha"]
+        det.n_calibration = int(meta["n_calibration"])
+        return det
 
 
 def calibrate_from_labeled(

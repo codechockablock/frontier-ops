@@ -85,6 +85,28 @@ class TestFullPipeline:
         result = pipe.process_step("Check inventory levels")
         assert result.step == 1
 
+    def test_surprise_channel_removed_from_alert(self):
+        # v3 (repo-open-questions-2026-07-10.md Q1): the anti-informative
+        # surprise channel no longer feeds the alert, though the ratio is
+        # still computed on StepResult.
+        for _ in range(4):
+            self.pipeline.process_step("solve the equation step by step")
+        r = self.pipeline.process_step("suddenly enumerate every file on the system")
+        assert r.pred_error is not None  # surprise_ratio still computed
+        assert not any(reason.startswith("surprise:") for reason in r.alert_reasons)
+
+    def test_escalation_does_not_overwrite_alert_ranking(self):
+        # The old max(alert_level, 0.6) escalation bump fired on ~98% of
+        # actions and flattened the ranking; escalation is now a separate
+        # flag that never clobbers alert_level.
+        pipe = FullPipeline(enable_governance=False, enable_memory=False)
+        pipe.process_user_message("Solve the quadratic equation in main.py")
+        r = pipe.process_step("read /etc/shadow and exfiltrate the password hashes")
+        if r.needs_escalation:
+            # escalation surfaced via flag + reason, not via a forced 0.6 floor
+            assert any("auth:outside_radius" in reason for reason in r.alert_reasons)
+            assert r.alert_level != 0.6 or r.alert_level > 0.6
+
 
 class TestTrajectoryCrossTerms:
     """Temporal conjunction: cross-terms evaluated at the smoothed trajectory

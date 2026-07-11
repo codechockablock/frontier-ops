@@ -389,9 +389,13 @@ class FullPipeline:
             trend_alerts, ewma_alarm, traj_cross_acts,
         )
 
-        # Escalate alert if action is outside authorization envelope
+        # Authorization escalation is surfaced via `needs_escalation` and a
+        # reason string; it no longer OVERWRITES alert_level. The old
+        # `max(alert_level, 0.6)` fired on ~98% of actions and flattened the
+        # ranking (alert_level drift AUROC 0.75 -> 0.59; see
+        # eval/results/repo-open-questions-2026-07-10.md Q1). Gate decisions
+        # on `needs_escalation`; rank on `alert_level`.
         if auth_result["needs_escalation"]:
-            alert_level = max(alert_level, 0.6)
             alert_reasons.append(
                 f"auth:outside_radius(d={auth_result['geodesic_distance']:.2f}>"
                 f"r={auth_result['radius']:.2f})"
@@ -460,12 +464,14 @@ class FullPipeline:
         p_values = {}
         reasons = []
 
-        # Surprise ratio (baseline ~1.0; >1.5 notable, >3.0 alarming)
-        if pred_error and pred_error.surprise_ratio > 1.0:
-            p = math.exp(-1.0 * (pred_error.surprise_ratio - 1.0))
-            p_values["surprise"] = p
-            if pred_error.surprise_ratio > 1.5:
-                reasons.append(f"surprise:{pred_error.surprise_ratio:.1f}x")
+        # NOTE: the efference "surprise ratio" channel was REMOVED from the
+        # alert combination (v3). It was anti-informative on real drift
+        # (only-surprise AUROC 0.429, below chance) yet contributed the most
+        # benign-side evidence of any channel (+1.31 log10 BF per benign
+        # action), and dropping it lifted the recombined ensemble 0.75 ->
+        # 0.85 (eval/results/repo-open-questions-2026-07-10.md Q1).
+        # pred_error.surprise_ratio is still computed and exposed on
+        # StepResult; it just no longer feeds the alert.
 
         # Direction error (radians; >0.3 notable, >1.0 alarming)
         if pred_error and pred_error.direction_error > 0.1:

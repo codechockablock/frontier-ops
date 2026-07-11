@@ -1,5 +1,60 @@
 # Changelog
 
+## 0.5.0 — 2026-07-11
+
+Productionization of the v3 detector plus repo hygiene and product seams.
+No breaking changes; every pre-0.5 import keeps working.
+
+**Detector productionization**
+
+- **Persistence** — `CalibratedDetector.save(path)` / `load(path)`:
+  direction + threshold + calibration provenance in a single `.npz` with a
+  format version. Round-trips bit-identically; a `model_name` mismatch or a
+  newer format raises a clear error; the encoder stays lazy through `load`.
+- **Conformal calibration** — the finite-sample split-conformal quantile
+  now lives in `frontier_ops.conformal.split_conformal_threshold`, shared
+  by the authorization-radius calibrator (historical radii unchanged) and
+  the new `CalibratedDetector.calibrate_conformal(benign_texts, alpha)`,
+  which guarantees marginal FPR ≤ α under exchangeability (Monte-Carlo
+  verified over 20 seeds). Calibration scores ride along in `save()`.
+- **Adaptive thresholding** — `frontier_ops.RollingThreshold`: a sliding /
+  exponentially-decayed benign-quantile threshold fed by operator-confirmed
+  scores, attachable via `detector.attach_rolling_threshold()`. On a +1σ
+  mean-shifted stream it holds FPR within ±0.05 of α while a frozen
+  threshold drifts past α + 0.1 — the transport failure measured in
+  `eval/results/calibration-transport-2026-07-04.md`, now mitigated.
+
+**Architecture**
+
+- **Encoder protocol** — `frontier_ops.encoder.Encoder`
+  (`encode(texts) -> (n, d)`): `CalibratedDetector`,
+  `SemanticConceptExtractor`, and `StepMeanScorer` accept any conforming
+  encoder by constructor injection; defaults unchanged.
+- **Product seams** — `pip install frontier-ops[detect]` (encoder, no
+  cryptography) and `[govern]` (cryptography, no encoder), with a
+  `frontier_ops.detection` façade. Verified: a detect-only environment
+  runs the detector end-to-end with cryptography imports blocked.
+- **Governance e2e test** — full producer → export → independent-auditor
+  lifecycle, with tamper cases (mutated payload fails at its exact
+  sequence number; dropped entries and foreign keys fail verification).
+
+**Hygiene**
+
+- Lint: `ruff check . --select E,F,W --ignore E501` exits 0 repo-wide;
+  `eval/session_artifacts/` excluded as verbatim provenance; terse eval
+  scripts get per-file style ignores.
+- Types: `mypy frontier_ops/` reports 0 errors (lenient config; a
+  4-module documented baseline covers quarantined/legacy glue). Fixed a
+  real shadowing bug in `constitution.py`'s cross-term loop (rename only).
+- CI: runs on all branches; matrix extended to 3.13/3.14; a semantic lane
+  installs sentence-transformers so detector tests can no longer silently
+  skip; a numpy-only lane guards the bare-import contract; the slow
+  battery sits behind `workflow_dispatch`.
+- Packaging: `python -m build` + `twine check` pass; the wheel ships
+  `py.typed`. Nothing published — that stays a human decision.
+- `CLAUDE.md` rewritten for v3 (public repo, detector-first, LEGACY.md
+  boundary).
+
 ## 0.4.0 — 2026-07-10
 
 v3 lean core — cut the dead weight. A repo-wide evidence audit (`eval/`,

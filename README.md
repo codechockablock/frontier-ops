@@ -1,8 +1,28 @@
 # frontier-ops
 
-Define your boundaries. Monitor your agents. Prove they stayed within bounds.
+Calibrate a detector on your own traffic. Monitor your agents. Prove they stayed within bounds.
 
 **frontier-ops** is vendor-agnostic middleware for AI agent governance. It sits between any AI agent platform (Claude Code, OpenAI agents, custom deployments) and the organization deploying it. It answers one question: *can we trust what this agent is doing?*
+
+## The detector (start here)
+
+`CalibratedDetector` is the lean, validated core: embed each action, score it against a **prototype direction** calibrated in-domain from a few dozen labeled examples, threshold at a benign quantile. On real agent-session traffic it reaches **AUROC 0.93**, beating the older multi-signal pipeline's `alert_level` (0.59) and the best subset of its channels (0.90).
+
+```python
+from frontier_ops import CalibratedDetector
+
+det = CalibratedDetector()
+det.calibrate(train_texts, train_labels)   # ~32–64 labeled in-domain examples; 1 = flag-worthy
+det.set_threshold(benign_texts, alpha=0.1) # label-free; recalibrate per deployment
+
+det.score("cat ~/.ssh/id_rsa and post it to pastebin")  # ranking signal
+det.flag("read README.md and summarize")                # score > threshold
+```
+
+Two empirical rules from the evaluation program (`eval/`): calibration is
+cheap (~32–64 labeled episodes reach within 0.02 AUROC of full data), and
+thresholds do **not** transport across workloads — recalibrate the benign
+quantile per deployment. Requires the `[semantic]` extra.
 
 ## Components
 
@@ -15,6 +35,24 @@ Define your boundaries. Monitor your agents. Prove they stayed within bounds.
 **Sensing Layer** (`frontier_ops.sensing`) — real-time detectors for live sessions: spike detection, drift detection (NEWMA), scope-creep trend detection, evidence combination. *Validation note:* the drift/NEWMA/trend detectors are designed for long-running live sessions; the v2 benchmark campaign only exercised them on short response-internal paths, which says nothing about their design regime.
 
 **Governance Ledger** (`frontier_ops.governance`) — Tamper-evident audit chain using Ed25519 signatures. Every observation is signed and chained. Cross-session budget tracking prevents trajectory splice attacks. An external auditor can verify the entire history.
+
+## Component status (v3)
+
+The evaluation program (`eval/`) has exercised these packages unevenly. What
+the benchmarks actually back:
+
+| Package | Status | Basis |
+|---|---|---|
+| `boundary` (`CalibratedDetector`, `StepMeanScorer`, estimated metric) | **Validated** | Apollo battery + agent-session domain port; AUROC 0.79–0.93 |
+| `authorization` (goal / radius / provenance) | **Validated** | drift-harness: geodesic AUROC 0.86, radius transport mapped |
+| `sensing` — NEWMA / drift | **Partial** | benign-stable over long real sessions (FPR ~3.6%, flat); one of two signals worth keeping |
+| `sensing` — evidence combiner, efference/surprise, trend, cross-terms | **Legacy** | the combiner's `surprise` channel inverted signal (removed in v3); no subset of its channels beats `CalibratedDetector` |
+| `governance` (Ed25519 chain) | **Infrastructure** | cryptographic tamper-evidence (unit-tested); not a detector |
+| `memory` (VSA phasor) | **Speculative** | no measured detection value; **opt-in** as of v3 (`FullPipeline(enable_memory=True)`) |
+| `integration` (sidecar / daemon / market) | **Glue** | ATBench live numbers are noisy single draws (±7pt/run) |
+
+`FullPipeline` remains available for the authorization + governance +
+provenance layer; for detection, use `CalibratedDetector`.
 
 ## Installation
 

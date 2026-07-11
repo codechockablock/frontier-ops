@@ -94,10 +94,22 @@ class StepResult:
 
 class FullPipeline:
     """
-    Complete geometric agent processing pipeline.
+    Full governance pipeline: concept encoding, the drift/NEWMA sensing
+    stack, authorization envelope, provenance graph, and (optional) Ed25519
+    governance chain, wired together. Call process_step() per agent output.
 
-    Instantiates and wires all components. Call process_step() for each
-    agent output to get a full diagnostic result.
+    For DETECTION, prefer ``frontier_ops.CalibratedDetector`` — an in-domain
+    calibrated prototype that beat this pipeline's alert_level and the best
+    subset of its channels on every workload tested
+    (eval/results/repo-open-questions-2026-07-10.md). Use FullPipeline when
+    you want the authorization/governance/provenance layer around it; its
+    ranking-quality signals are ``alert_level`` (post-v3 combiner fix) and
+    the NEWMA channel, not the full ensemble.
+
+    v3 default change: ``enable_memory`` now defaults to False. The VSA
+    memory/activation path has no measured detection value (a repo-wide
+    audit found it exercised by no benchmark) and added per-step cost; it is
+    opt-in. Set ``enable_memory=True`` to restore the priming path.
     """
 
     def __init__(
@@ -108,13 +120,15 @@ class FullPipeline:
         vsa_dim: int = 512,
         concept_extractor_tier: Optional[int] = 1,
         enable_governance: bool = True,
-        enable_memory: bool = True,
+        enable_memory: bool = False,
         newma_threshold: float = 0.65,
         dim_names: Optional[List[str]] = None,
         semantic_anchors: Optional[Dict[str, List[str]]] = None,
     ):
         """
         Args:
+            enable_memory: opt-in VSA memory/activation priming (default
+                False in v3 — no measured detection value; see class doc).
             dim_names: active concept dimensions, threaded through metric,
                 predictor, and extractor construction. Defaults to the stock
                 CONCEPTS, or to ``semantic_anchors``' keys when those are given.

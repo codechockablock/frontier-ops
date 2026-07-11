@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "frontier-ops"
-version = "0.3.0"
+version = "0.4.0"
 description = "Middleware for AI agent governance. Define boundaries. Monitor agents. Prove they stayed within bounds."
 readme = "README.md"
 license = "MIT"
@@ -52,8 +52,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/openclaw/frontier-ops"
-Documentation = "https://github.com/openclaw/frontier-ops#readme"
+Homepage = "https://github.com/codechockablock/frontier-ops"
+Documentation = "https://github.com/codechockablock/frontier-ops#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["frontier_ops"]

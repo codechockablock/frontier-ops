@@ -147,13 +147,17 @@ class SemanticConceptExtractor:
         model_name: str = "all-MiniLM-L6-v2",
         dims: Optional[List[str]] = None,
         anchors: Optional[Dict[str, List[str]]] = None,
+        encoder=None,
     ):
-        SentenceTransformer = _try_import_sentence_transformers()
-        if SentenceTransformer is None:
-            raise ImportError(
-                "SemanticConceptExtractor requires sentence-transformers. "
-                "Install with: pip install sentence-transformers"
-            )
+        if encoder is None:
+            SentenceTransformer = _try_import_sentence_transformers()
+            if SentenceTransformer is None:
+                raise ImportError(
+                    "SemanticConceptExtractor requires sentence-transformers. "
+                    "Install with: pip install sentence-transformers, or "
+                    "inject an `encoder` (see frontier_ops.encoder.Encoder)."
+                )
+            encoder = SentenceTransformer(model_name)
         if anchors is None:
             anchors = SEMANTIC_ANCHORS
         if dims is None:
@@ -166,14 +170,20 @@ class SemanticConceptExtractor:
             )
         self.dims: List[str] = list(dims)
         self.anchors: Dict[str, List[str]] = {d: list(anchors[d]) for d in self.dims}
-        self.model = SentenceTransformer(model_name)
+        self.model = encoder
         self._anchor_embeddings: Dict[str, np.ndarray] = {}
         self._build_anchors()
+
+    def _encode(self, texts: List[str]) -> np.ndarray:
+        """Batch-encode through the injected encoder (bare or rich API)."""
+        from frontier_ops.encoder import encode_batch
+
+        return encode_batch(self.model, texts, convert_to_numpy=True)
 
     def _build_anchors(self):
         """Pre-compute normalized embeddings for all anchor phrases."""
         for concept, phrases in self.anchors.items():
-            embeddings = self.model.encode(phrases, convert_to_numpy=True)
+            embeddings = self._encode(phrases)
             # Normalize each anchor embedding to unit length
             norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
             norms = np.maximum(norms, 1e-10)
@@ -187,7 +197,7 @@ class SemanticConceptExtractor:
         Score = max cosine similarity to any anchor in that dimension,
         rescaled from typical cosine range to [0, 1].
         """
-        embedding = self.model.encode(text, convert_to_numpy=True)
+        embedding = self._encode([text])[0]
         norm = np.linalg.norm(embedding)
         if norm > 1e-10:
             embedding = embedding / norm

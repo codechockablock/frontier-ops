@@ -58,9 +58,10 @@ class CalibratedDetector:
     """In-domain-calibrated prototype-direction detector.
 
     Args:
-        model: a preloaded sentence-transformers model to reuse (recommended
-            when scoring many texts). Lazily loaded from ``model_name`` when
-            omitted.
+        model: a preloaded sentence-transformers model — or any
+            :class:`~frontier_ops.encoder.Encoder` (``encode(texts) ->
+            (n, d)`` array) — to reuse. Lazily loaded from ``model_name``
+            when omitted.
         model_name: encoder to load if ``model`` is not given.
     """
 
@@ -94,9 +95,18 @@ class CalibratedDetector:
         return self._model
 
     def embed(self, texts: Sequence[str]) -> np.ndarray:
-        """L2-normalized encoder embeddings, shape (n, d)."""
-        return self.model.encode(
-            list(texts),
+        """L2-normalized encoder embeddings, shape (n, d).
+
+        ``model`` may be any :class:`~frontier_ops.encoder.Encoder` — the
+        sentence-transformers keyword arguments are dropped (and rows
+        normalized here instead) when the encoder only supports the bare
+        ``encode(texts)`` form.
+        """
+        from frontier_ops.encoder import encode_batch
+
+        return encode_batch(
+            self.model,
+            texts,
             batch_size=64,
             convert_to_numpy=True,
             normalize_embeddings=True,

@@ -9,5 +9,6 @@ from frontier_ops.boundary.constitution import ConstitutionSpec as ConstitutionS
 from frontier_ops.boundary.concept_extraction import CONCEPTS as CONCEPTS, ConceptExtractor as ConceptExtractor
 from frontier_ops.detector import CalibratedDetector as CalibratedDetector, calibrate_from_labeled as calibrate_from_labeled
 from frontier_ops.adaptive_threshold import RollingThreshold as RollingThreshold
+from frontier_ops.encoder import Encoder as Encoder
 from frontier_ops.pipeline import FullPipeline as FullPipeline, StepResult as StepResult
 from frontier_ops.authorization import AuthorizationState as AuthorizationState, ProvenanceGraph as ProvenanceGraph, AuthorizationLinkedBudget as AuthorizationLinkedBudget

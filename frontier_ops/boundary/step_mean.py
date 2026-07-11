@@ -50,6 +50,9 @@ class StepMeanScorer:
         dims: concept dimensions (default: stock CONCEPTS).
         anchors: anchor phrases per dim (default: stock SEMANTIC_ANCHORS).
         model_name: sentence-transformers model for a lazily built extractor.
+        encoder: any frontier_ops.encoder.Encoder for the lazily built
+            extractor (skips sentence-transformers entirely). Ignored when
+            ``extractor`` is given.
         ridge: ridge added to the pooled within-class covariance in fit().
     """
 
@@ -60,12 +63,14 @@ class StepMeanScorer:
         dims: Optional[List[str]] = None,
         anchors: Optional[Dict[str, List[str]]] = None,
         model_name: str = "all-MiniLM-L6-v2",
+        encoder=None,
         ridge: float = 1e-3,
     ):
         self._extractor = extractor
         self._dims = dims
         self._anchors = anchors
         self._model_name = model_name
+        self._encoder = encoder
         self.ridge = ridge
         self.metric: Optional[np.ndarray] = None
         self.centroid_0: Optional[np.ndarray] = None
@@ -81,7 +86,10 @@ class StepMeanScorer:
             )
 
             self._extractor = SemanticConceptExtractor(
-                model_name=self._model_name, dims=self._dims, anchors=self._anchors
+                model_name=self._model_name,
+                dims=self._dims,
+                anchors=self._anchors,
+                encoder=self._encoder,
             )
         return self._extractor
 

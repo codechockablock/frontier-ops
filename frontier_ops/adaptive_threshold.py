@@ -8,13 +8,13 @@ eval/results/calibration-transport-2026-07-04.md). This module keeps the
 operating point tracking the *current* benign distribution without
 relabeling: the operator feeds scores confirmed benign into
 :class:`RollingThreshold`, which maintains the ``1-alpha`` benign quantile
-over a sliding window (optionally exponentially decayed), and the detector
-consults it instead of a frozen threshold.
+over a sliding window, and the detector consults it instead of a frozen
+threshold. Prefer ``conformal=True`` (see docs/CALIBRATION.md).
 
 Usage::
 
     det = CalibratedDetector.load("det.npz")
-    rt = RollingThreshold(alpha=0.1, window=256)
+    rt = RollingThreshold(alpha=0.1, window=64, conformal=True)
     for text in stream:
         s = det.score(text)
         flagged = rt.ready and s > rt.threshold
@@ -22,6 +22,14 @@ Usage::
             rt.update(s)
 
 Numpy-only; usable standalone with any score stream.
+
+An exponentially-decayed window mode shipped briefly during 0.5.0
+development and was removed before release: no measured regime needed it,
+and it is incompatible with the conformal correction (weighted scores are
+not exchangeable), which outperformed the plug-in quantile at every
+window size on real streams (eval/results/
+conformal-rolling-transport-2026-07-11.md). Track faster shifts with a
+smaller window instead.
 """
 
 from __future__ import annotations
@@ -36,16 +44,13 @@ __all__ = ["RollingThreshold"]
 
 class RollingThreshold:
     """Benign-quantile threshold over a sliding window of confirmed-benign
-    scores, with optional exponential down-weighting of older scores.
+    scores.
 
     Args:
         alpha: target false-positive rate; the threshold is the ``1-alpha``
-            weighted quantile of the windowed scores.
-        window: number of most-recent benign scores retained.
-        decay: per-update multiplicative weight decay in (0, 1]. ``1.0``
-            (default) weights every retained score equally (pure sliding
-            window); smaller values emphasize recent scores, tracking faster
-            shifts at the cost of a noisier quantile.
+            quantile of the windowed scores.
+        window: number of most-recent benign scores retained. Smaller
+            windows track shifts faster at the cost of a noisier quantile.
         min_n: scores required before :attr:`threshold` is available
             (warmup). Until then :attr:`ready` is False and
             :attr:`threshold` raises.
@@ -54,17 +59,15 @@ class RollingThreshold:
             small windows the plug-in quantile is anti-conservative (its
             realized FPR overshoots ``alpha`` — measured at +0.04 for
             window 32 on real streams); the conformal correction removes
-            that bias. Requires ``decay == 1.0`` (weighted scores are not
-            exchangeable). The finite-sample guarantee is exact only under
+            that bias. The finite-sample guarantee is exact only under
             local exchangeability of the window — under active drift it is
-            a bias correction, not a certificate.
+            a bias correction, not a certificate. Recommended.
     """
 
     def __init__(
         self,
         alpha: float = 0.1,
         window: int = 256,
-        decay: float = 1.0,
         min_n: int = 20,
         conformal: bool = False,
     ):
@@ -72,18 +75,10 @@ class RollingThreshold:
             raise ValueError(f"alpha must be in (0, 1), got {alpha}")
         if window < 2:
             raise ValueError(f"window must be >= 2, got {window}")
-        if not 0 < decay <= 1:
-            raise ValueError(f"decay must be in (0, 1], got {decay}")
         if min_n < 2:
             raise ValueError(f"min_n must be >= 2, got {min_n}")
-        if conformal and decay < 1.0:
-            raise ValueError(
-                "conformal=True requires decay=1.0 (exponentially weighted "
-                "scores are not exchangeable)"
-            )
         self.alpha = float(alpha)
         self.window = int(window)
-        self.decay = float(decay)
         self.min_n = int(min_n)
         self.conformal = bool(conformal)
         self._scores: Deque[float] = deque(maxlen=self.window)
@@ -105,7 +100,7 @@ class RollingThreshold:
 
     @property
     def threshold(self) -> float:
-        """Current ``1-alpha`` (weighted) benign quantile.
+        """Current ``1-alpha`` benign quantile of the window.
 
         Raises:
             RuntimeError: during warmup (fewer than ``min_n`` scores seen).
@@ -120,29 +115,8 @@ class RollingThreshold:
             from frontier_ops.conformal import split_conformal_threshold
 
             return split_conformal_threshold(scores, self.alpha)
-        if self.decay >= 1.0:
-            return float(np.quantile(scores, 1.0 - self.alpha))
-        # weight w_i = decay^(age): newest score has weight 1
-        ages = np.arange(scores.size - 1, -1, -1, dtype=float)
-        weights = self.decay**ages
-        return _weighted_quantile(scores, weights, 1.0 - self.alpha)
+        return float(np.quantile(scores, 1.0 - self.alpha))
 
     def reset(self) -> None:
         """Drop all retained scores (back to warmup)."""
         self._scores.clear()
-
-
-def _weighted_quantile(values: np.ndarray, weights: np.ndarray, q: float) -> float:
-    """Weighted quantile via the cumulative-weight inverse CDF.
-
-    Returns the smallest value whose normalized cumulative weight reaches
-    ``q`` — the weighted analogue of a right-continuous empirical quantile.
-    """
-    order = np.argsort(values)
-    v = values[order]
-    w = weights[order]
-    cw = np.cumsum(w)
-    cw /= cw[-1]
-    idx = int(np.searchsorted(cw, q, side="left"))
-    idx = min(idx, v.size - 1)
-    return float(v[idx])

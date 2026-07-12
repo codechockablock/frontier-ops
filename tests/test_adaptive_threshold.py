@@ -23,12 +23,6 @@ class TestValidation:
         with pytest.raises(ValueError, match="window"):
             RollingThreshold(window=1)
 
-    def test_decay_bounds(self):
-        with pytest.raises(ValueError, match="decay"):
-            RollingThreshold(decay=0.0)
-        with pytest.raises(ValueError, match="decay"):
-            RollingThreshold(decay=1.5)
-
     def test_min_n_bounds(self):
         with pytest.raises(ValueError, match="min_n"):
             RollingThreshold(min_n=1)
@@ -72,19 +66,6 @@ class TestWindowing:
         # window holds only the five 10.0s
         assert rt.n == 5
         assert rt.threshold == 10.0
-
-    def test_decay_tracks_recent_scores_faster(self):
-        slow = RollingThreshold(alpha=0.1, window=200, decay=1.0, min_n=2)
-        fast = RollingThreshold(alpha=0.1, window=200, decay=0.9, min_n=2)
-        for _ in range(100):
-            slow.update(0.0)
-            fast.update(0.0)
-        for _ in range(10):
-            slow.update(1.0)
-            fast.update(1.0)
-        # equally-weighted window barely moves; decayed window jumps
-        assert slow.threshold < 0.5
-        assert fast.threshold == 1.0
 
 
 class TestShiftTracking:
@@ -141,10 +122,6 @@ class TestDetectorIntegration:
 
 
 class TestConformalMode:
-    def test_conformal_requires_no_decay(self):
-        with pytest.raises(ValueError, match="decay"):
-            RollingThreshold(conformal=True, decay=0.9)
-
     def test_conformal_removes_small_window_bias(self):
         """At window 32 the plug-in quantile overshoots alpha; the conformal
         order statistic must not. iid stream, 20 seeds, flag-then-update."""

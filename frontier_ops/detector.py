@@ -145,9 +145,14 @@ class CalibratedDetector:
         return self
 
     def set_threshold(self, benign_texts: Sequence[str], alpha: float = 0.1) -> float:
-        """Set the flag threshold to the ``1-alpha`` quantile of benign
-        scores (a label-free per-deployment recalibration — thresholds do
-        not transport across workloads)."""
+        """Set the flag threshold to the ``1-alpha`` plug-in quantile of
+        benign scores (a label-free per-deployment recalibration —
+        thresholds do not transport across workloads).
+
+        Soft-deprecated: prefer :meth:`calibrate_conformal`, which has no
+        regime where it is worse — it adds a finite-sample FPR ≤ alpha
+        guarantee at small n and coincides with the plug-in quantile at
+        large n (docs/CALIBRATION.md). Kept for back-compatibility."""
         if self.direction is None:
             raise RuntimeError("calibrate() before set_threshold()")
         scores = self.embed(benign_texts) @ self.direction

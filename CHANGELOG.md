@@ -17,11 +17,14 @@ No breaking changes; every pre-0.5 import keeps working.
   the new `CalibratedDetector.calibrate_conformal(benign_texts, alpha)`,
   which guarantees marginal FPR ≤ α under exchangeability (Monte-Carlo
   verified over 20 seeds). Calibration scores ride along in `save()`.
-- **Adaptive thresholding** — `frontier_ops.RollingThreshold`: a sliding /
-  exponentially-decayed benign-quantile threshold fed by operator-confirmed
-  scores, attachable via `detector.attach_rolling_threshold()`. On a +1σ
-  mean-shifted stream it holds FPR within ±0.05 of α while a frozen
-  threshold drifts past α + 0.1 — the transport failure measured in
+- **Adaptive thresholding** — `frontier_ops.RollingThreshold`: a
+  sliding-window benign-quantile threshold fed by operator-confirmed
+  scores, attachable via `detector.attach_rolling_threshold()`; the
+  `conformal=True` mode thresholds at the finite-sample order statistic,
+  removing the plug-in small-window bias (post-shift FPR 0.100–0.109 at
+  every window 32–256 on real streams). On a +1σ mean-shifted stream it
+  holds FPR within ±0.05 of α while a frozen threshold drifts past
+  α + 0.1 — the transport failure measured in
   `eval/results/calibration-transport-2026-07-04.md`, now mitigated.
 
 **Architecture**
@@ -54,6 +57,15 @@ No breaking changes; every pre-0.5 import keeps working.
   `py.typed`. Nothing published — that stays a human decision.
 - `CLAUDE.md` rewritten for v3 (public repo, detector-first, LEGACY.md
   boundary).
+- Evidence-driven trims before release: `set_threshold` soft-deprecated in
+  favor of `calibrate_conformal` (no regime where the plug-in quantile is
+  better); `detect`/`govern` documented as the canonical extras
+  (`semantic`/`governance` are legacy aliases); the `ica` extra marked
+  deprecated (serves only the quarantined `sensing.modes`); the one
+  wall-clock P99 test moved behind a `perf` marker so the default gate
+  (`-m "not slow and not perf"`) is load-independent. A speculative
+  decayed-window mode was removed from `RollingThreshold` before it
+  shipped (incompatible with the conformal correction; no measured use).
 
 ## 0.4.0 — 2026-07-10
 

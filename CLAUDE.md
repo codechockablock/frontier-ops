@@ -45,7 +45,7 @@ eval/               — evaluation scripts; session_artifacts/ is verbatim prove
 ## Running Tests
 
 ```bash
-pytest tests/ -q -m "not slow"     # the gate (slow battery needs Apollo data)
+pytest tests/ -q -m "not slow and not perf"   # the gate (slow = battery; perf = load-sensitive wall-clock)
 ruff check frontier_ops/ tests/ --select E,F,W --ignore E501   # lint gate
 mypy frontier_ops/                 # 0 errors (4-module baseline in pyproject)
 ```

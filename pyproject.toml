@@ -34,14 +34,20 @@ dependencies = [
 frontier-ops = "frontier_ops.integration.market_daemon:main"
 
 [project.optional-dependencies]
-kalman = ["scipy>=1.10"]
-ica = ["scikit-learn>=1.2"]
-governance = ["cryptography>=41.0"]
-semantic = ["sentence-transformers>=2.2"]
-# Product seams: detection (CalibratedDetector + boundary scorers) needs an
-# encoder but no crypto; governance/authorization needs crypto but no encoder.
+# Canonical product seams: detection (CalibratedDetector + boundary scorers)
+# needs an encoder but no crypto; governance/authorization needs crypto but
+# no encoder. Install these two.
 detect = ["sentence-transformers>=2.2"]
 govern = ["cryptography>=41.0"]
+# Legacy aliases of detect/govern (predate the product split) — kept for
+# back-compatibility, do not document in new material.
+semantic = ["sentence-transformers>=2.2"]
+governance = ["cryptography>=41.0"]
+kalman = ["scipy>=1.10"]
+# DEPRECATED: exists solely for sensing.modes (quarantined, emits
+# DeprecationWarning on import, zero benchmark contact — docs/LEGACY.md).
+# Will be removed when modes.py is.
+ica = ["scikit-learn>=1.2"]
 all = [
     "scipy>=1.10",
     "scikit-learn>=1.2",
@@ -100,4 +106,5 @@ extend-exclude = ["eval/session_artifacts"]
 testpaths = ["tests"]
 markers = [
     "slow: long-running eval battery checks (need Apollo data + sentence-transformers)",
+    "perf: wall-clock performance asserts — load-sensitive, excluded from the default gate",
 ]

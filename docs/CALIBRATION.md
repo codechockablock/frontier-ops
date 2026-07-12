@@ -58,8 +58,9 @@ for text in stream:
 - Window ≥ 32 confirmed-benign scores suffices with `conformal=True`.
   These are *unlabeled benign confirmations*, cheaper than the labeled
   examples in step 1.
-- `decay < 1` tracks faster shifts but forfeits the conformal correction
-  (weighted scores aren't exchangeable); prefer a smaller window instead.
+- Track faster shifts with a smaller window. (A decayed-window mode was
+  cut before release: no measured regime needed it, and it is
+  incompatible with the conformal correction.)
 
 **4. On a workload change** (new task mix, new deployment, new model
 generating the traffic): re-run step 2 on that workload's benign traffic,

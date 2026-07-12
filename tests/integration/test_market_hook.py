@@ -319,6 +319,7 @@ class TestSidecarIntegration:
 
 class TestPerformance:
 
+    @pytest.mark.perf
     def test_on_step_latency(self):
         """on_step() < 1ms P99 (includes disk write)."""
         hook = _make_hook()

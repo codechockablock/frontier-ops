@@ -34,7 +34,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m pytest tests/ -v --tb=short -m "not slow"
+        python -m pytest tests/ -v --tb=short -m "not slow and not perf"
 
     - name: Check import cleanliness
       run: |
@@ -89,7 +89,7 @@ jobs:
 
     - name: Run full suite with semantic paths active
       run: |
-        python -m pytest tests/ -v --tb=short -m "not slow"
+        python -m pytest tests/ -v --tb=short -m "not slow and not perf"
 
     - name: Assert detector tests did not skip
       run: |

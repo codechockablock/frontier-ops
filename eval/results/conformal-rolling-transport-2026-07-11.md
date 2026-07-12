@@ -43,24 +43,22 @@ grouped splits. Companion JSON: `conformal-rolling-transport-2026-07-11.json`.
    change. The unit of "in-domain" is the session mix — the same
    conclusion the calibration-transport study reached for the radius, now
    reproduced for the conformal detector threshold.
-3. **The rolling threshold survives its falsification test (Q8: does not
+3. **The rolling threshold survives its falsification test (Q8 does not
    fire).** Across the real A→D shift the frozen threshold runs at 0.211;
    the rolling window recovers to 0.106–0.143 post-refill, inside the
-   pre-registered band at every window size. w=32's 0.143 excess is
-   plug-in quantile bias at small n — **fixed**: R3b re-runs the same
-   streams with `RollingThreshold(conformal=True)` (the shared
-   split-conformal order statistic over the window) and the window
-   dependence disappears (0.100–0.109 at every window). A window of 32
-   confirmed-benign scores now suffices — half the previous minimum.
-4. **R4 is the finding that changes the story: the frozen threshold's high
-   TPR was purchased with silent FPR inflation.** On the fresh batch the
-   frozen threshold reads TPR 0.95 — at a realized FPR of 0.193, double
-   the advertised rate. Pull the operating point back to nominal (rolling,
-   any window) and TPR lands at 0.55–0.64, near the own-label
-   recalibration ceiling of ~0.73. Adaptation doesn't "cost" detection;
-   it reveals what detection at the advertised FPR actually is on the
-   shifted workload. Any TPR quoted at an uncalibrated threshold on
-   shifted traffic is inflated by exactly this mechanism.
+   pre-registered band at every window size. The w=32 excess (0.143) is
+   plug-in quantile bias at small n; R3b re-runs the same streams with
+   `RollingThreshold(conformal=True)` and the window dependence
+   disappears (0.100–0.109 everywhere). 32 confirmed-benign scores
+   suffice — half the previous minimum.
+4. **The frozen threshold's high TPR was FPR inflation.** On the fresh
+   batch it reads TPR 0.95 — at a realized FPR of 0.193, double the
+   advertised rate. Pulled back to nominal (rolling, any window), TPR is
+   0.55–0.64, near the own-label recalibration ceiling of ~0.73.
+   Adaptation doesn't "cost" detection; it shows what detection at the
+   advertised FPR is on the shifted workload. TPR quoted at an
+   uncalibrated threshold on shifted traffic is inflated by this
+   mechanism.
 
 ## Operational readout
 

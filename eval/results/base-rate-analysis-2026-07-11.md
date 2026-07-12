@@ -62,16 +62,14 @@ sessions + surviving TPR on labeled off-goal actions:
    as the finite-sample correction should be). The machinery from
    docs/CALIBRATION.md transfers unchanged to budgets expressed as
    "1 FP per K sessions"; α is derived, not chosen.
-4. **What this changes:** detector improvements should be measured as
-   recall gained *at a fixed operator budget* (e.g. TPR@1FP/20sessions),
-   not TPR at α=0.1. Per-action flagging at realistic base rates is an
-   alert-fatigue machine unless either the FPR drops ~two orders of
-   magnitude (per-action) or flags are aggregated to session level /
-   gated by the authorization layer before a human sees them. That is an
-   argument for the governance/escalation architecture carrying the
-   operational load, with the detector as its ranking engine —
-   consistent with AUROC being the one number that transported well all
-   along.
+4. **What this changes:** measure detector improvements as recall gained
+   at a fixed operator budget (e.g. TPR@1FP/20sessions), not TPR at
+   α=0.1. Per-action flagging at realistic base rates cannot face a
+   human unless FPR drops ~two orders of magnitude or flags are
+   aggregated to session level / gated by the authorization layer first
+   — i.e. the governance layer carries the operational load, with the
+   detector as its ranking engine (consistent with AUROC being the one
+   number that transported well).
 
 ## Provenance
 

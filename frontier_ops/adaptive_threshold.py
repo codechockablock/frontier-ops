@@ -21,15 +21,10 @@ Usage::
         if operator_confirms_benign(text):
             rt.update(s)
 
-Numpy-only; usable standalone with any score stream.
-
-An exponentially-decayed window mode shipped briefly during 0.5.0
-development and was removed before release: no measured regime needed it,
-and it is incompatible with the conformal correction (weighted scores are
-not exchangeable), which outperformed the plug-in quantile at every
-window size on real streams (eval/results/
-conformal-rolling-transport-2026-07-11.md). Track faster shifts with a
-smaller window instead.
+Numpy-only; usable standalone with any score stream. (A decayed-window
+mode was removed pre-release: incompatible with the conformal correction
+and no measured regime needed it — track faster shifts with a smaller
+window.)
 """
 
 from __future__ import annotations

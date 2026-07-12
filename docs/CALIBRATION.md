@@ -7,15 +7,15 @@ the project's own recorded traffic
 (`eval/results/conformal-rolling-transport-2026-07-11.md`,
 `domain-port-2026-07-10.md`, `calibration-transport-2026-07-04.md`).
 
-## The one rule that dominates everything else
+## The governing rule
 
 **Thresholds do not transport across workloads.** A threshold calibrated
 on one benign task mix runs at 2–3× its advertised false-positive rate on
 another (measured: nominal α=0.1 → realized 0.21–0.27 across the
 harness→directive boundary), and TPR quoted at an uncalibrated threshold
 is inflated by the same mechanism (measured: "TPR 0.95" at 2×α realized
-FPR became TPR 0.55–0.64 at the honest operating point). Ship the
-procedure, never the constant.
+FPR became TPR 0.55–0.64 once recalibrated). Ship the procedure, never
+the constant.
 
 ## Decision tree
 
@@ -77,9 +77,9 @@ ceiling ≈ 0.73) where the stale threshold claimed 0.95.
 sessions; the conformal machinery holds the realized burden to that budget
 across two orders of magnitude on real traffic. Expect recall ~0.5–0.6 at
 tolerable budgets (1 FP per 5–20 sessions), not the α=0.1 numbers — see
-`eval/results/base-rate-analysis-2026-07-11.md` for the measured
-budget→recall table and the precision-vs-base-rate arithmetic that makes
-per-action α=0.1 an alert-fatigue machine in deployment.
+`eval/results/base-rate-analysis-2026-07-11.md` for the budget→recall
+table and the precision-vs-base-rate arithmetic: per-action α=0.1 is not
+a viable human-facing alert rate.
 
 ## What each guarantee actually covers
 

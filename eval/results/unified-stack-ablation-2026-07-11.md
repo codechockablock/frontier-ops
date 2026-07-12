@@ -9,7 +9,7 @@ unmodified except for an in-memory patch at `Pipeline._determine_verdict`
 
 **Method.** Baseline run with per-trace fired-step attribution
 (`eval/unified_stack_ablation/ablation_runner.py`), step census
-(`ablation_analysis.py`), then a TRUE L2-only re-run
+(`ablation_analysis.py`), then a true L2-only re-run
 (`ablation_true_l2only.py`): conformal → ACT, cumulative e-value → 0,
 conjunction off, displacement → 0, coherence violation off, curvature → 0,
 quality e-value → OK, trajectory_cost → 0 (strict) or kept (sensitivity —
@@ -37,11 +37,11 @@ ATBench's GEO-unique fires are ~all `step_5c_trajectory_*`
 
 ## Reading
 
-1. **The fork's geometric core is NOT a shell.** Unlike upstream's Q8
-   (where no ensemble subset beat prototype+NEWMA and the 12-signal
-   pipeline collapsed), removing unified-stack's geometry costs
-   **28.5 TPR points on internal** and **24.5 on thinking_augmented**.
-   "Retire L0, keep L2" is refuted on the fork's own corpora.
+1. **The fork's geometric core is not a shell.** Unlike upstream's Q8,
+   where no ensemble subset beat prototype+NEWMA, removing unified-stack's
+   geometry costs 28.5 TPR points on internal and 24.5 on
+   thinking_augmented. "Retire L0, keep L2" is refuted on the fork's own
+   corpora.
 2. **But the load-bearing geometry is exactly the family upstream kept.**
    What carries the 25–30 points: embedding displacement from the task
    (a drift direction — the same family as upstream's prototype/NEWMA),
@@ -49,7 +49,7 @@ ATBench's GEO-unique fires are ~all `step_5c_trajectory_*`
    core), and a cumulative severity accumulator. What contributes almost
    nothing unique: curvature (7/253 internal, 2/500 ATBench — and only
    ever with corroboration), i.e. the same curvature-as-signal idea
-   upstream killed in v2. The two repos' evidence CONVERGES: drift
+   upstream killed in v2. The two repos' evidence converges: drift
    geometry + sequential statistics survive; curvature does not.
 3. **ATBench's "geometry" is one accumulator.** Strict removal drops it
    to 78.4, but keeping only trajectory_cost recovers 99.2 at unchanged
@@ -67,13 +67,12 @@ ATBench's GEO-unique fires are ~all `step_5c_trajectory_*`
 
 The fork's detection value does not reduce to its semantic layer — but it
 does reduce to *semantic layer + drift-displacement + sequential
-statistics + one accumulator*, which is architecturally the same skeleton
-as upstream v3 (prototype-drift detector + NEWMA + conformal + the
-authorization/semantics layer). A merge is therefore cleaner than feared:
-nothing unique to unified-stack's geometry survives EXCEPT components
-with direct upstream equivalents; its genuinely unique assets remain the
-L2 cascade, the corpora, the enforcement/MCP product surface, and the
-papers.
+statistics + one accumulator*, the same skeleton as upstream v3
+(prototype-drift detector + NEWMA + conformal + the
+authorization/semantics layer). Nothing in unified-stack's geometry
+survives except components with direct upstream equivalents; its unique
+assets are the L2 cascade, the corpora, the enforcement/MCP product
+surface, and the papers.
 
 ## Provenance
 

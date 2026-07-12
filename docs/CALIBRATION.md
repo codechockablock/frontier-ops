@@ -71,6 +71,15 @@ at a stale threshold is an artifact of FPR inflation, not detection skill.
 On labeled fresh-batch data, matched-FPR TPR was 0.55–0.64 (own-label
 ceiling ≈ 0.73) where the stale threshold claimed 0.95.
 
+**6. Choose α from the operator's false-flag budget, not by convention.**
+α = 1 / (K × actions-per-session) for a budget of one false flag per K
+sessions; the conformal machinery holds the realized burden to that budget
+across two orders of magnitude on real traffic. Expect recall ~0.5–0.6 at
+tolerable budgets (1 FP per 5–20 sessions), not the α=0.1 numbers — see
+`eval/results/base-rate-analysis-2026-07-11.md` for the measured
+budget→recall table and the precision-vs-base-rate arithmetic that makes
+per-action α=0.1 an alert-fatigue machine in deployment.
+
 ## What each guarantee actually covers
 
 - `calibrate_conformal` / `split_conformal_threshold`: marginal FPR ≤ α

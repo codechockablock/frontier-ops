@@ -1,0 +1,54 @@
+{
+ "strict": {
+  "internal": {
+   "n_adv": 253,
+   "n_ben": 265,
+   "tpr": 0.6600790513833992,
+   "fpr": 0.03773584905660377
+  },
+  "thinking_augmented": {
+   "n_adv": 200,
+   "n_ben": 200,
+   "tpr": 0.745,
+   "fpr": 0.08
+  },
+  "atbench": {
+   "n_adv": 250,
+   "n_ben": 250,
+   "tpr": 0.784,
+   "fpr": 0.096
+  },
+  "agentdojo": {
+   "n_adv": 236,
+   "n_ben": 121,
+   "tpr": 0.9322033898305084,
+   "fpr": 0.008264462809917356
+  }
+ },
+ "keep_trajectory_cost": {
+  "internal": {
+   "n_adv": 253,
+   "n_ben": 265,
+   "tpr": 0.6600790513833992,
+   "fpr": 0.03773584905660377
+  },
+  "thinking_augmented": {
+   "n_adv": 200,
+   "n_ben": 200,
+   "tpr": 0.745,
+   "fpr": 0.08
+  },
+  "atbench": {
+   "n_adv": 250,
+   "n_ben": 250,
+   "tpr": 0.992,
+   "fpr": 0.12
+  },
+  "agentdojo": {
+   "n_adv": 236,
+   "n_ben": 121,
+   "tpr": 0.9322033898305084,
+   "fpr": 0.008264462809917356
+  }
+ }
+}

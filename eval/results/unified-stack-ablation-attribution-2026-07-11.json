@@ -1,0 +1,211 @@
+{
+ "internal": {
+  "n_adv": 253,
+  "n_ben": 265,
+  "combined": {
+   "tpr": 0.9446640316205533,
+   "fpr": 0.10943396226415095
+  },
+  "geo_free": {
+   "tpr": 0.7114624505928854,
+   "fpr": 0.08679245283018867
+  },
+  "geo_unique": {
+   "tp": 59,
+   "fp": 6
+  },
+  "geo_unique_steps": {
+   "step_4_displacement_corroborated": 24,
+   "step_4_displacement_unconditional": 45,
+   "step_5f_long_drifted_egress_taint": 5,
+   "step_9_conformal_evalue_flag": 5,
+   "step_7_evalue_flag": 7,
+   "step_10e_curvature_interaction": 7,
+   "step_6_evalue_block": 5,
+   "step_5f_drifted_egress_interaction": 1,
+   "step_10c2_quality_displacement": 2
+  },
+  "unknown_steps": {},
+  "sensitivity_traj_as_semantic": {
+   "tpr": 0.7114624505928854,
+   "fpr": 0.08679245283018867
+  },
+  "fired_step_census": {
+   "step_4_displacement_unconditional": 97,
+   "step_3_kill_chain_block": 88,
+   "step_1_breaker_block": 80,
+   "step_4_displacement_corroborated": 69,
+   "step_5f_long_drifted_egress_taint": 44,
+   "step_13_semantic_lightweight": 29,
+   "step_10e_curvature_interaction": 26,
+   "step_2_content_block": 23,
+   "step_7_evalue_flag": 17,
+   "step_9_conformal_evalue_flag": 12,
+   "step_5_content_flag": 8,
+   "step_3b_task_auth_path_violation": 8,
+   "step_6_evalue_block": 8,
+   "step_10_breaker_flag": 7,
+   "step_5g3_url_substitution": 6,
+   "step_13_semantic_injection": 5,
+   "step_5g3_url_substitution_corroborated": 5,
+   "step_5f_drifted_egress_interaction": 5,
+   "step_5b_injection_flag": 5,
+   "step_5f_exfil_interaction": 3,
+   "step_3b_task_auth_tool_violation": 3,
+   "step_10c2_quality_displacement": 3,
+   "step_8_conformal_conjunction_block": 3,
+   "step_5g2_injection_compliance": 2,
+   "step_5h_harm_intent_corroborated": 1,
+   "step_5h_harm_intent_strong_corroboration": 1
+  }
+ },
+ "thinking_augmented": {
+  "n_adv": 200,
+  "n_ben": 200,
+  "combined": {
+   "tpr": 0.99,
+   "fpr": 0.13
+  },
+  "geo_free": {
+   "tpr": 0.77,
+   "fpr": 0.08
+  },
+  "geo_unique": {
+   "tp": 44,
+   "fp": 10
+  },
+  "geo_unique_steps": {
+   "step_4_displacement_corroborated": 33,
+   "step_4_displacement_unconditional": 40,
+   "step_10c_trajectory_moderate_evalue": 7,
+   "step_7_evalue_flag": 5,
+   "step_10b_thinking_moderate_evalue": 3,
+   "step_6_evalue_block": 3,
+   "step_8_conformal_conjunction_block": 1,
+   "step_9_conformal_evalue_flag": 2,
+   "step_5f_drifted_egress_interaction": 2,
+   "step_5f_long_drifted_egress_taint": 1,
+   "step_10e_curvature_interaction": 4,
+   "step_10c2_quality_displacement": 1
+  },
+  "unknown_steps": {},
+  "sensitivity_traj_as_semantic": {
+   "tpr": 0.77,
+   "fpr": 0.08
+  },
+  "fired_step_census": {
+   "step_4_displacement_corroborated": 95,
+   "step_5_content_flag": 90,
+   "step_4_displacement_unconditional": 88,
+   "step_1_breaker_block": 76,
+   "step_3_kill_chain_block": 59,
+   "step_2_content_block": 34,
+   "step_10_breaker_flag": 32,
+   "step_5f_long_drifted_egress_taint": 26,
+   "step_10c_trajectory_strong_breaker": 24,
+   "step_10c_trajectory_moderate_evalue": 20,
+   "step_7_evalue_flag": 15,
+   "step_13_semantic_lightweight": 14,
+   "step_9_conformal_evalue_flag": 10,
+   "step_10e_curvature_interaction": 10,
+   "step_10b_thinking_strong_breaker": 10,
+   "step_6_evalue_block": 8,
+   "step_10b_thinking_moderate_evalue": 7,
+   "step_8_conformal_conjunction_block": 5,
+   "step_10d_obfuscation_corroborated": 4,
+   "step_5f_exfil_interaction": 4,
+   "step_5b_injection_flag": 3,
+   "step_10c2_quality_displacement": 3,
+   "step_5f_drifted_egress_interaction": 2,
+   "step_3_kill_chain_discovery": 1,
+   "step_5g3_url_substitution_corroborated": 1,
+   "step_13_weak_voting": 1,
+   "step_10g_absence_strong_corroborated": 1,
+   "step_13_semantic_injection": 1,
+   "step_5g3_url_substitution": 1,
+   "step_5h_harm_intent_corroborated": 1,
+   "step_5h_harm_intent_strong_corroboration": 1
+  }
+ },
+ "atbench": {
+  "n_adv": 250,
+  "n_ben": 250,
+  "combined": {
+   "tpr": 1.0,
+   "fpr": 0.12
+  },
+  "geo_free": {
+   "tpr": 0.744,
+   "fpr": 0.1
+  },
+  "geo_unique": {
+   "tp": 64,
+   "fp": 5
+  },
+  "geo_unique_steps": {
+   "step_5c_trajectory_high_risk": 39,
+   "step_5c_trajectory_block": 43,
+   "step_10e_curvature_short_trajectory": 2,
+   "step_5c_trajectory_multi_vector": 3
+  },
+  "unknown_steps": {
+   "step_5g2_injection_compliance_advisory": 1
+  },
+  "sensitivity_traj_as_semantic": {
+   "tpr": 0.992,
+   "fpr": 0.116
+  },
+  "fired_step_census": {
+   "step_5c_trajectory_block": 102,
+   "step_5c_trajectory_high_risk": 95,
+   "step_5_content_flag": 85,
+   "step_2_content_block": 63,
+   "step_3_kill_chain_block": 56,
+   "step_5b_injection_flag": 19,
+   "step_5e_api_sequence_corroborated": 15,
+   "step_5h_harm_intent_corroborated": 15,
+   "step_13_weak_voting": 12,
+   "step_5e_api_sequence_high": 10,
+   "step_10_breaker_flag": 8,
+   "step_5c_trajectory_multi_vector": 6,
+   "step_5h_harm_intent_strong_corroboration": 5,
+   "step_5b4_credential_accumulation": 5,
+   "step_13_semantic_injection": 4,
+   "step_13_semantic_trajectory_strong": 3,
+   "step_13_semantic_lightweight": 2,
+   "step_10e_curvature_short_trajectory": 2,
+   "step_5f_prompted_privilege_interaction": 1,
+   "step_5g2_injection_compliance_advisory": 1,
+   "step_5b3_post_injection_anomalous_corroborated": 1,
+   "step_10d_obfuscation_corroborated": 1,
+   "step_5b2_corrupted_tool_followup": 1,
+   "step_13_semantic_trajectory_moderate": 1
+  }
+ },
+ "agentdojo": {
+  "n_adv": 236,
+  "n_ben": 121,
+  "combined": {
+   "tpr": 0.9322033898305084,
+   "fpr": 0.008264462809917356
+  },
+  "geo_free": {
+   "tpr": 0.9322033898305084,
+   "fpr": 0.008264462809917356
+  },
+  "geo_unique": {
+   "tp": 0,
+   "fp": 0
+  },
+  "geo_unique_steps": {},
+  "unknown_steps": {},
+  "sensitivity_traj_as_semantic": {
+   "tpr": 0.9322033898305084,
+   "fpr": 0.008264462809917356
+  },
+  "fired_step_census": {
+   "step_5b_injection_flag": 221,
+   "step_5b2_corrupted_tool_followup": 42
+  }
+ }
+}

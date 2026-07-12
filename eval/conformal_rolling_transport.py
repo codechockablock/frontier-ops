@@ -83,12 +83,16 @@ def fpr(scores: np.ndarray, thr: float) -> float:
 
 
 def rolling_replay(
-    phase1: np.ndarray, phase2: np.ndarray, window: int, alpha: float = ALPHA
+    phase1: np.ndarray,
+    phase2: np.ndarray,
+    window: int,
+    alpha: float = ALPHA,
+    conformal: bool = False,
 ) -> Dict:
     """Warm a RollingThreshold on phase1, then flag-then-update through
     phase2 (every score is operator-confirmed benign). Returns realized
     phase-2 FPR overall and post-refill (after `window` updates)."""
-    rt = RollingThreshold(alpha=alpha, window=window, min_n=20)
+    rt = RollingThreshold(alpha=alpha, window=window, min_n=20, conformal=conformal)
     for s in phase1:
         rt.update(float(s))
     flags = []
@@ -231,6 +235,29 @@ def main() -> None:
     for w, res in r3.items():
         print(
             f"R3 {w}: overall {res['fpr_overall_mean']:.3f}, post-refill "
+            f"{res['fpr_post_refill_mean']:.3f}, in-band {res['in_band']}"
+        )
+
+    # ---- R3b: conformal-corrected rolling window vs plug-in ---------------
+    # R3's small-window excess (0.143 at w=32) is plug-in quantile bias;
+    # RollingThreshold(conformal=True) should remove it on the same stream.
+    r3b: Dict[str, Dict] = {}
+    rng = np.random.default_rng(0)  # same generator protocol as R3
+    for window in WINDOWS:
+        per_seed = []
+        for seed in range(5):
+            order = rng.permutation(np.unique(d_sessions))
+            idx = np.concatenate([np.flatnonzero(d_sessions == s) for s in order])
+            per_seed.append(rolling_replay(bA, sD[idx], window, conformal=True))
+        post = float(np.mean([p["fpr_post_refill"] for p in per_seed]))
+        r3b[f"window_{window}"] = dict(
+            fpr_post_refill_mean=post,
+            in_band=bool(BAND[0] <= post <= BAND[1]),
+        )
+    report["R3b_rolling_conformal"] = r3b
+    for w, res in r3b.items():
+        print(
+            f"R3b {w} (conformal): post-refill "
             f"{res['fpr_post_refill_mean']:.3f}, in-band {res['in_band']}"
         )
 

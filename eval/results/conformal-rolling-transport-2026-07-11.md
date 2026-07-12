@@ -23,7 +23,8 @@ grouped splits. Companion JSON: `conformal-rolling-transport-2026-07-11.json`.
 | R2b conformal *within* D (session half-splits) | FPR **0.116** > α | nominal 0.1 |
 | R2b reverse D → A | FPR 0.065 (conservative) | — |
 | R3 frozen conformal threshold on D | FPR **0.211** | — |
-| R3 rolling, window 32 / 64 / 128 / 256 (post-refill) | **0.143 / 0.130 / 0.116 / 0.106** — all in the Q8 band [0.05, 0.15] | — |
+| R3 rolling (plug-in), window 32 / 64 / 128 / 256 (post-refill) | **0.143 / 0.130 / 0.116 / 0.106** — all in the Q8 band [0.05, 0.15] | — |
+| R3b rolling (**conformal=True**), same windows | **0.106 / 0.109 / 0.106 / 0.100** — window dependence gone | — |
 | R4 frozen on F | FPR 0.193, **TPR 0.95** | E4: 0.239 / 1.00 |
 | R4 rolling-adapted on F (w=32/64/128) | FPR 0.161/0.117/0.089, **TPR 0.64/0.55/0.64** | own-label recal TPR ≈ 0.73 (E4) |
 
@@ -45,10 +46,12 @@ grouped splits. Companion JSON: `conformal-rolling-transport-2026-07-11.json`.
 3. **The rolling threshold survives its falsification test (Q8: does not
    fire).** Across the real A→D shift the frozen threshold runs at 0.211;
    the rolling window recovers to 0.106–0.143 post-refill, inside the
-   pre-registered band at every window size. Improvement is monotone in
-   window size; w=32's 0.143 is mostly plug-in quantile bias at small n —
-   a conformal-corrected rolling quantile (use `split_conformal_threshold`
-   over the window instead of `np.quantile`) is the obvious follow-up.
+   pre-registered band at every window size. w=32's 0.143 excess is
+   plug-in quantile bias at small n — **fixed**: R3b re-runs the same
+   streams with `RollingThreshold(conformal=True)` (the shared
+   split-conformal order statistic over the window) and the window
+   dependence disappears (0.100–0.109 at every window). A window of 32
+   confirmed-benign scores now suffices — half the previous minimum.
 4. **R4 is the finding that changes the story: the frozen threshold's high
    TPR was purchased with silent FPR inflation.** On the fresh batch the
    frozen threshold reads TPR 0.95 — at a realized FPR of 0.193, double
@@ -62,11 +65,12 @@ grouped splits. Companion JSON: `conformal-rolling-transport-2026-07-11.json`.
 ## Operational readout
 
 Calibrate per deployment (conformal, for the finite-sample guarantee);
-maintain with a rolling window of ≥64 confirmed-benign scores (matches the
-32–64 label-budget scale; unlabeled confirmations, cheaper than labels);
+maintain with `RollingThreshold(conformal=True)` and a window of ≥32
+confirmed-benign scores (unlabeled confirmations, cheaper than labels);
 treat TPR as workload-specific and only meaningful at a calibrated
 operating point. Expect ~±0.02 FPR slack even in-domain from session
-heterogeneity (R2b).
+heterogeneity (R2b). The full decision tree lives in
+`docs/CALIBRATION.md`.
 
 ## Provenance
 

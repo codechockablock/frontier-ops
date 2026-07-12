@@ -49,6 +49,15 @@ class RollingThreshold:
         min_n: scores required before :attr:`threshold` is available
             (warmup). Until then :attr:`ready` is False and
             :attr:`threshold` raises.
+        conformal: use the finite-sample split-conformal order statistic
+            over the window instead of the plug-in ``np.quantile``. At
+            small windows the plug-in quantile is anti-conservative (its
+            realized FPR overshoots ``alpha`` — measured at +0.04 for
+            window 32 on real streams); the conformal correction removes
+            that bias. Requires ``decay == 1.0`` (weighted scores are not
+            exchangeable). The finite-sample guarantee is exact only under
+            local exchangeability of the window — under active drift it is
+            a bias correction, not a certificate.
     """
 
     def __init__(
@@ -57,6 +66,7 @@ class RollingThreshold:
         window: int = 256,
         decay: float = 1.0,
         min_n: int = 20,
+        conformal: bool = False,
     ):
         if not 0 < alpha < 1:
             raise ValueError(f"alpha must be in (0, 1), got {alpha}")
@@ -66,10 +76,16 @@ class RollingThreshold:
             raise ValueError(f"decay must be in (0, 1], got {decay}")
         if min_n < 2:
             raise ValueError(f"min_n must be >= 2, got {min_n}")
+        if conformal and decay < 1.0:
+            raise ValueError(
+                "conformal=True requires decay=1.0 (exponentially weighted "
+                "scores are not exchangeable)"
+            )
         self.alpha = float(alpha)
         self.window = int(window)
         self.decay = float(decay)
         self.min_n = int(min_n)
+        self.conformal = bool(conformal)
         self._scores: Deque[float] = deque(maxlen=self.window)
 
     def update(self, score: float) -> "RollingThreshold":
@@ -100,6 +116,10 @@ class RollingThreshold:
                 "scores seen"
             )
         scores = np.asarray(self._scores, dtype=float)
+        if self.conformal:
+            from frontier_ops.conformal import split_conformal_threshold
+
+            return split_conformal_threshold(scores, self.alpha)
         if self.decay >= 1.0:
             return float(np.quantile(scores, 1.0 - self.alpha))
         # weight w_i = decay^(age): newest score has weight 1

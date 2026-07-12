@@ -138,3 +138,39 @@ class TestDetectorIntegration:
         # detach restores the static threshold
         det.attach_rolling_threshold(None)
         assert det.effective_threshold == static
+
+
+class TestConformalMode:
+    def test_conformal_requires_no_decay(self):
+        with pytest.raises(ValueError, match="decay"):
+            RollingThreshold(conformal=True, decay=0.9)
+
+    def test_conformal_removes_small_window_bias(self):
+        """At window 32 the plug-in quantile overshoots alpha; the conformal
+        order statistic must not. iid stream, 20 seeds, flag-then-update."""
+        alpha, window = 0.1, 32
+        plug_fprs, conf_fprs = [], []
+        for seed in range(20):
+            rng = np.random.default_rng(seed)
+            stream = rng.standard_normal(600)
+            for conformal, sink in ((False, plug_fprs), (True, conf_fprs)):
+                rt = RollingThreshold(
+                    alpha=alpha, window=window, min_n=20, conformal=conformal
+                )
+                flags = []
+                for t, s in enumerate(stream):
+                    if t >= window:
+                        flags.append(s > rt.threshold)
+                    rt.update(float(s))
+                sink.append(float(np.mean(flags)))
+        plug, conf = float(np.mean(plug_fprs)), float(np.mean(conf_fprs))
+        assert conf < plug  # correction is strictly less anti-conservative
+        assert conf <= alpha + 0.01
+        assert conf >= alpha - 0.05  # and not vacuously conservative
+
+    def test_conformal_infinite_when_window_too_small_for_alpha(self):
+        rt = RollingThreshold(alpha=0.01, window=32, min_n=20, conformal=True)
+        for s in np.linspace(0.0, 1.0, 25):
+            rt.update(float(s))
+        # k = ceil(26*0.99) = 26 > 25 scores -> +inf: nothing flagged yet
+        assert rt.threshold == float("inf")

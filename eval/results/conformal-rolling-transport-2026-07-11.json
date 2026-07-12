@@ -47,6 +47,24 @@
       }
     }
   },
+  "R3b_rolling_conformal": {
+    "window_32": {
+      "fpr_post_refill_mean": 0.1055045871559633,
+      "in_band": true
+    },
+    "window_64": {
+      "fpr_post_refill_mean": 0.10865921787709495,
+      "in_band": true
+    },
+    "window_128": {
+      "fpr_post_refill_mean": 0.10566218809980805,
+      "in_band": true
+    },
+    "window_256": {
+      "fpr_post_refill_mean": 0.09969325153374234,
+      "in_band": true
+    }
+  },
   "R4_detection_cost_fresh": {
     "frozen": {
       "fpr": 0.1926605504587156,

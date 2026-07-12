@@ -57,7 +57,9 @@ mypy frontier_ops/                 # 0 errors (4-module baseline in pyproject)
   transport across workloads**; `calibrate_conformal(benign, alpha)` for a
   finite-sample FPR ≤ α guarantee; `save(path)`/`load(path)` round-trip.
 - `RollingThreshold` tracks benign drift from operator-confirmed scores;
-  attach via `detector.attach_rolling_threshold(rt)`.
+  attach via `detector.attach_rolling_threshold(rt)`; use
+  `conformal=True` (window ≥32). **Which mechanism when →
+  `docs/CALIBRATION.md`** (measured decision tree, do not guess).
 - `FullPipeline(enable_memory=False)` is the v3 default (memory is opt-in;
   no measured detection value). Read `alert_level` post-fix or the NEWMA
   channel; never the removed surprise/direction channels or the

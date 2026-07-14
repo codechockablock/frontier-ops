@@ -19,6 +19,12 @@ we get deterministic vectors that let us reason about expected cosine similariti
 from __future__ import annotations
 
 import numpy as np
+import pytest
+
+# TaskCoherenceScorer's slot vectors are semantic embeddings; without the
+# encoder the scorer degrades to zero-vectors and every similarity assert
+# is vacuous. The CI semantic lane provides the real coverage.
+pytest.importorskip("sentence_transformers")
 
 from frontier_ops.integration.vsa_core import PhasorAlgebra
 from frontier_ops.integration.agent_encoder import (

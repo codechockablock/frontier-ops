@@ -1,6 +1,9 @@
 """Tests for semantic_encoder: MiniLM → phasor projection."""
 
 import numpy as np
+import pytest
+
+pytest.importorskip("sentence_transformers")  # MiniLM is the object under test
 
 from frontier_ops.integration.semantic_encoder import encode_semantic
 

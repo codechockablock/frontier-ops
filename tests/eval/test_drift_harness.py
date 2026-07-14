@@ -177,6 +177,7 @@ def test_replay_radius_override_reduces_escalation():
     """`replay_record(radius_override=...)` must actually inject the radius: a
     large radius escalates strictly fewer actions than the tiny default 0.5.
     This is the mechanism the recalibration experiment depends on."""
+    pytest.importorskip("sentence_transformers")  # replay needs goal geometry
     import score
     rec = {
         "scenario_id": "t", "surface": "scope_exploration", "provenance": "emergent",

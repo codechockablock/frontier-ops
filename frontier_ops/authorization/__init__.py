@@ -30,6 +30,8 @@ from frontier_ops.authorization.scope import (
     ScopeOperator as ScopeOperator,
     AuthorizationEvent as AuthorizationEvent,
     GoalConditionedMetric as GoalConditionedMetric,
+    GoalExtractor as GoalExtractor,
+    AuthorizationRadius as AuthorizationRadius,
 )
 from frontier_ops.authorization.provenance import (
     ProvenanceNode as ProvenanceNode,

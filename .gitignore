@@ -8,10 +8,11 @@ dist/
 build/
 .DS_Store
 .env
-data/2026-03-20/proprioception-log-330k.jsonl
-
-# Real openclaw session content extracted for goal-conditioning — do not commit
-data/2026-07-02/
+# Real session content — privacy boundary, never commit any of it:
+# data/2026-07-02/ is extracted from live session transcripts;
+# data/2026-03-20/ is live sidecar telemetry (observations, chain, logs).
+# Eval scripts take explicit --directive/--records paths to local copies.
+data/
 
 # Apollo deception-detection checkout + battery encoding caches. Download at
 # runtime only: their repo has no LICENSE file, so nothing may be vendored.

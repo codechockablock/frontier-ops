@@ -39,8 +39,8 @@ jobs:
     - name: Check import cleanliness
       run: |
         python -c "from frontier_ops import FullPipeline, CalibratedDetector, RollingThreshold; print('Import OK')"
-        python -c "from frontier_ops.sensing import DASCUSUM, MarketGate; print('Sensing OK')"
-        python -c "from frontier_ops.governance import GovernanceChain, MarketAuditChain; print('Governance OK')"
+        python -c "from frontier_ops.sensing import DualEWMA, DriftClassifier; print('Sensing OK')"
+        python -c "from frontier_ops.governance import GovernanceChain, CrossSessionAngularDisplacement; print('Governance OK')"
         python -c "from frontier_ops.authorization import GoalExtractor, AuthorizationRadius; print('Authorization OK')"
 
   # The package must import with numpy alone — every heavier dependency

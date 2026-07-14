@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.6.0 — 2026-07-13
+
+The hard cut. An evidence census found the load-bearing code was ~10% of
+the library: the largest package (integration, 32 modules) and most of the
+sensing zoo had no benchmark contact, several components were measured
+harmful (task_affinity: 81–98% mimicry evasion), and the Q2 audit
+established there are no downstream consumers to protect — so the
+"never delete, quarantine" rule retired with its reason.
+
+Everything removed is preserved on the `attic/pre-v0.6` branch.
+
+**Removed from main** (breaking; nothing consumed it):
+- `integration/` except the session-log tail path (`log_tailer`,
+  `proprio_logger`) kept for the dogfood pilot — 30 modules including the
+  sidecar/daemon/market stack, ATBench glue, and the March slop-audit's
+  four worst files.
+- `sensing/`: CUSUM/SPRT, spike, market signals/gate/entropy, cold-start,
+  quarantined modes, legacy extractors. Kept: NEWMA, drift_classifier,
+  trend, efference, combiner (wired into `FullPipeline`'s measured
+  alert path) and the `drift` re-export shim.
+- `memory/` (VSA phasor): never measured any detection value.
+  `FullPipeline(enable_memory=True)` now raises a documented ImportError.
+- `boundary/metric.py` (deprecated curvature-walls machinery),
+  `governance/market_audit.py`, `authorization/{goal_conditioning,
+  task_affinity}.py` (research artifacts; affinity refuted by red-team).
+- The `frontier-ops` console script (`market_daemon`), the `ica` extra,
+  and the entire mypy ignore-baseline (all four modules atticked; mypy
+  now checks every remaining module clean with no exclusions).
+
+Suite: 845 → 358 tests, all meaningful. Archival eval scripts that
+imported atticked modules still document their experiments but must run
+against `attic/pre-v0.6`.
+
 ## 0.5.0 — 2026-07-11
 
 Productionization of the v3 detector plus repo hygiene and product seams.

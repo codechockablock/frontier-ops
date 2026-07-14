@@ -27,8 +27,6 @@ from frontier_ops.boundary.constitution import ConstitutionSpec, ConstitutionalM
 from frontier_ops.sensing.efference import EfferenceCopyPredictor, PredictionError
 from frontier_ops.sensing.newma import DualEWMA
 from frontier_ops.sensing.trend import ScopeCreepDetector, MetricAdaptiveEWMA
-from frontier_ops.memory.activation import MemoryEventBus, MemoryEventType, AutoActivator
-from frontier_ops.memory.vsa import VSAMemory, phasor_encode
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 from frontier_ops.sensing.combiner import BayesFactorCombiner
 from frontier_ops.authorization.scope import AuthorizationState, AuthorizationEvent
@@ -218,6 +216,20 @@ class FullPipeline:
         # Memory + Activation
         self._enable_memory = enable_memory
         if enable_memory:
+            # memory lives on the attic/pre-v0.6 branch; opt-in requires it
+            try:
+                from frontier_ops.memory.activation import (
+                    AutoActivator,
+                    MemoryEventBus,
+                    MemoryEventType,
+                )
+                from frontier_ops.memory.vsa import VSAMemory
+            except ImportError as e:
+                raise ImportError(
+                    "enable_memory=True requires the memory package, which "
+                    "moved to the attic/pre-v0.6 branch (no measured "
+                    "detection value — docs/LEGACY.md)."
+                ) from e
             self.event_bus = MemoryEventBus()
             self.activator = AutoActivator(event_bus=self.event_bus)
             self.memory = VSAMemory(dim=vsa_dim)
@@ -352,6 +364,8 @@ class FullPipeline:
         if self._enable_memory:
             self._primed = []
             self._novelty = False
+            from frontier_ops.memory.vsa import phasor_encode
+
             c_phasor = phasor_encode(concept_vec[:3].tobytes().hex(), self.memory.dim)
             r_phasor = phasor_encode("reasoning", self.memory.dim)
             self.activator.perceive(c_phasor, r_phasor, step=self._step)
@@ -563,6 +577,8 @@ class FullPipeline:
         self.trend.clear()
         self.ewma.clear()
         if self._enable_memory:
+            from frontier_ops.memory.vsa import VSAMemory
+
             self.memory = VSAMemory(dim=self.memory.dim)
         # Reset authorization (provenance is preserved for audit)
         self.auth_state = AuthorizationState(

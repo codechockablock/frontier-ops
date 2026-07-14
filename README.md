@@ -34,7 +34,7 @@ not convention (`docs/CALIBRATION.md` is the decision tree). Requires the
 
 **Custom concept dimensions** — constitutions, semantic anchors, and the full pipeline accept custom dimensions as constructor parameters (`FullPipeline(dim_names=..., semantic_anchors=...)`, Tier-2 extraction; the Tier-1 keyword table is skipped automatically for dims it does not cover).
 
-**Sensing Layer** (`frontier_ops.sensing`) — real-time detectors for live sessions: spike detection, drift detection (NEWMA), scope-creep trend detection, evidence combination. *Validation note:* the drift/NEWMA/trend detectors are designed for long-running live sessions; the v2 benchmark campaign only exercised them on short response-internal paths, which says nothing about their design regime.
+**Sensing Layer** (`frontier_ops.sensing`) — drift detection (NEWMA), scope-creep trend detection, drift classification, evidence combination. *Validation note:* NEWMA is benign-stable over long real sessions; trend/cross-terms are designed for long-running sessions and remain untested in that regime. (The wider detector zoo — CUSUM/SPRT, spike, market signals — lives on the `attic/pre-v0.6` branch.)
 
 **Governance Ledger** (`frontier_ops.governance`) — Tamper-evident audit chain using Ed25519 signatures. Every observation is signed and chained. Cross-session budget tracking prevents trajectory splice attacks. An external auditor can verify the entire history.
 
@@ -48,10 +48,13 @@ the benchmarks actually back:
 | `boundary` (`CalibratedDetector`, `StepMeanScorer`, estimated metric) | **Validated** | Apollo battery + agent-session domain port; AUROC 0.79–0.93 |
 | `authorization` (goal / radius / provenance) | **Validated** | drift-harness: geodesic AUROC 0.86, radius transport mapped |
 | `sensing` — NEWMA / drift | **Partial** | benign-stable over long real sessions (FPR ~3.6%, flat); one of two signals worth keeping |
-| `sensing` — evidence combiner, efference/surprise, trend, cross-terms | **Legacy** | the combiner's `surprise` channel inverted signal (removed in v3); no subset of its channels beats `CalibratedDetector` |
-| `governance` (Ed25519 chain) | **Infrastructure** | cryptographic tamper-evidence (unit-tested); not a detector |
-| `memory` (VSA phasor) | **Speculative** | no measured detection value; **opt-in** as of v3 (`FullPipeline(enable_memory=True)`) |
-| `integration` (sidecar / daemon / market) | **Glue** | ATBench live numbers are noisy single draws (±7pt/run) |
+| `sensing` — evidence combiner, efference, trend | **Legacy** | kept because `FullPipeline`'s measured alert path wires them; the `surprise` channel was removed in v3 |
+| `governance` (Ed25519 chain, ledger) | **Infrastructure** | cryptographic tamper-evidence (unit + e2e tested); not a detector |
+
+Everything without evidence — the sidecar/daemon/market stack, the wider
+sensing zoo, VSA memory, refuted research artifacts — was moved to the
+`attic/pre-v0.6` branch in 0.6.0 (see CHANGELOG). The kept
+`integration/log_tailer` exists for the live-pilot tail path.
 
 `FullPipeline` remains available for the authorization + governance +
 provenance layer; for detection, use `CalibratedDetector`.

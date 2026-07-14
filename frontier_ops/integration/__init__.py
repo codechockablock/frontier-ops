@@ -1,4 +1,8 @@
-"""Integration layer: agent platform connectors and monitoring sidecar."""
-from frontier_ops.integration.wrapper import ProprioceptiveWrapper as ProprioceptiveWrapper
-from frontier_ops.integration.tiered_verdict import ReasoningValidationSystem as ReasoningValidationSystem
-from frontier_ops.integration.signature_detectors import SafetyPolytopeEngine as SafetyPolytopeEngine
+"""Integration plumbing — v0.6 keeps only the session-log tail path used
+by the dogfood pilot. The sidecar/daemon/market stack lives on the
+attic/pre-v0.6 branch (no benchmark evidence; docs/LEGACY.md)."""
+
+from frontier_ops.integration.log_tailer import (
+    OpenClawLogTailer as OpenClawLogTailer,
+    parse_log_line as parse_log_line,
+)

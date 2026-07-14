@@ -14,8 +14,6 @@ _CRYPTO_EXPORTS = {
     "ChainEntry": "frontier_ops.governance.chain",
     "VerificationResult": "frontier_ops.governance.chain",
     "observe_agent_step": "frontier_ops.governance.chain",
-    "MarketAuditChain": "frontier_ops.governance.market_audit",
-    "MarketChainEntry": "frontier_ops.governance.market_audit",
 }
 
 

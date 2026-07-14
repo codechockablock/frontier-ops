@@ -3,7 +3,7 @@ frontier-ops: Middleware for AI agent governance.
 Define your boundaries. Monitor your agents. Prove they stayed within bounds.
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 from frontier_ops.boundary.constitution import ConstitutionSpec as ConstitutionSpec, Boundary as Boundary, CrossTerm as CrossTerm
 from frontier_ops.boundary.concept_extraction import CONCEPTS as CONCEPTS, ConceptExtractor as ConceptExtractor

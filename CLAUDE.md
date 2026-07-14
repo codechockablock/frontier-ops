@@ -25,20 +25,20 @@ re-run. One live coupling remains: both claim the distribution name
 ## Repo Structure
 
 ```
-frontier_ops/
+frontier_ops/          (v0.6: the evidenced core only — everything else
+                        lives on the attic/pre-v0.6 branch)
   detector.py       — CalibratedDetector (THE detector; save/load, conformal)
   adaptive_threshold.py — RollingThreshold (drift-tracking benign quantile)
   conformal.py      — shared split-conformal quantile core
   pipeline.py       — FullPipeline (authorization/governance layer, alert_level)
-  boundary/         — encoder, StepMeanScorer, CalibratedMetric
-  sensing/          — NEWMA (validated), CUSUM/SPRT/entropy, EWMA, quarantined modes
-  governance/       — Ed25519 audit chain (infrastructure, not detection)
-  memory/           — VSA phasor (speculative; OFF by default)
+  boundary/         — encoder, StepMeanScorer, CalibratedMetric, DecisionCosts
+  sensing/          — NEWMA, drift_classifier, trend, efference, combiner
+  governance/       — Ed25519 audit chain + cross-session ledger
   authorization/    — GoalExtractor, AuthorizationRadius, AGM scope, conformal radius
-  integration/      — sidecar/daemon glue (ATBench; noisy tier)
+  integration/      — log_tailer only (the dogfood-pilot tail path)
 tests/              — non-slow suite must stay green
 paper/              — research paper drafts
-docs/               — LEGACY.md (validation boundary), API.md, briefs
+docs/               — LEGACY.md (validation boundary), CALIBRATION.md, API.md
 eval/               — evaluation scripts; session_artifacts/ is verbatim provenance — NEVER edit
 ```
 
@@ -47,7 +47,7 @@ eval/               — evaluation scripts; session_artifacts/ is verbatim prove
 ```bash
 pytest tests/ -q -m "not slow and not perf"   # the gate (slow = battery; perf = load-sensitive wall-clock)
 ruff check frontier_ops/ tests/ --select E,F,W --ignore E501   # lint gate
-mypy frontier_ops/                 # 0 errors (4-module baseline in pyproject)
+mypy frontier_ops/                 # 0 errors, no exclusions
 ```
 
 ## Key Facts (v3)
@@ -60,11 +60,10 @@ mypy frontier_ops/                 # 0 errors (4-module baseline in pyproject)
   attach via `detector.attach_rolling_threshold(rt)`; use
   `conformal=True` (window ≥32). **Which mechanism when →
   `docs/CALIBRATION.md`** (measured decision tree, do not guess).
-- `FullPipeline(enable_memory=False)` is the v3 default (memory is opt-in;
-  no measured detection value). Read `alert_level` post-fix or the NEWMA
-  channel; never the removed surprise/direction channels or the
-  `max(alert_level, 0.6)` escalation overwrite (both cut on purpose, with
-  regression tests).
+- memory/VSA moved to attic/pre-v0.6; `enable_memory=True` raises. Read
+  `alert_level` post-fix or the NEWMA channel; never the removed
+  surprise/direction channels or the `max(alert_level, 0.6)` escalation
+  overwrite (cut on purpose, with regression tests).
 - Numpy-only import must never break: `python -c "import frontier_ops"`
   with only numpy installed works; scipy/cryptography/sentence-transformers
   stay behind lazy guards.
@@ -76,7 +75,9 @@ mypy frontier_ops/                 # 0 errors (4-module baseline in pyproject)
 - Repo is **public** (codechockablock/frontier-ops). Nothing is published
   to PyPI; publishing is a human decision.
 - No credentials in code.
-- Never delete an exported symbol (deprecate/quarantine instead).
+- Removal policy: cuts go to an attic branch (`attic/pre-v0.6`), never
+  silent deletion. Once anything is published to PyPI, exported symbols
+  become deprecate-first again.
 - Never edit `eval/session_artifacts/` (verbatim provenance records).
 
 ## Token Efficiency Rules

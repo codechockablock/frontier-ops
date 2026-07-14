@@ -70,3 +70,13 @@ score = det.score(text)                          # 0.93 AUROC on drift
 `FullPipeline` remains for the authorization + governance + provenance layer;
 read `alert_level` (post-fix) or the NEWMA channel for its detection signal,
 never the full-ensemble gating.
+
+## 0.6.0 — the attic
+
+The quarantine table above described 0.4.0's default-path cuts. In 0.6.0
+the quarantined and no-contact components left `main` entirely — the Q2
+audit established there are no downstream consumers, so "importable but
+deprecated" no longer bought anything. The complete pre-cut tree is
+preserved on the **`attic/pre-v0.6`** branch; the CHANGELOG lists every
+removed module. Archival eval scripts that reference atticked modules
+document their experiments as run and execute against that branch.

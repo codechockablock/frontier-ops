@@ -1,5 +1,7 @@
 """Tests for the full pipeline integration."""
 
+import pytest
+
 from frontier_ops.pipeline import FullPipeline, StepResult
 from frontier_ops.boundary.constitution import ConstitutionSpec
 
@@ -71,10 +73,10 @@ class TestFullPipeline:
         assert "angular_disp" in s
         assert "lambda" in s
 
-    def test_with_memory(self):
-        pipe = FullPipeline(enable_governance=False, enable_memory=True)
-        result = pipe.process_step("Solve the quadratic equation")
-        assert isinstance(result, StepResult)
+    def test_memory_optin_points_at_attic(self):
+        # memory moved to attic/pre-v0.6; the opt-in must fail loudly
+        with pytest.raises(ImportError, match="attic"):
+            FullPipeline(enable_governance=False, enable_memory=True)
 
     def test_different_constitution(self):
         pipe = FullPipeline(

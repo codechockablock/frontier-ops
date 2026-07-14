@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "frontier-ops"
-version = "0.5.0"
+version = "0.6.0"
 description = "Middleware for AI agent governance. Define boundaries. Monitor agents. Prove they stayed within bounds."
 readme = "README.md"
 license = "MIT"
@@ -30,9 +30,6 @@ dependencies = [
     "numpy>=1.24",
 ]
 
-[project.scripts]
-frontier-ops = "frontier_ops.integration.market_daemon:main"
-
 [project.optional-dependencies]
 # Canonical product seams: detection (CalibratedDetector + boundary scorers)
 # needs an encoder but no crypto; governance/authorization needs crypto but
@@ -44,10 +41,6 @@ govern = ["cryptography>=41.0"]
 semantic = ["sentence-transformers>=2.2"]
 governance = ["cryptography>=41.0"]
 kalman = ["scipy>=1.10"]
-# DEPRECATED: exists solely for sensing.modes (quarantined, emits
-# DeprecationWarning on import, zero benchmark contact — docs/LEGACY.md).
-# Will be removed when modes.py is.
-ica = ["scikit-learn>=1.2"]
 all = [
     "scipy>=1.10",
     "scikit-learn>=1.2",
@@ -78,20 +71,6 @@ ignore_missing_imports = true
 check_untyped_defs = false
 warn_unused_ignores = true
 
-# Tracked typing baseline (2026-07-11): the only modules still excluded.
-# - sensing.modes: quarantined dead weight (docs/LEGACY.md), DeprecationWarning
-#   on import — not worth typing before removal.
-# - integration detection_signals / signature_detectors / tiered_verdict:
-#   ATBench glue with ~46 mechanical Optional/annotation debts; type when
-#   next touched. Everything else in frontier_ops/ checks clean.
-[[tool.mypy.overrides]]
-module = [
-    "frontier_ops.sensing.modes",
-    "frontier_ops.integration.detection_signals",
-    "frontier_ops.integration.signature_detectors",
-    "frontier_ops.integration.tiered_verdict",
-]
-ignore_errors = true
 
 [tool.ruff]
 # Verbatim provenance records from live sessions — never reformat or lint.

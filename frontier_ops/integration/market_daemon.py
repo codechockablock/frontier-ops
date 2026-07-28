@@ -111,6 +111,13 @@ def main():
 
     running = True
 
+    class _ShutdownRequested(BaseException):
+        """Raised from the signal handler to unblock a pending FIFO open().
+
+        Inherits from BaseException, not Exception, so the broad ``except
+        Exception`` in the message loop below cannot swallow it.
+        """
+
     def _shutdown(sig, frame):
         nonlocal running
         running = False
@@ -128,6 +135,12 @@ def main():
                 f"last_operator={auth_stats.get('last_operator', 'none')}",
                 file=sys.stderr,
             )
+        # Clearing `running` is not enough. The loop below only re-checks it
+        # after open() returns, and open() on a FIFO blocks until a writer
+        # appears — which never happens once the parent unlinks and recreates
+        # the FIFO. Raising interrupts that open() so the process can exit
+        # instead of being orphaned.
+        raise _ShutdownRequested
 
     signal.signal(signal.SIGTERM, _shutdown)
     signal.signal(signal.SIGINT, _shutdown)
@@ -200,6 +213,8 @@ def main():
                         if args.verbose:
                             print(f"[daemon] Error: {e}", file=sys.stderr)
 
+        except _ShutdownRequested:
+            break
         except OSError:
             if running:
                 time.sleep(0.5)

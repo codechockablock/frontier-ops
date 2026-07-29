@@ -3,8 +3,14 @@
 ## What This Is
 
 Vendor-agnostic middleware for AI agent governance. v0.2.0. pip-installable Python library.
-6 packages: boundary, sensing, governance, memory, authorization, integration.
-514 tests, Python 3.10–3.14.
+7 packages: boundary, sensing, governance, memory, authorization, integration, heartbeat.
+764 tests, Python 3.10–3.14.
+
+**Branch context:** the numbers above describe this checkout's branch
+(`fable-spec-v2-encoder-drift`, `pyproject.toml` v0.2.0), which predates the v0.6 hard cut and
+is not merged into `main`. `main` is at v0.6.0 with a reduced package set and a different
+detector story — read that branch's own CLAUDE.md before assuming anything here applies to it.
+Do not "fix" the version above to 0.6.0; the two branches genuinely differ.
 
 **Relationship to unified-stack:** `~/unified-stack` is a *diverged fork*, not a downstream
 consumer (verified 2026-07-11, re-verified 2026-07-28): it vendors its own `frontier_ops`
@@ -49,7 +55,7 @@ ruff check .                  # lint (run before pushing)
 ## Hard Rules
 
 - CI/CD: GitHub Actions (pytest 3.10–3.12 + ruff). All PRs must pass.
-- Repo is private (codechockablock/frontier-ops).
+- Repo is **public** (codechockablock/frontier-ops); default branch is `main`.
 - No credentials in code.
 
 ## Token Efficiency Rules

@@ -1,10 +1,13 @@
 # Operating Map — frontier-ops
 
+**Project status: LEGACY / parked (operator, 2026-08-06). No active work. Lanes below are a parked-state record — where things stood when the project was set down — not live coordination.**
+
 Read-first rule: any session joining this project reads this file before starting work,
 and records itself as owning session when it takes a lane.
 Update on state change only (start / block / handoff / done), not as a journal.
 
 ## Decisions
+- 2026-08-06 — Operator: this project is legacy; nothing is in flight. Map retained as historical state record.
 - 2026-08-06 — Map initialized. Lanes inferred from branches, dirty tree, and spec files (⚠ = unconfirmed; operator to correct).
 
 ## Lanes
@@ -12,28 +15,28 @@ Update on state change only (start / block / handoff / done), not as a journal.
 ### fable-spec-v2-encoder-drift ⚠
 - **Objective:** v2 encoder-drift harness per fable-spec-drift-harness.md
 - **Owning session:** unassigned — record on next session
-- **State:** active — current branch with ~46 uncommitted files (pipeline.py, test_pipeline.py in flight)
+- **State:** parked (project legacied — operator, 2026-08-06)
 - **Blockers:** —
 - **Last update:** 2026-08-06 — inferred from working tree
 
 ### calibration-transport ⚠
 - **Objective:** Calibration transport spec/implementation (fable-spec-calibration-transport.md, CALIBRATION_REPORT.md)
 - **Owning session:** unassigned
-- **State:** active — spec recently modified
+- **State:** parked (project legacied — operator, 2026-08-06)
 - **Blockers:** possibly sequenced behind encoder-drift lane (same spec family)
 - **Last update:** 2026-08-06 — inferred
 
 ### v2-postmortem-refactor ⚠
 - **Objective:** Post-mortem-driven refactor branch (+v2-postmortem-refactor)
 - **Owning session:** unassigned
-- **State:** paused — branch exists, no recent commits observed
+- **State:** parked (project legacied — operator, 2026-08-06)
 - **Blockers:** —
 - **Last update:** 2026-08-06 — inferred
 
 ### market-daemon ⚠
 - **Objective:** Market daemon per MARKET_IMPLEMENTATION_PLAN.md (SIGTERM orphan fix landed 2026-07-28)
 - **Owning session:** unassigned
-- **State:** paused / maintenance
+- **State:** parked (project legacied — operator, 2026-08-06)
 - **Blockers:** —
 - **Last update:** 2026-08-06 — inferred
 

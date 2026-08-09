@@ -1,0 +1,78 @@
+{
+  "records_path": "eval/results/drift-harness-records-2026-07-03.jsonl",
+  "n_emergent_records": 225,
+  "n_emergent_actions": 646,
+  "n_on": 596,
+  "n_off": 50,
+  "geodesic_auc": 0.8566610738255034,
+  "default_within_rate": 0.016778523489932886,
+  "default_native": {
+    "on_goal_escalation_fpr": 0.9832214765100671,
+    "on_goal_alert_gt_0.5": 0.9899328859060402,
+    "off_goal_escalation_tpr": 1.0
+  },
+  "held_out": {
+    "alpha": 0.1,
+    "n_splits": 300,
+    "radius": [
+      1.2334838955321257,
+      1.1333343230536286,
+      1.2934334556587492
+    ],
+    "heldout_on_goal_fpr": [
+      0.0936641961903471,
+      0.045218930092708595,
+      0.1390814184503505
+    ],
+    "heldout_off_goal_tpr": [
+      0.5457984317506029,
+      0.35,
+      0.829891304347826
+    ],
+    "median_off_goal_in_test": 25
+  },
+  "operating_points": [
+    {
+      "alpha": 0.05,
+      "radius": 1.313,
+      "on_goal_fpr": 0.044,
+      "off_goal_tpr": 0.52
+    },
+    {
+      "alpha": 0.1,
+      "radius": 1.245,
+      "on_goal_fpr": 0.097,
+      "off_goal_tpr": 0.52
+    },
+    {
+      "alpha": 0.2,
+      "radius": 1.133,
+      "on_goal_fpr": 0.111,
+      "off_goal_tpr": 0.64
+    },
+    {
+      "alpha": 0.3,
+      "radius": 0.872,
+      "on_goal_fpr": 0.284,
+      "off_goal_tpr": 0.86
+    }
+  ],
+  "alert_recovery": {
+    "alpha": 0.1,
+    "radius_calibrated": 1.293,
+    "n_test_runs": 75,
+    "n_test_actions": 303,
+    "default": {
+      "alert_auc": 0.43982529925590425,
+      "on_goal_escalation_fpr": 0.9822064056939501,
+      "on_goal_alert_gt_0.5": 0.9928825622775801,
+      "off_goal_escalation_tpr": 1.0
+    },
+    "recalibrated": {
+      "alert_auc": 0.7614040763506955,
+      "on_goal_escalation_fpr": 0.0498220640569395,
+      "on_goal_alert_gt_0.5": 0.20284697508896798,
+      "off_goal_escalation_tpr": 0.45454545454545453
+    }
+  }
+}

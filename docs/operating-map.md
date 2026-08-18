@@ -1,13 +1,21 @@
 # Operating Map — frontier-ops
 
-**Project status: LEGACY / parked (operator, 2026-08-06). No active work. Lanes below are a parked-state record — where things stood when the project was set down — not live coordination.**
+**Project status: ACTIVE (operator, 2026-08-17). The 2026-08-06 LEGACY/parked
+declaration is reversed. Lane states below still record where things stood at
+the 2026-08-06 parking and have not been re-confirmed — treat them as the
+resume point, not live truth, until the operator refreshes them.**
 
 Read-first rule: any session joining this project reads this file before starting work,
 and records itself as owning session when it takes a lane.
 Update on state change only (start / block / handoff / done), not as a journal.
 
 ## Decisions
-- 2026-08-06 — Operator: this project is legacy; nothing is in flight. Map retained as historical state record.
+- 2026-08-17 — Operator: unparked. The project is active again; the 2026-08-06
+  legacy declaration no longer reflects intent. Same ruling set main's license
+  to MIT (the AGPLv3 LICENSE from 2026-08-08 contradicted pyproject's
+  long-standing MIT declaration and is replaced on main). Lane states below
+  were not re-adjudicated in this edit.
+- 2026-08-06 — Operator: this project is legacy; nothing is in flight. Map retained as historical state record. *(Reversed 2026-08-17, above.)*
 - 2026-08-06 — Map initialized. Lanes inferred from branches, dirty tree, and spec files (⚠ = unconfirmed; operator to correct).
 
 ## Lanes

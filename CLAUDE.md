@@ -15,11 +15,12 @@ Do not "fix" the version above to 0.6.0; the two branches genuinely differ.
 **Relationship to unified-stack:** `~/unified-stack` is a *diverged fork*, not a downstream
 consumer (verified 2026-07-11, re-verified 2026-07-28): it vendors its own `frontier_ops`
 package at v2.0.0 with a different architecture, and neither repo imports the other. Changes
-here cannot break it, and its tests need no re-run. Two couplings remain: both repos claim the
-distribution name `frontier-ops` (resolve before any PyPI publish), and the OpenClaw sidecar in
-`~/.openclaw/workspace` imports *unified-stack's* `Pipeline` for live evaluation while running
-this repo's market architecture in a separate subprocess — the two `frontier_ops` packages
-cannot coexist in one interpreter.
+here cannot break it, and its tests need no re-run. The name collision is RESOLVED
+(2026-08-17): unified-stack renamed its distribution to `unified-stack` and its package to
+`unified_stack`, so this repo is the sole claimant of `frontier-ops`/`frontier_ops`. The OpenClaw
+sidecar in `~/.openclaw/workspace` now imports *unified-stack's* `unified_stack.Pipeline` for
+live evaluation while running this repo's market architecture in a separate subprocess — the
+two packages can now coexist in one interpreter.
 
 ## Repo Structure
 

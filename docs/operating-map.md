@@ -10,6 +10,10 @@ and records itself as owning session when it takes a lane.
 Update on state change only (start / block / handoff / done), not as a journal.
 
 ## Decisions
+- 2026-08-17 (later) — Operator: fable-spec-v2-encoder-drift lane RETIRED. Its
+  July WIP (goal_conditioning, task_affinity — the modules main's v0.6 hard cut
+  removed as refuted) is preserved on `attic/fable-spec-wip` and cleaned from
+  the working tree. Retired means history, not a resume point.
 - 2026-08-17 — Operator: unparked. The project is active again; the 2026-08-06
   legacy declaration no longer reflects intent. Same ruling set main's license
   to MIT (the AGPLv3 LICENSE from 2026-08-08 contradicted pyproject's

@@ -1,0 +1,1238 @@
+{
+  "date": "2026-07-03",
+  "seed": 7,
+  "k": 5,
+  "n_boot": 1000,
+  "tier": 2,
+  "n_records": 143,
+  "n_pairs": 10015,
+  "n_valid_goals": 143,
+  "auc": 0.4669995007488767,
+  "ci": [
+    0.39664876420748885,
+    0.5376832559373904
+  ],
+  "auc_unconditioned": 0.4675986020968547,
+  "bands": {
+    "short (<=6 words)": {
+      "auc": 0.48839285714285713,
+      "ci": [
+        0.40125930284333056,
+        0.5942566410819756
+      ],
+      "auc_uncond": 0.4888392857142857,
+      "n_records": 36,
+      "n_pairs": 2240,
+      "d_own_mean": 0.6447213673066557,
+      "d_mm_mean": 0.7091912471945921,
+      "goal_norm_mean": 1.0
+    },
+    "medium (7-15)": {
+      "auc": 0.526,
+      "ci": [
+        0.39617094763449867,
+        0.6490097604259095
+      ],
+      "auc_uncond": 0.526,
+      "n_records": 56,
+      "n_pairs": 4000,
+      "d_own_mean": 0.9479662580571845,
+      "d_mm_mean": 0.9597055506060985,
+      "goal_norm_mean": 1.0
+    },
+    "long (>15)": {
+      "auc": 0.39178807947019867,
+      "ci": [
+        0.2852764252481135,
+        0.49526696832579187
+      ],
+      "auc_uncond": 0.39311258278145694,
+      "n_records": 51,
+      "n_pairs": 3775,
+      "d_own_mean": 0.9138077102997822,
+      "d_mm_mean": 0.8635784735816969,
+      "goal_norm_mean": 1.0
+    }
+  },
+  "ceiling": {
+    "auc": 0.6541188217673489,
+    "ci": [
+      0.5940759385826286,
+      0.7131197833242224
+    ],
+    "bands": {
+      "short (<=6 words)": {
+        "auc": 0.4785714285714286,
+        "n_pairs": 2240
+      },
+      "medium (7-15)": {
+        "auc": 0.58025,
+        "n_pairs": 4000
+      },
+      "long (>15)": {
+        "auc": 0.8365562913907285,
+        "n_pairs": 3775
+      }
+    },
+    "model": "all-MiniLM-L6-v2 (raw 384-dim cosine)"
+  },
+  "d_own_mean": 0.8672656017351297,
+  "d_own_median": 0.7366434325971858,
+  "d_mm_mean": 0.8674407722327696,
+  "d_mm_median": 0.715591790944923,
+  "own_authorized_rate_r05": 0.10284573140289566,
+  "sanity": {
+    "action": "exec: git init",
+    "own_directive": "Can you commit that to git in a private repo?",
+    "mismatch_directive": "why isnt my sound coming through my speakers",
+    "d_own": 0.4407435595501402,
+    "d_mismatch": 0.51727687586064,
+    "passes": true
+  },
+  "records": [
+    {
+      "session": "105df06f-0c58-4e29-bbfe-229c79edb4af",
+      "seq": 1,
+      "n_actions": 5,
+      "directive_words": 10,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "105df06f-0c58-4e29-bbfe-229c79edb4af",
+      "seq": 2,
+      "n_actions": 6,
+      "directive_words": 13,
+      "goal_valid": true,
+      "record_auc": 0.8333333333333334
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 1,
+      "n_actions": 15,
+      "directive_words": 127,
+      "goal_valid": true,
+      "record_auc": 0.7066666666666667
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 2,
+      "n_actions": 3,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.7333333333333333
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 4,
+      "n_actions": 20,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.6
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 5,
+      "n_actions": 11,
+      "directive_words": 32,
+      "goal_valid": true,
+      "record_auc": 0.34545454545454546
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 9,
+      "n_actions": 7,
+      "directive_words": 22,
+      "goal_valid": true,
+      "record_auc": 0.5428571428571428
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 11,
+      "n_actions": 4,
+      "directive_words": 145,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "2eeaf383-f62d-412e-8daa-d74afcf19868",
+      "seq": 12,
+      "n_actions": 4,
+      "directive_words": 123,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "307aeba9-e17e-46ef-bf17-159bfdd4be55",
+      "seq": 0,
+      "n_actions": 8,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.325
+    },
+    {
+      "session": "307aeba9-e17e-46ef-bf17-159bfdd4be55",
+      "seq": 1,
+      "n_actions": 26,
+      "directive_words": 28,
+      "goal_valid": true,
+      "record_auc": 0.9230769230769231
+    },
+    {
+      "session": "307aeba9-e17e-46ef-bf17-159bfdd4be55",
+      "seq": 2,
+      "n_actions": 4,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.85
+    },
+    {
+      "session": "307aeba9-e17e-46ef-bf17-159bfdd4be55",
+      "seq": 4,
+      "n_actions": 21,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.6666666666666666
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 0,
+      "n_actions": 3,
+      "directive_words": 155,
+      "goal_valid": true,
+      "record_auc": 0.13333333333333333
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 1,
+      "n_actions": 6,
+      "directive_words": 10,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 2,
+      "n_actions": 3,
+      "directive_words": 32,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 3,
+      "n_actions": 3,
+      "directive_words": 38,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 5,
+      "n_actions": 4,
+      "directive_words": 11,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 6,
+      "n_actions": 5,
+      "directive_words": 1,
+      "goal_valid": true,
+      "record_auc": 0.68
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 11,
+      "n_actions": 4,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.1
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 14,
+      "n_actions": 18,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.2111111111111111
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 16,
+      "n_actions": 14,
+      "directive_words": 11,
+      "goal_valid": true,
+      "record_auc": 0.8571428571428571
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 17,
+      "n_actions": 18,
+      "directive_words": 13,
+      "goal_valid": true,
+      "record_auc": 0.43333333333333335
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 19,
+      "n_actions": 6,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 20,
+      "n_actions": 9,
+      "directive_words": 17,
+      "goal_valid": true,
+      "record_auc": 0.3111111111111111
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 22,
+      "n_actions": 7,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.2571428571428571
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 23,
+      "n_actions": 6,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.43333333333333335
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 25,
+      "n_actions": 6,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.06666666666666667
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 26,
+      "n_actions": 9,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.24444444444444444
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 27,
+      "n_actions": 16,
+      "directive_words": 15,
+      "goal_valid": true,
+      "record_auc": 0.725
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 28,
+      "n_actions": 6,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.8333333333333334
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 29,
+      "n_actions": 6,
+      "directive_words": 6,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 30,
+      "n_actions": 4,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 31,
+      "n_actions": 5,
+      "directive_words": 31,
+      "goal_valid": true,
+      "record_auc": 0.52
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 32,
+      "n_actions": 5,
+      "directive_words": 21,
+      "goal_valid": true,
+      "record_auc": 0.68
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 33,
+      "n_actions": 8,
+      "directive_words": 20,
+      "goal_valid": true,
+      "record_auc": 0.625
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 35,
+      "n_actions": 11,
+      "directive_words": 38,
+      "goal_valid": true,
+      "record_auc": 0.18181818181818182
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 36,
+      "n_actions": 7,
+      "directive_words": 20,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 37,
+      "n_actions": 3,
+      "directive_words": 97,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 38,
+      "n_actions": 9,
+      "directive_words": 19,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 39,
+      "n_actions": 6,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.8
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 42,
+      "n_actions": 3,
+      "directive_words": 10,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 45,
+      "n_actions": 4,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.55
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 46,
+      "n_actions": 9,
+      "directive_words": 13,
+      "goal_valid": true,
+      "record_auc": 0.24444444444444444
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 50,
+      "n_actions": 8,
+      "directive_words": 26,
+      "goal_valid": true,
+      "record_auc": 0.075
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 53,
+      "n_actions": 9,
+      "directive_words": 46,
+      "goal_valid": true,
+      "record_auc": 0.13333333333333333
+    },
+    {
+      "session": "31412aef-fc9f-4890-b6f1-37fb4a7c13ba",
+      "seq": 54,
+      "n_actions": 6,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "4cdd887e-9698-4afb-9db0-e2a135b9b909",
+      "seq": 1,
+      "n_actions": 9,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.7777777777777778
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 0,
+      "n_actions": 7,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.9428571428571428
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 2,
+      "n_actions": 60,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.006666666666666667
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 3,
+      "n_actions": 19,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.43157894736842106
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 4,
+      "n_actions": 18,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.6666666666666666
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 5,
+      "n_actions": 60,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.25666666666666665
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 6,
+      "n_actions": 17,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 7,
+      "n_actions": 14,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.6285714285714286
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 8,
+      "n_actions": 16,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.5375
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 9,
+      "n_actions": 27,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.5777777777777777
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 10,
+      "n_actions": 42,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.3142857142857143
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 11,
+      "n_actions": 19,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.21052631578947367
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 12,
+      "n_actions": 11,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 13,
+      "n_actions": 4,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 15,
+      "n_actions": 60,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.8033333333333333
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 16,
+      "n_actions": 4,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.7
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 18,
+      "n_actions": 3,
+      "directive_words": 13,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 19,
+      "n_actions": 5,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.84
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 20,
+      "n_actions": 7,
+      "directive_words": 18,
+      "goal_valid": true,
+      "record_auc": 0.45714285714285713
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 21,
+      "n_actions": 19,
+      "directive_words": 11,
+      "goal_valid": true,
+      "record_auc": 0.5578947368421052
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 25,
+      "n_actions": 3,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.6
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 26,
+      "n_actions": 3,
+      "directive_words": 14,
+      "goal_valid": true,
+      "record_auc": 0.8
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 27,
+      "n_actions": 15,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "510be13b-8015-4776-9701-53220a361d7d",
+      "seq": 28,
+      "n_actions": 3,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.7333333333333333
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 0,
+      "n_actions": 31,
+      "directive_words": 162,
+      "goal_valid": true,
+      "record_auc": 0.025806451612903226
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 1,
+      "n_actions": 17,
+      "directive_words": 145,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 3,
+      "n_actions": 3,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.8
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 4,
+      "n_actions": 4,
+      "directive_words": 17,
+      "goal_valid": true,
+      "record_auc": 0.15
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 6,
+      "n_actions": 23,
+      "directive_words": 146,
+      "goal_valid": true,
+      "record_auc": 0.591304347826087
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 7,
+      "n_actions": 8,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.325
+    },
+    {
+      "session": "7a93c35b-029c-48a1-af94-fb5b535bbbb9",
+      "seq": 8,
+      "n_actions": 13,
+      "directive_words": 144,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 1,
+      "n_actions": 3,
+      "directive_words": 1,
+      "goal_valid": true,
+      "record_auc": 0.7333333333333333
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 2,
+      "n_actions": 4,
+      "directive_words": 17,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 6,
+      "n_actions": 3,
+      "directive_words": 137,
+      "goal_valid": true,
+      "record_auc": 0.3333333333333333
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 7,
+      "n_actions": 20,
+      "directive_words": 6,
+      "goal_valid": true,
+      "record_auc": 0.09
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 9,
+      "n_actions": 23,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.8869565217391304
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 11,
+      "n_actions": 36,
+      "directive_words": 43,
+      "goal_valid": true,
+      "record_auc": 0.25
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 14,
+      "n_actions": 5,
+      "directive_words": 11,
+      "goal_valid": true,
+      "record_auc": 0.36
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 15,
+      "n_actions": 14,
+      "directive_words": 6,
+      "goal_valid": true,
+      "record_auc": 0.6571428571428571
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 16,
+      "n_actions": 4,
+      "directive_words": 10,
+      "goal_valid": true,
+      "record_auc": 0.45
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 17,
+      "n_actions": 12,
+      "directive_words": 16,
+      "goal_valid": true,
+      "record_auc": 0.6333333333333333
+    },
+    {
+      "session": "7fa29a51-0024-435b-b6e9-73d669b9d104",
+      "seq": 18,
+      "n_actions": 30,
+      "directive_words": 28,
+      "goal_valid": true,
+      "record_auc": 0.54
+    },
+    {
+      "session": "9e3775fb-6cd7-4819-9003-b7417e5cca52",
+      "seq": 1,
+      "n_actions": 5,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "9e3775fb-6cd7-4819-9003-b7417e5cca52",
+      "seq": 2,
+      "n_actions": 5,
+      "directive_words": 17,
+      "goal_valid": true,
+      "record_auc": 0.88
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 0,
+      "n_actions": 39,
+      "directive_words": 37,
+      "goal_valid": true,
+      "record_auc": 0.8
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 1,
+      "n_actions": 47,
+      "directive_words": 14,
+      "goal_valid": true,
+      "record_auc": 0.4297872340425532
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 2,
+      "n_actions": 18,
+      "directive_words": 22,
+      "goal_valid": true,
+      "record_auc": 0.011111111111111112
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 3,
+      "n_actions": 60,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.21333333333333335
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 4,
+      "n_actions": 25,
+      "directive_words": 12,
+      "goal_valid": true,
+      "record_auc": 0.6
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 5,
+      "n_actions": 60,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.77
+    },
+    {
+      "session": "c1678b88-01af-4954-add4-579c288bcb01",
+      "seq": 6,
+      "n_actions": 42,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.9285714285714286
+    },
+    {
+      "session": "ccfd2b98-eb38-47bb-b57b-e69e739043dd",
+      "seq": 0,
+      "n_actions": 60,
+      "directive_words": 120,
+      "goal_valid": true,
+      "record_auc": 0.5033333333333333
+    },
+    {
+      "session": "ccfd2b98-eb38-47bb-b57b-e69e739043dd",
+      "seq": 1,
+      "n_actions": 42,
+      "directive_words": 120,
+      "goal_valid": true,
+      "record_auc": 0.21428571428571427
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 7,
+      "n_actions": 10,
+      "directive_words": 16,
+      "goal_valid": true,
+      "record_auc": 0.6
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 8,
+      "n_actions": 10,
+      "directive_words": 11,
+      "goal_valid": true,
+      "record_auc": 0.46
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 9,
+      "n_actions": 15,
+      "directive_words": 6,
+      "goal_valid": true,
+      "record_auc": 0.6666666666666666
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 10,
+      "n_actions": 7,
+      "directive_words": 13,
+      "goal_valid": true,
+      "record_auc": 0.8857142857142857
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 16,
+      "n_actions": 7,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.14285714285714285
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 17,
+      "n_actions": 3,
+      "directive_words": 14,
+      "goal_valid": true,
+      "record_auc": 0.4666666666666667
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 19,
+      "n_actions": 21,
+      "directive_words": 10,
+      "goal_valid": true,
+      "record_auc": 0.3238095238095238
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 20,
+      "n_actions": 4,
+      "directive_words": 1,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 21,
+      "n_actions": 20,
+      "directive_words": 16,
+      "goal_valid": true,
+      "record_auc": 0.69
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 22,
+      "n_actions": 5,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.24
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 23,
+      "n_actions": 5,
+      "directive_words": 4,
+      "goal_valid": true,
+      "record_auc": 0.92
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 26,
+      "n_actions": 10,
+      "directive_words": 3,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 29,
+      "n_actions": 28,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.85
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 30,
+      "n_actions": 15,
+      "directive_words": 1,
+      "goal_valid": true,
+      "record_auc": 0.48
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 31,
+      "n_actions": 3,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "d161743f-2047-4665-907b-ff6e9f880fda",
+      "seq": 34,
+      "n_actions": 3,
+      "directive_words": 17,
+      "goal_valid": true,
+      "record_auc": 0.3333333333333333
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 0,
+      "n_actions": 31,
+      "directive_words": 163,
+      "goal_valid": true,
+      "record_auc": 0.535483870967742
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 2,
+      "n_actions": 15,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.37333333333333335
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 3,
+      "n_actions": 4,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.8
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 6,
+      "n_actions": 26,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 10,
+      "n_actions": 60,
+      "directive_words": 105,
+      "goal_valid": true,
+      "record_auc": 0.0033333333333333335
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 11,
+      "n_actions": 27,
+      "directive_words": 141,
+      "goal_valid": true,
+      "record_auc": 0.6592592592592592
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 12,
+      "n_actions": 3,
+      "directive_words": 5,
+      "goal_valid": true,
+      "record_auc": 0.6
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 13,
+      "n_actions": 20,
+      "directive_words": 139,
+      "goal_valid": true,
+      "record_auc": 0.3
+    },
+    {
+      "session": "d2ee5fec-6f26-46da-b179-987ec28fb013",
+      "seq": 14,
+      "n_actions": 11,
+      "directive_words": 139,
+      "goal_valid": true,
+      "record_auc": 0.7818181818181819
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 0,
+      "n_actions": 3,
+      "directive_words": 14,
+      "goal_valid": true,
+      "record_auc": 0.7333333333333333
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 1,
+      "n_actions": 12,
+      "directive_words": 32,
+      "goal_valid": true,
+      "record_auc": 0.05
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 3,
+      "n_actions": 11,
+      "directive_words": 46,
+      "goal_valid": true,
+      "record_auc": 0.2
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 4,
+      "n_actions": 14,
+      "directive_words": 9,
+      "goal_valid": true,
+      "record_auc": 0.9428571428571428
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 6,
+      "n_actions": 3,
+      "directive_words": 52,
+      "goal_valid": true,
+      "record_auc": 0.3333333333333333
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 8,
+      "n_actions": 13,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 9,
+      "n_actions": 6,
+      "directive_words": 10,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 10,
+      "n_actions": 9,
+      "directive_words": 11,
+      "goal_valid": true,
+      "record_auc": 0.4
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 11,
+      "n_actions": 20,
+      "directive_words": 8,
+      "goal_valid": true,
+      "record_auc": 0.61
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 12,
+      "n_actions": 13,
+      "directive_words": 23,
+      "goal_valid": true,
+      "record_auc": 0.4153846153846154
+    },
+    {
+      "session": "f4397107-a648-49c6-936a-0ca77372df66",
+      "seq": 13,
+      "n_actions": 3,
+      "directive_words": 23,
+      "goal_valid": true,
+      "record_auc": 0.8
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 1,
+      "n_actions": 22,
+      "directive_words": 45,
+      "goal_valid": true,
+      "record_auc": 0.35454545454545455
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 3,
+      "n_actions": 3,
+      "directive_words": 15,
+      "goal_valid": true,
+      "record_auc": 0.8666666666666667
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 4,
+      "n_actions": 5,
+      "directive_words": 19,
+      "goal_valid": true,
+      "record_auc": 0.0
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 5,
+      "n_actions": 10,
+      "directive_words": 26,
+      "goal_valid": true,
+      "record_auc": 0.42
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 6,
+      "n_actions": 4,
+      "directive_words": 1,
+      "goal_valid": true,
+      "record_auc": 1.0
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 8,
+      "n_actions": 4,
+      "directive_words": 7,
+      "goal_valid": true,
+      "record_auc": 0.85
+    },
+    {
+      "session": "f5e918a7-ae94-4269-9f9f-38fcf2e0f2af",
+      "seq": 9,
+      "n_actions": 4,
+      "directive_words": 6,
+      "goal_valid": true,
+      "record_auc": 0.45
+    }
+  ]
+}

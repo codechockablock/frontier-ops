@@ -31,6 +31,14 @@ from frontier_ops.authorization.scope import (
     AuthorizationEvent as AuthorizationEvent,
     GoalConditionedMetric as GoalConditionedMetric,
 )
+from frontier_ops.authorization.goal_conditioning import (
+    GoalConditioningResult as GoalConditioningResult,
+    GoalConditioningScorer as GoalConditioningScorer,
+)
+from frontier_ops.authorization.task_affinity import (
+    AffinityThreshold as AffinityThreshold,
+    TaskAffinityChannel as TaskAffinityChannel,
+)
 from frontier_ops.authorization.provenance import (
     ProvenanceNode as ProvenanceNode,
     ProvenanceGraph as ProvenanceGraph,

@@ -76,6 +76,8 @@ class GoalExtractor:
         # Confidence: how much signal is in the extraction?
         # High user_aligned + low other dims = clear task directive.
         # All dims near baseline = vague instruction.
+        # Computed on the RAW extraction, before length-invariance below —
+        # raw magnitude is signal for confidence, artifact for direction.
         user_aligned = scores.get("user_aligned_task_execution", 0.0)
         max_other = max(
             (v for k, v in scores.items() if k != "user_aligned_task_execution"),
@@ -90,9 +92,21 @@ class GoalExtractor:
             0.0, 1.0,
         ))
 
+        # Length-invariance: a goal is a DIRECTION in concept space (what the
+        # directive authorizes), not a magnitude. Raw activations grow with
+        # directive verbosity (more keyword/anchor hits across dims), which
+        # confounds goal->action distance with directive length — a verbose
+        # directive would otherwise sit systematically farther from its own
+        # actions than a terse one, corrupting radius calibration. Signal
+        # strength lives in `confidence`, not in the vector norm.
+        norm = np.linalg.norm(vec)
+        if norm > 1e-10:
+            vec = vec / norm
+        normalized_scores = {c: float(vec[i]) for i, c in enumerate(CONCEPTS)}
+
         return GoalVector(
             concept_vec=vec,
-            concept_scores=scores,
+            concept_scores=normalized_scores,
             confidence=confidence,
             raw_message=user_message,
             extraction_tier=self._extractor.tier,
@@ -102,7 +116,13 @@ class GoalExtractor:
 
 @dataclass
 class GoalVector:
-    """A structured goal extracted from a user directive."""
+    """A structured goal extracted from a user directive.
+
+    `concept_vec` is a unit-norm DIRECTION in concept space (or the zero
+    vector for an empty goal): magnitude is deliberately factored out as a
+    verbosity artifact. Signal strength is carried by `confidence`.
+    `concept_scores` mirrors the normalized vector, keyed by concept name.
+    """
     concept_vec: np.ndarray
     concept_scores: Dict[str, float]
     confidence: float  # 0.0 = vague/empty, 1.0 = clear directive

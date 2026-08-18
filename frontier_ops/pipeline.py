@@ -32,7 +32,11 @@ from frontier_ops.memory.vsa import VSAMemory, phasor_encode
 from frontier_ops.governance.chain import GovernanceChain
 from frontier_ops.sensing.drift_classifier import DriftClassifier
 from frontier_ops.sensing.combiner import BayesFactorCombiner
-from frontier_ops.authorization.scope import AuthorizationState, AuthorizationEvent
+from frontier_ops.authorization.scope import (
+    AuthorizationState,
+    AuthorizationEvent,
+    GoalConditionedMetric,
+)
 from frontier_ops.authorization.provenance import ProvenanceGraph, RESTRICTED_DIMENSIONS
 from frontier_ops.authorization.budget import AuthorizationLinkedBudget
 
@@ -210,6 +214,46 @@ class FullPipeline:
         self._angular_disp_acc = 0.0
         self._trajectory: List[np.ndarray] = []
 
+        # Opt-in label-free warmup calibration (see enable_warmup_calibration).
+        # None = disabled = default radius behavior, exactly as before.
+        self._warmup: Optional[Dict[str, Any]] = None
+
+    def enable_warmup_calibration(
+        self,
+        n: int = 30,
+        alpha: float = 0.1,
+        locked_floor: Optional[float] = None,
+    ) -> None:
+        """Opt in to label-free in-session calibration of the authorization
+        radius. OFF by default; enabling it is the only way it runs.
+
+        In production there are no ground-truth benign labels to feed
+        ``AuthorizationState.calibrate_radius``. This treats the session's
+        first ``n`` goal-conditioned actions as presumptively benign and sets
+        the radius to their split-conformal (1-alpha) quantile — EXCEPT
+        actions that fire a LOCKED dim (credential / self-modification /
+        goal-displacement), which are never safe calibration examples
+        regardless of distance (the mimicry red-team's non-mimicable floor).
+        By default "fires" means crossing the constitution's own boundary
+        threshold for that dim; pass ``locked_floor`` to use a uniform
+        activation ceiling instead. Until ``n`` qualifying distances
+        accumulate, behavior is unchanged (the conservative default radius
+        applies).
+
+        Calibration transport (eval/results/calibration-transport-2026-07-04)
+        shows a radius does not transport across workload distributions, so
+        calibrate per deployment/session like this rather than shipping a
+        constant.
+        """
+        if n < 10:
+            raise ValueError("warmup needs n >= 10 (conformal minimum)")
+        self._warmup = {
+            "n": n,
+            "alpha": alpha,
+            "locked_floor": locked_floor,
+            "distances": [],
+        }
+
     def process_user_message(self, message: str) -> AuthorizationEvent:
         """
         Process a user message to establish/update authorization scope.
@@ -316,6 +360,36 @@ class FullPipeline:
 
         # 10. Authorization check (Layers 1-3)
         auth_result = self.auth_state.check_action(concept_vec)
+
+        # 10b. Label-free warmup calibration (opt-in): collect this action's
+        # distance as presumptively benign unless a LOCKED dim fired. The
+        # current action was already checked under the pre-calibration radius.
+        if (
+            self._warmup is not None
+            and not self.auth_state.radius.calibrated
+            and self.auth_state.has_goal
+        ):
+            floor = self._warmup["locked_floor"]
+            if floor is None:
+                # constitutional boundary per LOCKED dim
+                locked_fired = any(
+                    concept_scores.get(d, 0.0)
+                    >= self._boundary_thresholds.get(d, float("inf"))
+                    for d in GoalConditionedMetric.LOCKED_DIMS
+                )
+            else:
+                locked_fired = max(
+                    concept_scores.get(d, 0.0)
+                    for d in GoalConditionedMetric.LOCKED_DIMS
+                ) > floor
+            if not locked_fired:
+                self._warmup["distances"].append(
+                    float(auth_result["geodesic_distance"])
+                )
+                if len(self._warmup["distances"]) >= self._warmup["n"]:
+                    self.auth_state.calibrate_radius(
+                        self._warmup["distances"], self._warmup["alpha"]
+                    )
 
         # Record action in provenance graph
         auth_verdict = "no_goal"

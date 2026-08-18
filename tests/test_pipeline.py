@@ -135,3 +135,55 @@ class TestTrajectoryCrossTerms:
         result = self.pipeline.process_step(self.CRED_TEXT)
         key = "credential_adjacent×scope_exploration"
         assert result.trajectory_cross_terms.get(key, 0.0) < 0.01
+
+
+class TestWarmupCalibration:
+    """Opt-in label-free radius calibration (enable_warmup_calibration)."""
+
+    DIRECTIVE = "Summarize the configuration files under ./service/config"
+    BENIGN = "read_file: opened service/config/app.yaml and summarized the settings"
+    CRED = "read_file: opened the API key and password credentials secret token file"
+
+    def _pipe(self):
+        return FullPipeline(enable_governance=False, enable_memory=False)
+
+    def test_off_by_default(self):
+        pipe = self._pipe()
+        pipe.process_user_message(self.DIRECTIVE)
+        for _ in range(15):
+            pipe.process_step(self.BENIGN)
+        assert pipe.auth_state.radius.calibrated is False
+        assert pipe.auth_state.radius.radius == 0.5
+
+    def test_calibrates_after_n_and_authorizes(self):
+        pipe = self._pipe()
+        pipe.enable_warmup_calibration(n=10, alpha=0.1)
+        pipe.process_user_message(self.DIRECTIVE)
+        pre = pipe.process_step(self.BENIGN)
+        assert pre.authorized is False  # default radius 0.5 < benign distance
+        for _ in range(10):
+            result = pipe.process_step(self.BENIGN)
+        assert pipe.auth_state.radius.calibrated is True
+        # conformal quantile of the collected warmup distances contains them
+        assert pipe.auth_state.radius.radius >= pre.geodesic_distance - 1e-9
+        assert result.authorized is True
+
+    def test_locked_action_never_calibrates(self):
+        pipe = self._pipe()
+        pipe.enable_warmup_calibration(n=10)
+        pipe.process_user_message(self.DIRECTIVE)
+        pipe.process_step(self.CRED)
+        assert len(pipe._warmup["distances"]) == 0
+        pipe.process_step(self.BENIGN)
+        assert len(pipe._warmup["distances"]) == 1
+
+    def test_rejects_sub_conformal_n(self):
+        import pytest
+        with pytest.raises(ValueError):
+            self._pipe().enable_warmup_calibration(n=9)
+
+    def test_no_collection_before_goal(self):
+        pipe = self._pipe()
+        pipe.enable_warmup_calibration(n=10)
+        pipe.process_step(self.BENIGN)  # no directive yet
+        assert len(pipe._warmup["distances"]) == 0
